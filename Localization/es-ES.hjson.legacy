@@ -1,0 +1,17 @@
+Mods: {
+	Drawbridge: {
+		Items: {
+			CursedHorseshoe: {
+				// DisplayName: Cursed Horseshoe
+				// Tooltip: Summons a Wight Palfrey mount
+			}
+		}
+
+		Buffs: {
+			WightPalfreyBuff: {
+				// DisplayName: Wight Palfrey
+				// Description: A skeletal steed.
+			}
+		}
+	}
+}
