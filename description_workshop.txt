@@ -1,0 +1,116 @@
+[h1]Legendary Drawbridge & Castle Additions[/h1]
+Mod commissioned by [url=https://steamcommunity.com/profiles/76561198024313379]Vatheryl[/url]
+
+[img]https://i.imgur.com/mNExLxc.png[/img]
+
+[h2]Drawbridges:[/h2]
+[i]For castle moats and entrances...[/i]
+[img]https://i.imgur.com/pYbbNLA.gif[/img]
+[img]https://i.imgur.com/emJcWbp.gif[/img]
+[list]
+[*]2 Tiles wide - 15 Tiles tall
+[*]Regular Drawbridge Recipe: 50 Wood + 30 Gray Bricks + 15 Iron/Lead Bars + 10 Chains at Heavy Work Bench
+[*]Hell Drawbridge Recipe: 30 Obsidian + 15 Hellstone Bricks + 10 Chains at Heavy Work Bench
+[*]Lion Drawbridge Recipe: 30 Gold/Platinum Bricks + 20 Marble + 10 Chains at Heavy Work Bench
+[/list]
+
+[h2]Portcullises:[/h2]
+[i]Classic castle gate barriers...[/i]
+[img]https://i.imgur.com/HUuXb1Y.gif[/img]
+[list]
+[*]1 Tile wide - 8 Tiles tall
+[*]Recipe: 10 Wood + 5 Gray Bricks at Heavy Work Bench
+[/list]
+
+[h2]Spiked Palisades:[/h2]
+[i]Defensive wooden barriers with spikes, inflict Bleeding on contact[/i]
+[img]https://i.imgur.com/LKhxWPs.gif[/img]
+[list]
+[*]3 Tiles wide - 6 Tiles tall
+[*]Recipe: 20 Wood + 5 Iron/Lead Bars at Work Bench
+[/list]
+
+[h2]Tower Clock & Bells:[/h2]
+[i]Large decorative clock and chimeable bells for castle towers[/i]
+[img]https://i.imgur.com/0R4hTDK.gif[/img]
+[list]
+[*]Tower Clock: 5 Tiles wide - 5 Tiles tall
+[*]Recipe: 30 Stone Block + 10 Glass + 5 Gold Bar + 3 Chain at Heavy Work Bench
+[*]Golden Bell: 3 Tiles wide - 3 Tiles tall
+[*]Recipe: 10 Gold Bar + 2 Chain at Anvil
+[*]Graveyard Bell: 3 Tiles wide - 3 Tiles tall
+[*]Recipe: 10 Lead Bar + 2 Chain + 5 Bone at Anvil (in a Graveyard)
+[/list]
+
+[h2]Stable Gates:[/h2]
+[i]Store and display your mounts[/i]
+[img]https://i.imgur.com/OtzAV5L.gif[/img]
+[list]
+[*]Stable Gate: 9 Tiles wide - 6 Tiles tall
+[*]Recipe: 30 Wood + 2 Gold/Platinum Bars at Work Bench
+[*]Holds 1 mount in Singleplayer (decorative in Multiplayer)
+
+[*]Stable Gate Extended: 27 Tiles wide - 6 Tiles tall
+[*]Recipe: 1 Stable Gate + 60 Wood + 2 Gold/Platinum Bars at Work Bench
+[*]Holds up to 4 mounts in Singleplayer (decorative in Multiplayer)
+[/list]
+
+[h2]Horse Armors:[/h2]
+[i]"The chanfron, crinet, and peytral deflect frontal attacks, while the flanchards and crupper secure the flanks and rear..."[/i]
+[img]https://i.imgur.com/w9P9EDB.gif[/img]
+[img]https://i.imgur.com/7AENMSU.png[/img]
+[list]
+[*]Copper Horse Armor: 6 Copper/Tin Bars + 4 Silk at Anvil
+[*]Silver Horse Armor: 6 Silver/Tungsten Bars + 4 Silk at Anvil
+[*]Equine Armature: Display mannequin for horse armor - Recipe: 40 Wood at Sawmill
+[*]Iron Field Barding: 8 Iron/Lead Bars + 5 Silk at Anvil
+[*]Golden Regal Barding: 10 Gold/Platinum Bars + 8 Silk + 1 Iron Field Barding at Anvil
+[*]Inferno Barding: 12 Hellstone Bars + 5 Obsidian + 1 Gold Armor at Hellforge
+
+[*]Equip in the new slot next to the Mount slot
+[*]While mounted with armor equipped: +3 Defense (Iron), +5 Defense (Gold), +8 Defense (Molten)
+[/list]
+
+[h2]Magical Bookshelves:[/h2]
+[i]Dark teleportation portals disguised as ancient bookcases...[/i]
+[img]https://i.imgur.com/85OBwR8.gif[/img]
+[list]
+[*]Doorcase: 3 Tiles wide - 4 Tiles tall
+[*]Recipe: 20 Books + 30 Ebonwood/Shadewood + 8 Shadow Scales/Tissue Samples + 3 Fallen Stars at Heavy Workbench
+[*]Right-click to open/close - step into open doorcases to teleport between wired ones
+[/list]
+
+[h2]NPC Signs:[/h2]
+[i]Professional signage for your town[/i]
+[img]https://i.imgur.com/1w7iwgN.png[/img]
+[list]
+[*]19 different signs for each NPC profession
+[*]Purchased from its respective Town-NPC
+[*]Sign posts for mounting signs
+[/list]
+
+[h2]Machicolations:[/h2]
+[i]Medieval siege defense - pour boiling water on invaders![/i]
+[img]https://i.imgur.com/QAVTQGk.gif[/img]
+[list]
+[*]10 Tiles wide - 6 Tiles tall
+[*]Recipe: 1 Cauldron + 1 Water Bucket + 1 Campfire + 20 Wood + 30 Stone Block at Heavy Work Bench
+[*]Right-click to activate - boils water and pours it down below
+[*]Boiling water damages enemies and players for 3 seconds before evaporating
+[*]3 minute cooldown between uses
+[/list]
+
+[h2]Other[/h2]
+The mod also includes some other items such as an armour set and additional furniture.
+
+
+[hr][/hr]
+[i]Damages players / enemies on crushing[/i]
+[i]Can be activated with wires[/i]
+[i]Bells can be wire-connected to a Tower Clock to automatically chime at morning/evening[/i]
+[i]Bells also give buffs to nearby players when chimed[/i]
+[i]Horses will make occasionally make noises and drop poop blocks every morning/evening[/i]
+[i]World: [url]https://steamcommunity.com/sharedfiles/filedetails/?id=3267730304[/url][/i]
+[i]Multiplayer Compatible[/i]
+[h2]Need help?[/h2]
+Join our Discord server: [url]discord.gg/dXazSyYxH3[/url]

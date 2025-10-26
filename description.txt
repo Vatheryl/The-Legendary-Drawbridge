@@ -1,0 +1,83 @@
+Legendary Drawbridge & Castle Additions
+
+Mod commissioned by Vatheryl
+
+Drawbridges:
+For castle moats and entrances...
+- 2 Tiles wide - 15 Tiles tall
+- Regular Drawbridge Recipe: 50 Wood + 30 Gray Bricks + 15 Iron/Lead Bars + 10 Chains at Heavy Work Bench
+- Hell Drawbridge Recipe: 30 Obsidian + 15 Hellstone Bricks + 10 Chains at Heavy Work Bench
+- Lion Drawbridge Recipe: 30 Gold/Platinum Bricks + 20 Marble + 10 Chains at Heavy Work Bench
+
+Portcullises:
+Classic castle gate barriers...
+- 1 Tile wide - 8 Tiles tall
+- Recipe: 10 Wood + 5 Gray Bricks at Heavy Work Bench
+
+Spiked Palisades:
+Defensive wooden barriers with spikes, inflict Bleeding on contact
+- 3 Tiles wide - 6 Tiles tall
+- Recipe: 20 Wood + 5 Iron/Lead Bars at Work Bench
+
+Tower Clock & Bells:
+Large decorative clock and chimeable bells for castle towers
+- Tower Clock: 5 Tiles wide - 5 Tiles tall
+- Recipe: 30 Stone Block + 10 Glass + 5 Gold Bar + 3 Chain at Heavy Work Bench
+- Golden Bell: 3 Tiles wide - 3 Tiles tall
+- Recipe: 10 Gold/Platinum Bars + 2 Chain at Anvil
+- Graveyard Bell: 3 Tiles wide - 3 Tiles tall
+- Recipe: 10 Iron/Lead Bars + 2 Chain + 5 Bone at Anvil (in a Graveyard)
+
+Stable Gates:
+Store and display your mounts
+- Stable Gate: 9 Tiles wide - 6 Tiles tall
+- Recipe: 30 Wood + 2 Gold/Platinum Bars at Work Bench
+- Holds 1 mount in Singleplayer (decorative in Multiplayer)
+
+- Stable Gate Extended: 27 Tiles wide - 6 Tiles tall
+- Recipe: 1 Stable Gate + 60 Wood + 2 Gold/Platinum Bars at Work Bench
+- Holds up to 4 mounts in Singleplayer (decorative in Multiplayer)
+
+Horse Armors:
+- Visual and defensive upgrades for horse mounts
+- Equine Armature: Display mannequin for horse armor - Recipe: 40 Wood at Sawmill
+- Copper Horse Armor: 6 Copper/Tin Bars + 4 Silk at Anvil
+- Silver Horse Armor: 6 Silver/Tungsten Bars + 4 Silk at Anvil
+- Iron Field Barding: 8 Iron/Lead Bars + 5 Silk at Anvil
+- Golden Regal Barding: 10 Gold/Platinum Bars + 8 Silk + 1 Iron Field Barding at anvil
+- Inferno Barding: 12 Hellstone Bars + 5 Obsidian + 1 Gold Armor at Hellforge
+
+Equip in the new slot next to the Mount one
+While mounted with armor equipped: +3 Defense (Iron), +5 Defense (Gold), +8 Defense (Molten)
+
+Magical Bookshelves:
+Dark teleportation portals disguised as ancient bookcases
+- Doorcase: 3 Tiles wide - 4 Tiles tall
+- Recipe: 20 Books + 30 Ebonwood/Shadewood + 8 Shadow Scales/Tissue Samples + 3 Fallen Stars at Heavy Workbench
+- Right-click to open/close - step into open doorcases to teleport between paired ones
+- Automatically closes after teleportation with dark dust effects
+
+NPC Signs:
+Professional signage for your town
+- 19 different signs for each NPC profession
+- Sign posts for mounting signs
+- Purchased from its respective town-npc
+
+Machicolations:
+Medieval siege defense - pour boiling water on invaders!
+- 10 Tiles wide - 6 Tiles tall
+- Recipe: 1 Cauldron + 1 Water Bucket + 1 Campfire + 20 Wood + 30 Stone Block at Heavy Work Bench
+- Right-click to activate - boils water and pours it down below
+- Boiling water damages enemies and players for 3 seconds before evaporating
+- 3 minute cooldown between uses
+---
+- Damages players / enemies on crushing
+- Can be activated with wires
+- Bells can be wire-connected to a Tower Clock to automatically chime at morning/evening
+- Bells also give buffs to nearby players when chimed
+- Horses will occasionally make noises and drop poop blocks every morning/evening
+
+Black Culvert wall type added (uses vanilla Wall_94 texture)
+
+Need help?
+Join our Discord server: discord.gg/dXazSyYxH3

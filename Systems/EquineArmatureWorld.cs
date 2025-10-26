@@ -1,0 +1,202 @@
+using System.Collections.Generic;
+using System.IO;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+
+namespace Drawbridge.Systems
+{
+    // Stores per-placed EquineArmatureTile overlay state
+    public class EquineArmatureWorld : ModSystem
+    {
+        // 0 = none, 1 = Iron, 2 = Gold, 3 = Molten
+        private static readonly Dictionary<Point16, int> OverlayTypeByTopLeft = new Dictionary<Point16, int>();
+        private static readonly Dictionary<Point16, bool> FlippedByTopLeft = new Dictionary<Point16, bool>();
+
+        public static int GetType(Point16 topLeft)
+        {
+            if (OverlayTypeByTopLeft.TryGetValue(topLeft, out int v))
+                return v;
+            return 0;
+        }
+
+        public static bool TryGetType(Point16 topLeft, out int value) => OverlayTypeByTopLeft.TryGetValue(topLeft, out value);
+
+        public static void SetType(Point16 topLeft, int overlayType)
+        {
+            if (overlayType != 0)
+                OverlayTypeByTopLeft[topLeft] = overlayType;
+            else
+                OverlayTypeByTopLeft.Remove(topLeft);
+        }
+
+        // Back-compat wrappers for older calls in code (boolean presence)
+        public static bool Get(Point16 topLeft) => GetType(topLeft) != 0;
+        public static bool TryGet(Point16 topLeft, out bool value)
+        {
+            value = GetType(topLeft) != 0;
+            return value;
+        }
+        public static void Set(Point16 topLeft, bool equipped) => SetType(topLeft, equipped ? 1 : 0);
+
+        public static bool GetFlipped(Point16 topLeft)
+        {
+            if (FlippedByTopLeft.TryGetValue(topLeft, out bool v))
+                return v;
+            return false;
+        }
+
+        public static void SetFlipped(Point16 topLeft, bool flipped)
+        {
+            if (flipped)
+                FlippedByTopLeft[topLeft] = true;
+            else
+                FlippedByTopLeft.Remove(topLeft);
+        }
+
+        public static void SetAndSyncFlipped(Point16 topLeft, bool flipped)
+        {
+            SetFlipped(topLeft, flipped);
+            if (Main.netMode == NetmodeID.MultiplayerClient || Main.netMode == NetmodeID.Server)
+            {
+                ModPacket p = ModContent.GetInstance<Drawbridge>().GetPacket();
+                p.Write((byte)MessageType.SyncEquineArmatureFlip);
+                p.Write((int)topLeft.X);
+                p.Write((int)topLeft.Y);
+                p.Write(flipped);
+                p.Send();
+            }
+        }
+
+        public static void SetAndSyncType(Point16 topLeft, int overlayType)
+        {
+            SetType(topLeft, overlayType);
+            if (Main.netMode == NetmodeID.MultiplayerClient || Main.netMode == NetmodeID.Server)
+            {
+                ModPacket p = ModContent.GetInstance<Drawbridge>().GetPacket();
+                p.Write((byte)MessageType.SyncEquineArmatureArmor);
+                p.Write((int)topLeft.X);
+                p.Write((int)topLeft.Y);
+                p.Write(overlayType);
+                p.Send();
+            }
+        }
+
+        public override void SaveWorldData(TagCompound tag)
+        {
+            var list = new List<TagCompound>();
+            foreach (var kv in OverlayTypeByTopLeft)
+            {
+                list.Add(new TagCompound
+                {
+                    ["x"] = kv.Key.X,
+                    ["y"] = kv.Key.Y,
+                    ["type"] = kv.Value,
+                });
+            }
+            tag["EquineArmatureEquips"] = list;
+
+            var listFlip = new List<TagCompound>();
+            foreach (var kv in FlippedByTopLeft)
+            {
+                listFlip.Add(new TagCompound
+                {
+                    ["x"] = kv.Key.X,
+                    ["y"] = kv.Key.Y,
+                    ["fl"] = kv.Value,
+                });
+            }
+            tag["EquineArmatureFlip"] = listFlip;
+        }
+
+        public override void LoadWorldData(TagCompound tag)
+        {
+            OverlayTypeByTopLeft.Clear();
+            FlippedByTopLeft.Clear();
+            if (!tag.ContainsKey("EquineArmatureEquips"))
+            {
+                // still try to load flip if available
+            }
+            var list = tag.GetList<TagCompound>("EquineArmatureEquips");
+            foreach (var t in list)
+            {
+                var pt = new Point16(t.GetShort("x"), t.GetShort("y"));
+                int type = 0;
+                if (t.ContainsKey("type"))
+                    type = t.GetInt("type");
+                else
+                {
+                    // Backward compat with boolean save
+                    bool eq = t.GetBool("eq");
+                    type = eq ? 1 : 0;
+                }
+                if (type != 0)
+                    OverlayTypeByTopLeft[pt] = type;
+            }
+
+            if (tag.ContainsKey("EquineArmatureFlip"))
+            {
+                var listFlip = tag.GetList<TagCompound>("EquineArmatureFlip");
+                foreach (var t in listFlip)
+                {
+                    var pt = new Point16(t.GetShort("x"), t.GetShort("y"));
+                    bool fl = t.GetBool("fl");
+                    if (fl)
+                        FlippedByTopLeft[pt] = true;
+                }
+            }
+        }
+
+        public override void NetSend(BinaryWriter writer)
+        {
+            // Overlay types
+            writer.Write(OverlayTypeByTopLeft.Count);
+            foreach (var kv in OverlayTypeByTopLeft)
+            {
+                writer.Write((short)kv.Key.X);
+                writer.Write((short)kv.Key.Y);
+                writer.Write(kv.Value);
+            }
+
+            // Flip states
+            writer.Write(FlippedByTopLeft.Count);
+            foreach (var kv in FlippedByTopLeft)
+            {
+                writer.Write((short)kv.Key.X);
+                writer.Write((short)kv.Key.Y);
+                writer.Write(kv.Value);
+            }
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            OverlayTypeByTopLeft.Clear();
+            FlippedByTopLeft.Clear();
+
+            int overlayCount = reader.ReadInt32();
+            for (int n = 0; n < overlayCount; n++)
+            {
+                short x = reader.ReadInt16();
+                short y = reader.ReadInt16();
+                int type = reader.ReadInt32();
+                if (type != 0)
+                    OverlayTypeByTopLeft[new Point16(x, y)] = type;
+            }
+
+            int flipCount = reader.ReadInt32();
+            for (int n = 0; n < flipCount; n++)
+            {
+                short x = reader.ReadInt16();
+                short y = reader.ReadInt16();
+                bool flipped = reader.ReadBoolean();
+                if (flipped)
+                    FlippedByTopLeft[new Point16(x, y)] = true;
+            }
+        }
+    }
+    
+}
+
+

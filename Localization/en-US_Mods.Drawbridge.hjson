@@ -1,0 +1,492 @@
+Tiles: {
+	DrawbridgeTile.MapEntry: Drawbridge Tile
+	DrawbridgeHorizontalTile.MapEntry: Drawbridge Horizontal Tile
+	WheelTile.MapEntry: Wheel Tile
+	WheelAnchorTile.MapEntry: Wheel Anchor Tile
+	WheelHorizontalTile.MapEntry: Wheel Horizontal Tile
+	PortcullisDownTile.MapEntry: Portcullis Down Tile
+	PortcullisUpTile.MapEntry: Portcullis Up Tile
+	DrawbridgeHorizontalFlippedTile.MapEntry: Drawbridge Horizontal Flipped Tile
+	DrawbridgeVerticalFlippedTile.MapEntry: Drawbridge Vertical Flipped Tile
+	SpikedPallisadeTile.MapEntry: Spiked Pallisade Tile
+	SpikedPallisadeFlippedTile.MapEntry: Spiked Pallisade Flipped Tile
+	GoldBellTile.MapEntry: Gold Bell Tile
+	ClockTile.MapEntry: Clock
+	GraveyardBellTile.MapEntry: Graveyard Bell Tile
+	HorseStableTile.MapEntry: Horse Stable
+	Tile.CulvertDecorationTile: Culvert Decoration
+
+	CulvertDecorationTile: {
+		$parentVal: Culvert Decoration
+		MapEntry: Culvert Decoration Tile
+	}
+
+	HorseStableExtendedTile.MapEntry: Horse Stable Extended Tile
+	HellDrawbridgeHorizontalFlippedTile.MapEntry: Hell Drawbridge Horizontal Flipped Tile
+	HellDrawbridgeHorizontalTile.MapEntry: Hell Drawbridge Horizontal Tile
+	HellDrawbridgeTile.MapEntry: Hell Drawbridge Tile
+	HellDrawbridgeVerticalFlippedTile.MapEntry: Hell Drawbridge Vertical Flipped Tile
+	LionDrawbridgeHorizontalFlippedTile.MapEntry: Lion Drawbridge Horizontal Flipped Tile
+	LionDrawbridgeHorizontalTile.MapEntry: Lion Drawbridge Horizontal Tile
+	LionDrawbridgeTile.MapEntry: Lion Drawbridge Tile
+	LionDrawbridgeVerticalFlippedTile.MapEntry: Lion Drawbridge Vertical Flipped Tile
+	EquineArmatureTile.MapEntry: Equine Armature Tile
+	TwinarchTile.MapEntry: Twinarch Tile
+	DoorcaseTile.MapEntry: Doorcase Tile
+	Fish_Sign_Placed.MapEntry: Fish Sign
+	Anvil_Sign_Placed.MapEntry: Anvil Sign
+	Spear_Tiles.MapEntry: Spear_ Tiles
+	Sword_Hang_TIle.MapEntry: Sword_ Hang_ T Ile
+	Trident_Tiles.MapEntry: Trident_ Tiles
+	SpearSignTile.MapEntry: Spear Sign Tile
+	SwordSignTile.MapEntry: Sword Sign Tile
+	TridentSignTile.MapEntry: Trident Sign Tile
+	AnvilSignTile.MapEntry: Anvil Sign Tile
+	BlankSignTile.MapEntry: Blank Sign Tile
+	ClothierSignTile.MapEntry: Clothier Sign Tile
+	CyberSignTile.MapEntry: Cyber Sign Tile
+	DemolitionistSignTile.MapEntry: Demolitionist Sign Tile
+	DryadSignTile.MapEntry: Dryad Sign Tile
+	DyeSignTile.MapEntry: Dye Sign Tile
+	GolfSignTile.MapEntry: Golf Sign Tile
+	GunSignTile.MapEntry: Gun Sign Tile
+	MechanicSignTile.MapEntry: Mechanic Sign Tile
+	MerchantSignTile.MapEntry: Merchant Sign Tile
+	PirateSignTile.MapEntry: Pirate Sign Tile
+	PrincessSignTile.MapEntry: Princess Sign Tile
+	SteamSignTile.MapEntry: Steam Sign Tile
+	StylistSignTile.MapEntry: Stylist Sign Tile
+	TinkererSignTile.MapEntry: Tinkerer Sign Tile
+	TruffleSignTile.MapEntry: Truffle Sign Tile
+	ZooSignTile.MapEntry: Zoo Sign Tile
+	HookTile.MapEntry: Hook
+	MacchicolationTile.MapEntry: Machicolation
+	MacchicolationTile_F.MapEntry: Macchicolation Tile_ F
+}
+
+Items: {
+	DrawbridgeItem: {
+		DisplayName: Drawbridge
+		Tooltip: ""
+	}
+
+	WheelItem: {
+		DisplayName: Wheel
+		Tooltip: ""
+	}
+
+	PortcullisItem: {
+		DisplayName: Portcullis
+		Tooltip: ""
+	}
+
+	SpikedPallisadeItem: {
+		DisplayName: Spiked Palisade
+		Tooltip: Right Click while placed to actuate.
+	}
+
+	GoldBellItem: {
+		DisplayName: Golden Bell
+		Tooltip: Can be wire-linked with the Tower Clock
+	}
+
+	ClockItem: {
+		DisplayName: Tower Clock
+		Tooltip: Can be wire-linked with a Bell
+	}
+
+	GraveyardBellItem: {
+		DisplayName: Graveyard Bell
+		Tooltip: Can be wire-linked with the Tower Clock
+	}
+
+	HorseStableItem: {
+		DisplayName: Stable Gate
+		Tooltip: Can hold 1 mount in Singleplayer. Only decorative for Multiplayer.
+	}
+
+	BlackCulvertWallItem: {
+		DisplayName: Black Culvert Wall
+		Tooltip: ""
+	}
+
+	Item.CulvertDecorationTileItem: Culvert Decoration
+
+	CulvertDecorationTileItem: {
+		$parentVal: Culvert Decoration
+		DisplayName: Culvert
+		Tooltip: ""
+	}
+
+	HorseStableExtendedItem: {
+		DisplayName: Stable Gate Extended
+		Tooltip: Can hold up to 4 mounts in Singleplayer. Only decorative for Multiplayer.
+	}
+
+	HellDrawbridgeItem: {
+		Tooltip: ""
+		DisplayName: Hell Drawbridge
+	}
+
+	LionDrawbridgeItem: {
+		Tooltip: ""
+		DisplayName: Lion Drawbridge
+	}
+
+	EquineArmatureItem: {
+		DisplayName: Equine Armature
+		Tooltip: ""
+	}
+
+	IronFieldBardingItem: {
+		DisplayName: Iron Field Barding
+		Tooltip: ""
+	}
+
+	GoldArmorItem: {
+		DisplayName: Golden Regal Barding
+		Tooltip: ""
+	}
+
+	MoltenArmorItem: {
+		DisplayName: Inferno Barding
+		Tooltip: ""
+	}
+
+	TwinarchItem: {
+		DisplayName: Twinarch Item
+		Tooltip: ""
+	}
+
+	DoorcaseItem: {
+		DisplayName: Doorcase Item
+		Tooltip: ""
+	}
+
+	Fish_Sign_Item: {
+		DisplayName: Fish Sign
+		Tooltip: ""
+	}
+
+	Anvil_Sign_Item: {
+		DisplayName: Anvil Sign
+		Tooltip: ""
+	}
+
+	Spear_Inventory2: {
+		DisplayName: Spear_ Inventory2
+		Tooltip: ""
+	}
+
+	Sword_Hang_Inventory: {
+		DisplayName: Sword_ Hang_ Inventory
+		Tooltip: ""
+	}
+
+	TRident_Inventory: {
+		DisplayName: T Rident_ Inventory
+		Tooltip: ""
+	}
+
+	SpearSignItem: {
+		DisplayName: Spear Sign Item
+		Tooltip: ""
+	}
+
+	SwordSignItem: {
+		DisplayName: Sword Sign Item
+		Tooltip: ""
+	}
+
+	TridentSignItem: {
+		DisplayName: Trident Sign Item
+		Tooltip: ""
+	}
+
+	// New NPC-themed signs
+	BlankSignItem: {
+		DisplayName: Blank Sign
+		Tooltip: ""
+	}
+
+	AnvilSignItem: {
+		DisplayName: Anvil Sign
+		Tooltip: ""
+	}
+
+	ClothierSignItem: {
+		DisplayName: Clothier Sign
+		Tooltip: ""
+	}
+
+	CyberSignItem: {
+		DisplayName: Cyber Sign
+		Tooltip: ""
+	}
+
+	DemolitionistSignItem: {
+		DisplayName: Demolitionist Sign
+		Tooltip: ""
+	}
+
+	DryadSignItem: {
+		DisplayName: Dryad Sign
+		Tooltip: ""
+	}
+
+	DyeSignItem: {
+		DisplayName: Dye Sign
+		Tooltip: ""
+	}
+
+	GolfSignItem: {
+		DisplayName: Golf Sign
+		Tooltip: ""
+	}
+
+	GunSignItem: {
+		DisplayName: Gun Sign
+		Tooltip: ""
+	}
+
+	MechanicSignItem: {
+		DisplayName: Mechanic Sign
+		Tooltip: ""
+	}
+
+	MerchantSignItem: {
+		DisplayName: Merchant Sign
+		Tooltip: ""
+	}
+
+	PirateSignItem: {
+		DisplayName: Pirate Sign
+		Tooltip: ""
+	}
+
+	PrincessSignItem: {
+		DisplayName: Princess Sign
+		Tooltip: ""
+	}
+
+	SteamSignItem: {
+		DisplayName: Steam Sign
+		Tooltip: ""
+	}
+
+	StylistSignItem: {
+		DisplayName: Stylist Sign
+		Tooltip: ""
+	}
+
+	TinkererSignItem: {
+		DisplayName: Tinkerer Sign
+		Tooltip: ""
+	}
+
+	TruffleSignItem: {
+		DisplayName: Truffle Sign
+		Tooltip: ""
+	}
+
+	ZooSignItem: {
+		DisplayName: Zoo Sign
+		Tooltip: ""
+	}
+
+	HookItem: {
+		DisplayName: Hook
+		Tooltip: Can hold fish
+	}
+
+	SkyLionCloak: {
+		DisplayName: Sky Lion Cloak
+		Tooltip: ""
+	}
+
+	SkyLionCuirass: {
+		DisplayName: Sky Lion Cuirass
+		Tooltip: ""
+	}
+
+	SkyLionGreaves: {
+		DisplayName: Sky Lion Greaves
+		Tooltip: ""
+	}
+
+	SkyLionMane: {
+		DisplayName: Sky Lion Mane
+		Tooltip: ""
+	}
+
+	SkyLionChestplate: {
+		DisplayName: Sky Lion Cuirass
+		Tooltip: ""
+	}
+
+	SkyLionHelmet: {
+		DisplayName: Sky Lion Mane
+		Tooltip: ""
+	}
+
+	SkyLionLeggings: {
+		DisplayName: Sky Lion Greaves
+		Tooltip: ""
+	}
+
+	CopperArmorItem: {
+		DisplayName: Copper Armor
+		Tooltip: ""
+	}
+
+	SilverArmorItem: {
+		DisplayName: Silver Armor
+		Tooltip: ""
+	}
+
+	CursedHorseshoeItem: {
+		DisplayName: Cursed Horseshoe
+		Tooltip: Summons a rideable skeletal horse
+	}
+
+	CursedHorseshoe: {
+		DisplayName: Cursed Horseshoe
+		Tooltip: ""
+	}
+
+	WastelanderBoots: {
+		DisplayName: Wastelander Boots
+		Tooltip: ""
+	}
+
+	WastelanderChestplate: {
+		DisplayName: Wastelander Chestplate
+		Tooltip: ""
+	}
+
+	WastelanderHood: {
+		DisplayName: Wastelander Hood
+		Tooltip: ""
+	}
+
+	MacchicolationItem: {
+		DisplayName: Machicolation
+		Tooltip: Medieval siege cauldron. Right click to drop boiling water on enemies.
+	}
+
+	MacchicolationItem_F: {
+		DisplayName: Macchicolation Item_ F
+		Tooltip: ""
+	}
+}
+
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: Gold Bell Clapper
+	GoldBellAnimation.DisplayName: Gold Bell Animation
+	ClockHand.DisplayName: Clock Hand
+	GraveyardBellClapper.DisplayName: Graveyard Bell Clapper
+	GraveyardBellAnimation.DisplayName: Graveyard Bell Animation
+	FriendlyBatProjectile.DisplayName: Friendly Bat Projectile
+	FriendlyFairyProjectile.DisplayName: Friendly Fairy Projectile
+	StableUnicornMount.DisplayName: Stable Unicorn Mount
+	PoopVisualProjectile.DisplayName: Poop Visual Projectile
+	HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	HookProjectile.DisplayName: Hook Projectile
+}
+
+DeathReason.SpikedPallisade: was impaled by a spiked pallisade!
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Drawbridge Config
+
+		DisableEasterEgg: {
+			Label: Disable Easter Egg
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Mute Clock Sound
+			Tooltip: If enabled, the clock will not play its hourly sound.
+		}
+
+		MuteStableNoises: {
+			Label: Mute Stable Noises
+			Tooltip: If enabled, horse stables will not play their stable noises.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Disable Horse Stable Pooping
+			Tooltip: If enabled, horses in stables will not drop Poo.
+		}
+	}
+}
+
+Buffs: {
+	GoldenResonance: {
+		DisplayName: Golden Resonance
+		Description: Grants increased life regeneration and movement speed.
+	}
+
+	SpiritVeil: {
+		DisplayName: Spirit Veil
+		Description: Grants defense at night or in graveyards, and immunity to Cursed and Darkness.
+	}
+
+	SkyLionMane: {
+		DisplayName: Sky Lion Mane
+		Tooltip: The majestic mane of a sky lion
+	}
+
+	SkyLionCuirass: {
+		DisplayName: Sky Lion Cuirass
+		Tooltip: Protective chest armor of a sky lion
+	}
+
+	SkyLionGreaves: {
+		DisplayName: Sky Lion Greaves
+		Tooltip: Leg armor that grants the agility of a sky lion
+	}
+
+	SkyLionCloak: {
+		DisplayName: Sky Lion Cloak
+		Tooltip: A majestic cloak that flows like the wind
+	}
+
+	WightPalfreyBuff: {
+		DisplayName: Wight Palfrey
+		Description: Whispers tell of the Wight Palfrey, the skeletal horror riding the dark borders, drifting between worlds, whose very stride beckons the Necromancer Rise.
+	}
+}
+
+Mods: {
+	Drawbridge: {
+		Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile
+		HorseStableTile.DisplayName: Horse Stable
+
+		HorseStableItem: {
+			DisplayName: Horse Stable
+			Tooltip: A cozy stable for your horses. Decorative only.
+		}
+	}
+}
+
+Wall.BlackCulvertWall: Black Culvert
+Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Black Culvert Wall
+	CulvertDecorationTile.MapEntry: Culvert Decoration
+}
+
+NPCs: {
+	ObsidianSerpent.DisplayName: Obsidian Serpent
+	ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+"Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
