@@ -12,12 +12,13 @@ namespace Drawbridge.Systems;
 
 public class WheelRenderSystem : ModSystem
 {
-    private static Dictionary<string, Asset<Texture2D>> TextureLookup = [];
+    private static readonly Dictionary<string, Asset<Texture2D>> TextureLookup = [];
 
     public override void Load()
     {
         TextureLookup.Clear();
 
+        // Old textures, directly mirrored in PostDrawTiles by a named variable
         TextureLookup.Add("wheelV", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelTile"));
         TextureLookup.Add("wheelH", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelHorizontalTile"));
         TextureLookup.Add("hellWheel", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel"));
@@ -27,15 +28,19 @@ public class WheelRenderSystem : ModSystem
         TextureLookup.Add("hellGlowMaskHorizontal",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_MaskHorizontal"));
         TextureLookup.Add("hellGlowMaskHorizontalFlipped",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_MaskHorizontalFlipped"));
         TextureLookup.Add("hellWheelGlowMask",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_mask"));
-        TextureLookup.Add("wheelV", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_maskHorizontal"));
+        TextureLookup.Add("hellWheelGlowMaskHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_maskHorizontal"));
         TextureLookup.Add("lionWheel", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_Wheel"));
-        TextureLookup.Add("lionWheelHorizontal", ModContent.Request<Texture2D>("Drawbridge /Tiles/Lion_WheelHorizontal"));
+        TextureLookup.Add("lionWheelHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_WheelHorizontal"));
         TextureLookup.Add("stableMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableMiddle"));
         TextureLookup.Add("stableExtendedMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableExtendedMiddle"));
         TextureLookup.Add("lionCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_Drawbridge_cover"));
         TextureLookup.Add("lionCoverFlipped", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeFlipped_cover"));
         TextureLookup.Add("lionCoverHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeHorizontal_cover"));
         TextureLookup.Add("lionCoverHorizontalFlipped", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeHorizontalFlipped_cover"));
+
+        // New values
+        TextureLookup.Add("hellCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge_cover"));
+        TextureLookup.Add("hellFlippedCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeFlipped_cover"));
     }
 
     public override void PostDrawTiles()
@@ -61,7 +66,7 @@ public class WheelRenderSystem : ModSystem
         Texture2D hellGlowMaskHorizontal = TextureLookup["hellGlowMaskHorizontal"].Value;
         Texture2D hellGlowMaskHorizontalFlipped = TextureLookup["hellGlowMaskHorizontalFlipped"].Value;
         Texture2D hellWheelGlowMask = TextureLookup["hellWheelGlowMask"].Value;
-        Texture2D hellWheelGlowMaskHorizontal = TextureLookup["hellGlowMaskHorizontal"].Value;
+        Texture2D hellWheelGlowMaskHorizontal = TextureLookup["hellWheelGlowMaskHorizontal"].Value;
         Texture2D lionWheel = TextureLookup["lionWheel"].Value;
         Texture2D lionWheelHorizontal = TextureLookup["lionWheelHorizontal"].Value;
         Texture2D stableMiddle = TextureLookup["stableMiddle"].Value;
@@ -93,81 +98,33 @@ public class WheelRenderSystem : ModSystem
                 if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>()
                     && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
-                    Texture2D hellTex = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge_cover").Value;
+                    Texture2D hellTex = TextureLookup["hellCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     // 14px left of hinge + 4px adjustment
                     Vector2 origin = new Vector2(30f + 4f, hellTex.Height);
                     sb.Draw(hellTex, pivot, null, Lighting.GetColor(i, j) * 0.9f,
                             0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // End current batch and start additive blending for glow
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
+
                     // Draw glow mask overlay with pulsing effect
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellGlowMask, pivot, null, (Color.White * glowPulse) with { A = 0 },
                             0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // End additive batch and restart normal blending
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                 }
                 // Hell vertical flipped
                 else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>()
                          && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
-                    Texture2D hellTexFlip = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeFlipped_cover").Value;
+                    Texture2D hellTexFlip = TextureLookup["hellFlippedCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     // revert flipped to original cover offset: spriteWidth - 30px
                     Vector2 origin = new Vector2(hellTexFlip.Width - 46f - 4f, hellTexFlip.Height);
                     sb.Draw(hellTexFlip, pivot, null, Lighting.GetColor(i, j) * 0.9f,
                             0f, origin, 1f, SpriteEffects.None, 0f);
                     
-                    //// End current batch and start additive blending for glow
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     // Draw glow mask overlay (flipped) with pulsing effect
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellGlowMaskFlipped, pivot, null, (Color.White * glowPulse) with { A = 0 },
                             0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // End additive batch and restart normal blending
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                 }
                 // Hell horizontal normal
                 else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>()
@@ -180,34 +137,10 @@ public class WheelRenderSystem : ModSystem
                     sb.Draw(hellHoriz, pivot, null, Lighting.GetColor(i, j) * 0.9f,
                             0f, origin, 1f, SpriteEffects.None, 0f);
                     
-                    // End current batch and start additive blending for glow
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     // Draw glow mask overlay (horizontal) with pulsing effect
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellGlowMaskHorizontal, pivot, null, (Color.White * glowPulse) with { A = 0 },
                             0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // End additive batch and restart normal blending
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                 }
                 // Hell horizontal flipped
                 else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>()
@@ -220,34 +153,10 @@ public class WheelRenderSystem : ModSystem
                     sb.Draw(hellHorizFlip, pivot, null, Lighting.GetColor(i, j) * 0.9f,
                             0f, origin, 1f, SpriteEffects.None, 0f);
                     
-                    // End current batch and start additive blending for glow
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     // Draw glow mask overlay (horizontal flipped) with pulsing effect
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellGlowMaskHorizontalFlipped, pivot, null, (Color.White * glowPulse) with { A = 0 },
                             0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // End additive batch and restart normal blending
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                 }
                 // Static Hell vertical hinge segment
                 if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>()
@@ -260,31 +169,8 @@ public class WheelRenderSystem : ModSystem
                     Vector2 origin = new Vector2(hellWheel.Width * 0.5f, hellWheel.Height * 0.5f);
                     sb.Draw(hellWheel, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.None, 0f);
                     
-                    // Draw hell wheel glow mask
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellWheelGlowMask, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.TransformationMatrix
-                    //);
                 }
 
                 // Static vertical hinge segment
@@ -334,31 +220,8 @@ public class WheelRenderSystem : ModSystem
                     Vector2 originFlipped = new Vector2(hellWheel.Width * 0.5f, hellWheel.Height * 0.5f);
                     sb.Draw(hellWheel, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, originFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
                     
-                    // Draw hell wheel glow mask (flipped)
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellWheelGlowMask, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, originFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
-                    
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                 }
                 // Static vertical hinge segment (flipped)
                 else if (tile.TileType == ModContent.TileType<DrawbridgeVerticalFlippedTile>()
@@ -409,31 +272,8 @@ public class WheelRenderSystem : ModSystem
                     Vector2 origin = new Vector2(hellWheelHorizontal.Width * 0.5f, hellWheelHorizontal.Height * 0.5f);
                     sb.Draw(hellWheelHorizontal, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.FlipHorizontally, 0f);
                     
-                    // Draw hell wheel glow mask (horizontal)
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellWheelGlowMaskHorizontal, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, SpriteEffects.FlipHorizontally, 0f);
-                    
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                     
                     // Draw static chain for hell horizontal drawbridge (left pivot)
                     Texture2D chainTexture = TextureAssets.Chain.Value;
@@ -522,31 +362,8 @@ public class WheelRenderSystem : ModSystem
                     Vector2 origin = new Vector2(hellWheelHorizontal.Width * 0.5f, hellWheelHorizontal.Height * 0.5f);
                     sb.Draw(hellWheelHorizontal, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.None, 0f);
                     
-                    // Draw hell wheel glow mask (horizontal flipped)
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.Additive,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
-                    
                     float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
                     sb.Draw(hellWheelGlowMaskHorizontal, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    //sb.End();
-                    //sb.Begin(
-                    //    SpriteSortMode.Deferred,
-                    //    BlendState.AlphaBlend,
-                    //    Main.DefaultSamplerState,
-                    //    DepthStencilState.None,
-                    //    RasterizerState.CullCounterClockwise,
-                    //    null,
-                    //    Main.GameViewMatrix.ZoomMatrix
-                    //);
                     
                     // Draw static chain for hell horizontal drawbridge (right pivot)
                     Texture2D chainTextureFlipped = TextureAssets.Chain.Value;
@@ -765,6 +582,7 @@ public class WheelRenderSystem : ModSystem
                         }
                     }
                 }
+
                 // Lion vertical normal
                 if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>()
                     && tile.TileFrameX == 16 && tile.TileFrameY == 224)
@@ -805,6 +623,7 @@ public class WheelRenderSystem : ModSystem
                     sb.Draw(lionCoverHorizontalFlipped, pivot, null, Lighting.GetColor(i, j) * 0.9f,
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
+
                 if (tile.TileType == ModContent.TileType<HorseStableTile>())
                 {
                     // Only draw at the origin tile (frameX == 4*16, frameY == 5*16)
@@ -816,6 +635,7 @@ public class WheelRenderSystem : ModSystem
                         sb.Draw(stableMiddle, drawPos, null, Lighting.GetColor(i, j), 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                     }
                 }
+
                 // Add support for extended stable
                 if (tile.TileType == ModContent.TileType<HorseStableExtendedTile>())
                 {
@@ -830,6 +650,7 @@ public class WheelRenderSystem : ModSystem
                 }
             }
         }
+
         // End the custom batch to avoid interfering with other draw calls
         sb.End();
     }
