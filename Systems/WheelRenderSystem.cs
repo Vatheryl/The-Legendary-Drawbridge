@@ -45,20 +45,11 @@ public class WheelRenderSystem : ModSystem
 
     public override void PostDrawTiles()
     {
-        Tile tile32 = Main.tile[Main.MouseWorld.ToTileCoordinates()];
-        Main.NewText(tile32.TileFrameX + " " + tile32.TileFrameY + " " + tile32.TileType);
+        // Begin a new sprite batch for world drawing
 
         SpriteBatch sb = Main.spriteBatch;
-        // Begin a new sprite batch for world drawing
-        sb.Begin(
-            SpriteSortMode.Deferred,
-            BlendState.AlphaBlend,
-            Main.DefaultSamplerState,
-            DepthStencilState.None,
-            RasterizerState.CullNone,
-            null,
-            Main.GameViewMatrix.TransformationMatrix
-        );
+        Matrix matrix = Main.GameViewMatrix.TransformationMatrix;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
 
         Texture2D wheelV = TextureLookup["wheelV"].Value;
         Texture2D wheelH = TextureLookup["wheelH"].Value;
@@ -98,8 +89,7 @@ public class WheelRenderSystem : ModSystem
                     continue;
 
                 // Hell vertical normal
-                if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>()
-                    && tile.TileFrameX == 16 && tile.TileFrameY == 224)
+                if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
                     Texture2D hellTex = TextureLookup["hellCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
@@ -114,8 +104,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Hell vertical flipped
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
                     Texture2D hellTexFlip = TextureLookup["hellFlippedCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
@@ -130,8 +119,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Hell horizontal normal
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>()
-                         && tile.TileFrameX == 224 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
                     Texture2D hellHoriz = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontal_cover").Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
@@ -146,8 +134,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Hell horizontal flipped
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
                     Texture2D hellHorizFlip = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontalFlipped_cover").Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
@@ -162,8 +149,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Static Hell vertical hinge segment
-                if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>()
-                    && tile.TileFrameX == 16 && tile.TileFrameY == 224)
+                if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -177,8 +163,7 @@ public class WheelRenderSystem : ModSystem
                 }
 
                 // Static vertical hinge segment
-                else if (tile.TileType == ModContent.TileType<DrawbridgeTile>()
-                    && tile.TileFrameX == 16 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<DrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -212,8 +197,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Hell vertical hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -227,8 +211,7 @@ public class WheelRenderSystem : ModSystem
                     sb.Draw(hellWheelGlowMask, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, originFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
                 }
                 // Static vertical hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<DrawbridgeVerticalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<DrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     // Wheel pivot (shifted left one tile)
@@ -265,8 +248,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Hell horizontal hinge segment (normal)
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>()
-                         && tile.TileFrameX == 224 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -312,8 +294,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static horizontal hinge segment (normal)
-                else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalTile>()
-                         && tile.TileFrameX == 224 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -354,8 +335,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Hell horizontal hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -402,8 +382,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Lion vertical hinge segment
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>()
-                    && tile.TileFrameX == 16 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -413,8 +392,7 @@ public class WheelRenderSystem : ModSystem
                     sb.Draw(lionWheel, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Static Lion vertical hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
                     const float tileOffset = 12 * 16f;
                     // Wheel pivot (shifted left one tile)
@@ -453,8 +431,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Lion horizontal hinge segment (normal)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>()
-                         && tile.TileFrameX == 224 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -497,8 +474,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static Lion horizontal hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -542,8 +518,7 @@ public class WheelRenderSystem : ModSystem
                     }
                 }
                 // Static horizontal hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
                     const float tileOffset = 12 * 16f;
                     Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
@@ -587,8 +562,7 @@ public class WheelRenderSystem : ModSystem
                 }
 
                 // Lion vertical normal
-                if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>()
-                    && tile.TileFrameX == 16 && tile.TileFrameY == 224)
+                if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
                 {
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     float halfWidth = lionCover.Width / 2f;
@@ -597,8 +571,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Lion vertical flipped
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 224)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
                 {
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     float halfWidth = lionCoverFlipped.Width / 2f;
@@ -607,8 +580,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Lion horizontal normal
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>()
-                         && tile.TileFrameX == 224 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
                     Vector2 pivot = new Vector2(i * 16f - 12 * 16f + 6 * 16f - 16f - 8f + 16f, j * 16f + 16f - 16f) - screenPos;
                     float halfHeight = lionCoverHorizontal.Height / 2f;
@@ -617,8 +589,7 @@ public class WheelRenderSystem : ModSystem
                             0f, origin, 1f, SpriteEffects.None, 0f);
                 }
                 // Lion horizontal flipped
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>()
-                         && tile.TileFrameX == 0 && tile.TileFrameY == 16)
+                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
                     Vector2 pivot = new Vector2(i * 16f + 12 * 16f - 6 * 16f + 2 * 16f + 8f - 16f, j * 16f + 16f - 16f) - screenPos;
                     float halfHeight = lionCoverHorizontalFlipped.Height / 2f;

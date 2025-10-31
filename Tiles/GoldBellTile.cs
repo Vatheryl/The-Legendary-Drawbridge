@@ -108,7 +108,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleGoldBell, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleGoldBell, i, j);
             }
             else
             {

@@ -81,7 +81,7 @@ namespace Drawbridge.Tiles
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 // Ask server to handle interaction
-                PacketHandler.SendPacket(MessageType.HookFishInteract, i, j);
+                PacketHandler.SendContextPacket(MessageType.HookFishInteract, i, j);
                 return true;
             }
 

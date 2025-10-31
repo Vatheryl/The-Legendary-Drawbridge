@@ -1,16 +1,17 @@
+using Drawbridge.Items;
+using Drawbridge.Projectiles;
+using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Terraria.DataStructures;
-using Terraria.Enums;
-using Drawbridge.Items;
-using Drawbridge.Projectiles;
 
 namespace Drawbridge.Tiles
 {
-    public class PortcullisDownTile : ModTile
+    public class PortcullisDownTile : ModTile, IToggleTile
     {
         public override string Texture => "Drawbridge/Tiles/PortcullisTile";
 
@@ -78,7 +79,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleDrawbridge, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
             }
             else
         {
