@@ -41,6 +41,8 @@ public class WheelRenderSystem : ModSystem
         // New values
         TextureLookup.Add("hellCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge_cover"));
         TextureLookup.Add("hellFlippedCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeFlipped_cover"));
+        TextureLookup.Add("hellHoriCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontal_cover"));
+        TextureLookup.Add("hellHoriFlippedCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontalFlipped_cover"));
     }
 
     public override void PostDrawTiles()
@@ -121,7 +123,7 @@ public class WheelRenderSystem : ModSystem
                 // Hell horizontal normal
                 else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
                 {
-                    Texture2D hellHoriz = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontal_cover").Value;
+                    Texture2D hellHoriz = TextureLookup["hellHoriCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     // Shift 12 tiles left (192px) + 4px right and 4px down
                     Vector2 origin = new Vector2(30f + 4f + 192f - 2f, hellHoriz.Height - 16f - 2f);
@@ -136,7 +138,7 @@ public class WheelRenderSystem : ModSystem
                 // Hell horizontal flipped
                 else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
                 {
-                    Texture2D hellHorizFlip = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontalFlipped_cover").Value;
+                    Texture2D hellHorizFlip = TextureLookup["hellHoriFlippedCover"].Value;
                     Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - screenPos;
                     // Shift 12 tiles right (192px) + 4px left and 4px down  
                     Vector2 origin = new Vector2(hellHorizFlip.Width - 46f - 4f - 192f + 2f, hellHorizFlip.Height - 16f - 2f);
