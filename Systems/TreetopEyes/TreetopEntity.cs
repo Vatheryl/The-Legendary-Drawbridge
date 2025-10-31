@@ -196,7 +196,12 @@ internal class TreetopEntity : GlobalTile
 
     public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
-        if (fail || !Main.dayTime || !TileValidForTreetop(i, j) || !Treetops.TryGetValue(new Point16(i, j), out Treetop top))
+        bool hasTop = Treetops.TryGetValue(new Point16(i, j), out Treetop top);
+
+        if (hasTop)
+            Treetops.Remove(new Point16(i, j));
+
+        if (fail || !Main.dayTime || !TileValidForTreetop(i, j) || !hasTop)
             return;
 
         for (int k = 0; k < top.eyeCount; ++k)
