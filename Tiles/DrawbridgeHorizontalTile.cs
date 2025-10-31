@@ -9,10 +9,11 @@ using Terraria.Audio;
 using Drawbridge.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
+using Drawbridge.Systems;
 
 namespace Drawbridge.Tiles
 {
-    public class DrawbridgeHorizontalTile : ModTile
+    public class DrawbridgeHorizontalTile : ModTile, IToggleTile
     {
         public override string Texture => "Drawbridge/Tiles/DrawbridgeHorizontalTile";
 
@@ -160,7 +161,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleDrawbridge, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
             }
             else
         {

@@ -72,7 +72,7 @@ namespace Drawbridge.Systems
                 // Trigger the bridge
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
-                    PacketHandler.SendPacket(MessageType.ToggleDrawbridge, nearest.X, nearest.Y);
+                    PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, nearest.X, nearest.Y);
                 }
                 else
                 {
@@ -93,7 +93,7 @@ namespace Drawbridge.Systems
                 // Trigger the bridge
                 if (Main.netMode == NetmodeID.MultiplayerClient)
                 {
-                    PacketHandler.SendPacket(MessageType.ToggleDrawbridge, nearest.X, nearest.Y);
+                    PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, nearest.X, nearest.Y);
                 }
                 else
                 {

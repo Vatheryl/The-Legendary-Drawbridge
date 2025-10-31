@@ -1,19 +1,20 @@
+using Drawbridge.Items;
+using Drawbridge.Projectiles;
+using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.Enums;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Terraria.DataStructures;
-using Terraria.Enums;
-using Terraria.Audio;
-using Drawbridge.Projectiles;
-using Terraria.GameContent;
-using Drawbridge.Items;
 
 namespace Drawbridge.Tiles
 {
-    public class LionDrawbridgeHorizontalFlippedTile : ModTile
+    public class LionDrawbridgeHorizontalFlippedTile : ModTile, IToggleTile
     {
         public override string Texture => "Drawbridge/Tiles/Lion_DrawbridgeHorizontalFlippedTile";
 
@@ -105,7 +106,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleDrawbridge, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
             }
             else
             {

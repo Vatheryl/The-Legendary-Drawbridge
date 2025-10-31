@@ -100,7 +100,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleGraveyardBell, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleGraveyardBell, i, j);
             }
             else
             {

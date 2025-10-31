@@ -1,18 +1,19 @@
+using Drawbridge.Items;
+using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Terraria.GameContent;
-using Drawbridge.Items;
 
 namespace Drawbridge.Tiles
 {
-    public class HellDrawbridgeTile : ModTile
+    public class HellDrawbridgeTile : ModTile, IToggleTile
     {
         public override string Texture => "Drawbridge/Tiles/Hell_Drawbridge";
 
@@ -73,7 +74,7 @@ namespace Drawbridge.Tiles
         public override bool RightClick(int i, int j)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
-                PacketHandler.SendPacket(MessageType.ToggleDrawbridge, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
             else
                 Toggle(i, j);
             return true;

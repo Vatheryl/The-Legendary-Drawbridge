@@ -87,7 +87,7 @@ namespace Drawbridge.Systems
                             if (Main.netMode != NetmodeID.SinglePlayer)
                             {
                                 int itemTypeSynced = (modPlayer.horseArmorSlot != null && !modPlayer.horseArmorSlot.IsAir) ? modPlayer.horseArmorSlot.type : 0;
-                                PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, itemTypeSynced);
+                                PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, itemTypeSynced);
                             }
 						}
 					}
@@ -98,7 +98,7 @@ namespace Drawbridge.Systems
 						Terraria.Audio.SoundEngine.PlaySound(SoundID.Grab);
                         if (Main.netMode != NetmodeID.SinglePlayer)
                         {
-                            PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, 0);
+                            PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, 0);
                         }
 					}
 				}
@@ -112,7 +112,7 @@ namespace Drawbridge.Systems
 						Terraria.Audio.SoundEngine.PlaySound(SoundID.Grab);
                         if (Main.netMode != NetmodeID.SinglePlayer)
                         {
-                            PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, 0);
+                            PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Main.myPlayer, 0);
                         }
 					}
 				}

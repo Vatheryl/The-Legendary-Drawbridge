@@ -42,7 +42,7 @@ namespace Drawbridge.Items
 			SoundEngine.PlaySound(SoundID.Grab);
             if (Main.netMode != NetmodeID.SinglePlayer)
             {
-                PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, player.whoAmI, modPlayer.horseArmorSlot.type);
+                PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, player.whoAmI, modPlayer.horseArmorSlot.type);
             }
 			if (previous != null && !previous.IsAir)
 			{

@@ -78,7 +78,7 @@ namespace Drawbridge.Tiles
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ToggleSpikedPallisade, i, j);
+                PacketHandler.SendContextPacket(MessageType.ToggleSpikedPallisade, i, j);
             }
             else
             {

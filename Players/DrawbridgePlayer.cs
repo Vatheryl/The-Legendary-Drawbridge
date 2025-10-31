@@ -39,9 +39,9 @@ namespace Drawbridge.Players
             lastSafePosition = Player.position;
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PacketHandler.SendPacket(MessageType.ClearSolidTiles, 0);
+                PacketHandler.SendContextPacket(MessageType.ClearSolidTiles, 0);
                 int itemType = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
-                PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, itemType);
+                PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, itemType);
             }
             else if (Main.netMode == NetmodeID.SinglePlayer)
             {
@@ -260,7 +260,7 @@ namespace Drawbridge.Players
             int newType = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
             if (oldType != newType && Main.netMode != NetmodeID.SinglePlayer)
             {
-                PacketHandler.SendPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, newType);
+                PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, newType);
             }
         }
 
