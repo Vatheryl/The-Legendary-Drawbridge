@@ -196,7 +196,7 @@ internal class TreetopEntity : GlobalTile
 
     public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
-        if (fail || !TileValidForTreetop(i, j) || !Treetops.TryGetValue(new Point16(i, j), out Treetop top))
+        if (fail || !Main.dayTime || !TileValidForTreetop(i, j) || !Treetops.TryGetValue(new Point16(i, j), out Treetop top))
             return;
 
         for (int k = 0; k < top.eyeCount; ++k)
@@ -225,9 +225,9 @@ internal class TreetopEntity : GlobalTile
         for (int k = 0; k < top.eyeCount; ++k)
         {
             int offset = GetOffsetFromPositionAndIteration(i, j, k);
-            bool needsFront = offset % 2 == 1;
+            bool needsFront = offset % 3 != 1;
 
-            if (needsFront == front)
+            if (needsFront != front)
                 continue;
 
             Vector2 off = Offsets[offset];
