@@ -45,6 +45,9 @@ public class WheelRenderSystem : ModSystem
 
     public override void PostDrawTiles()
     {
+        Tile tile32 = Main.tile[Main.MouseWorld.ToTileCoordinates()];
+        Main.NewText(tile32.TileFrameX + " " + tile32.TileFrameY + " " + tile32.TileType);
+
         SpriteBatch sb = Main.spriteBatch;
         // Begin a new sprite batch for world drawing
         sb.Begin(
