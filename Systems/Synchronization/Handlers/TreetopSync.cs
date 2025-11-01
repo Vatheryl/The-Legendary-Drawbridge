@@ -1,6 +1,8 @@
 ﻿using Drawbridge.Systems.TreetopEyes;
 using System.IO;
+using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace Drawbridge.Systems.Synchronization.Handlers;
@@ -10,7 +12,11 @@ internal class TreetopSync : Handler
     // Used to ask for the treetop entities
     private class TreetopSyncPlayer : ModPlayer
     {
-        public override void OnEnterWorld() => Send();
+        public override void OnEnterWorld()
+        {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                Send();
+        }
     }
 
     public override MessageType Message => MessageType.RequestTreetops;
