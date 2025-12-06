@@ -396,6 +396,7 @@ Projectiles: {
 	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
 	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
 	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Machicolation Water
 }
 
 // DeathReason.SpikedPallisade: was impaled by a spiked pallisade!
