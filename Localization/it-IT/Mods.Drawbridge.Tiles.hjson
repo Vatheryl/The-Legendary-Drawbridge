@@ -1,0 +1,63 @@
+DrawbridgeTile.MapEntry: Ponte levatoio
+DrawbridgeHorizontalTile.MapEntry: Ponte levatoio orizzontale
+WheelTile.MapEntry: Ruota
+WheelAnchorTile.MapEntry: Ancora della ruota
+WheelHorizontalTile.MapEntry: Ruota orizzontale
+PortcullisDownTile.MapEntry: Saracinesca abbassata
+PortcullisUpTile.MapEntry: Saracinesca alzata
+DrawbridgeHorizontalFlippedTile.MapEntry: Ponte levatoio orizzontale capovolto
+DrawbridgeVerticalFlippedTile.MapEntry: Ponte levatoio verticale capovolto
+SpikedPallisadeTile.MapEntry: Palizzata spinata
+SpikedPallisadeFlippedTile.MapEntry: Palizzata spinata capovolta
+GoldBellTile.MapEntry: Campana Dorata
+ClockTile.MapEntry: Orologio
+GraveyardBellTile.MapEntry: Campana del cimitero
+HorseStableTile.MapEntry: Stalla
+Tile.CulvertDecorationTile: Decorazione del Canale
+
+CulvertDecorationTile: {
+	$parentVal: Decorazione del Canale
+	MapEntry: Piastrella Decorazione Canale
+}
+
+HorseStableExtendedTile.MapEntry: Stalla estesa
+// HellDrawbridgeHorizontalFlippedTile.MapEntry: Hell {$DrawbridgeTile}
+// HellDrawbridgeHorizontalTile.MapEntry: Hell {$DrawbridgeTile}
+// HellDrawbridgeTile.MapEntry: Hell {$DrawbridgeTile}
+// HellDrawbridgeVerticalFlippedTile.MapEntry: Hell {$DrawbridgeTile}
+// LionDrawbridgeHorizontalFlippedTile.MapEntry: Lion {$DrawbridgeTile}
+// LionDrawbridgeHorizontalTile.MapEntry: Lion {$DrawbridgeTile}
+// LionDrawbridgeTile.MapEntry: Lion {$DrawbridgeTile}
+// LionDrawbridgeVerticalFlippedTile.MapEntry: Lion {$DrawbridgeTile}
+EquineArmatureTile.MapEntry: Manichino di Armatura Equina
+// TwinarchTile.MapEntry: Twinarch
+// DoorcaseTile.MapEntry: Doorcase
+// Fish_Sign_Placed.MapEntry: Fish Sign
+// Anvil_Sign_Placed.MapEntry: Anvil Sign
+// Spear_Tiles.MapEntry: Spear
+// Sword_Hang_TIle.MapEntry: Sword Hang
+// Trident_Tiles.MapEntry: Tridents
+// SpearSignTile.MapEntry: Spear Sign
+// SwordSignTile.MapEntry: Sword Sign
+// TridentSignTile.MapEntry: Trident Sign
+// AnvilSignTile.MapEntry: Anvil Sign
+// BlankSignTile.MapEntry: Blank Sign
+// ClothierSignTile.MapEntry: Clothier Sign
+// CyberSignTile.MapEntry: Cyber Sign
+// DemolitionistSignTile.MapEntry: Demolitionist Sign
+// DryadSignTile.MapEntry: Dryad Sign
+// DyeSignTile.MapEntry: Dye Sign
+// GolfSignTile.MapEntry: Golf Sign
+// GunSignTile.MapEntry: Gun Sign
+// MechanicSignTile.MapEntry: Mechanic Sign
+// MerchantSignTile.MapEntry: Merchant Sign
+// PirateSignTile.MapEntry: Pirate Sign
+// PrincessSignTile.MapEntry: Princess Sign
+// SteamSignTile.MapEntry: Steam Sign
+// StylistSignTile.MapEntry: Stylist Sign
+// TinkererSignTile.MapEntry: Tinkerer Sign
+// TruffleSignTile.MapEntry: Truffle Sign
+// ZooSignTile.MapEntry: Zoo Sign
+// HookTile.MapEntry: Hook
+// MacchicolationTile.MapEntry: Machicolation
+// MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"

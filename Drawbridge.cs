@@ -19,15 +19,12 @@ namespace Drawbridge
 			PacketHandler.HandlePacket(reader, whoAmI);
 		}
 
-		// Register HorseStableTile and HorseStableItem if needed (tModLoader usually auto-registers ModTile/ModItem)
+        // Register HorseStableTile and HorseStableItem if needed (tModLoader usually auto-registers ModTile/ModItem)
 
-		public override void Load()
-		{
-			// Force-load our PlayerDrawLayer so tModLoader discovers it at runtime
-			_ = typeof(Systems.IronFieldBardingLayer);
-		}
+        // Force-load our PlayerDrawLayer so tModLoader discovers it at runtime
+        public override void Load() => _ = typeof(Systems.IronFieldBardingLayer);
 
-		public override void Unload()
+        public override void Unload()
 		{
 		}
 	}

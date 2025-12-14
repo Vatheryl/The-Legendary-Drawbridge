@@ -96,36 +96,6 @@ internal static class PacketHandler
                     // Because we are on the server, we can now call Toggle.
                     if (ModContent.GetModTile(tile.TileType) is IToggleTile toggle)
                         toggle.Toggle(i, j);
-
-                    // We check which tile type it is and call the appropriate Toggle method.
-                    //if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalTile>())
-                    //    ModContent.GetInstance<DrawbridgeHorizontalTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<DrawbridgeTile>())
-                    //    ModContent.GetInstance<DrawbridgeTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<PortcullisUpTile>())
-                    //    ModContent.GetInstance<PortcullisUpTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<PortcullisDownTile>())
-                    //    ModContent.GetInstance<PortcullisDownTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalFlippedTile>())
-                    //    ModContent.GetInstance<DrawbridgeHorizontalFlippedTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<DrawbridgeVerticalFlippedTile>())
-                    //    ModContent.GetInstance<DrawbridgeVerticalFlippedTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<HellDrawbridgeTile>())
-                    //    ModContent.GetInstance<HellDrawbridgeTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalTile>())
-                    //    ModContent.GetInstance<HellDrawbridgeHorizontalTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<HellDrawbridgeHorizontalFlippedTile>())
-                    //    ModContent.GetInstance<HellDrawbridgeHorizontalFlippedTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<HellDrawbridgeVerticalFlippedTile>())
-                    //    ModContent.GetInstance<HellDrawbridgeVerticalFlippedTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>())
-                    //    ModContent.GetInstance<LionDrawbridgeTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>())
-                    //    ModContent.GetInstance<LionDrawbridgeHorizontalTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>())
-                    //    ModContent.GetInstance<LionDrawbridgeHorizontalFlippedTile>().Toggle(i, j);
-                    //else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>())
-                    //    ModContent.GetInstance<LionDrawbridgeVerticalFlippedTile>().Toggle(i, j);
                 }
 
                 break;
@@ -183,23 +153,18 @@ internal static class PacketHandler
                         if (newType == 0)
                         {
                             // Removed overlay: drop the previous item
-                            int oldItemType = oldType == 1 ? ModContent.ItemType<Items.IronFieldBardingItem>() : (oldType == 2 ? ModContent.ItemType<Items.GoldArmorItem>() : (oldType == 3 ? ModContent.ItemType<Items.MoltenArmorItem>() : 0));
-                            if (oldItemType != 0)
-                                Item.NewItem(new EntitySource_TileInteraction(sender, pt.X, pt.Y), pt.X * 16, pt.Y * 16, 16 * 6, 16 * 5, oldItemType);
+                            if (oldType != 0)
+                                Item.NewItem(new EntitySource_TileInteraction(sender, pt.X, pt.Y), pt.X * 16, pt.Y * 16, 16 * 6, 16 * 5, oldType);
                         }
                         else
                         {
                             // Equipping/replacing overlay
                             if (oldType != 0)
                             {
-                                int oldItemType = oldType == 1 ? ModContent.ItemType<Items.IronFieldBardingItem>() : (oldType == 2 ? ModContent.ItemType<Items.GoldArmorItem>() : (oldType == 3 ? ModContent.ItemType<Items.MoltenArmorItem>() : 0));
-                                if (oldItemType != 0)
-                                    Item.NewItem(new EntitySource_TileInteraction(sender, pt.X, pt.Y), pt.X * 16, pt.Y * 16, 16 * 6, 16 * 5, oldItemType);
+                                Item.NewItem(new EntitySource_TileInteraction(sender, pt.X, pt.Y), pt.X * 16, pt.Y * 16, 16 * 6, 16 * 5, oldType);
                             }
 
-                            int consumeType = newType == 1 ? ModContent.ItemType<Items.IronFieldBardingItem>() : (newType == 2 ? ModContent.ItemType<Items.GoldArmorItem>() : (newType == 3 ? ModContent.ItemType<Items.MoltenArmorItem>() : 0));
-                            if (consumeType != 0)
-                                sender.ConsumeItem(consumeType);
+                            sender.ConsumeItem(newType);
                         }
 
                         ModPacket p = ModContent.GetInstance<Drawbridge>().GetPacket();
@@ -269,13 +234,13 @@ internal static class PacketHandler
                     {
                         int hi = context;
                         int hj = context2;
-                        if (TileEntity.TryGet(hi, hj, out Tiles.HookTileEntity hookTE))
+                        if (TileEntity.TryGet(hi, hj, out HookTileEntity hookTE))
                         {
                             Player player = Main.player[whoAmI];
                             if (hookTE.StoredItemType == 0)
                             {
                                 Item held = player.HeldItem;
-                                if (held != null && !held.IsAir && Tiles.HookTile.IsFishItemType(held.type))
+                                if (held != null && !held.IsAir && HookTile.IsFishItemType(held.type))
                                 {
                                     hookTE.StoredItemType = held.type;
                                     held.stack--;

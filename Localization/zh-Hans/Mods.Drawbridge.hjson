@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: 金钟舌
+	GoldBellAnimation.DisplayName: 金钟动画
+	ClockHand.DisplayName: 时钟指针
+	GraveyardBellClapper.DisplayName: 墓地钟舌
+	GraveyardBellAnimation.DisplayName: 墓地钟动画
+	FriendlyBatProjectile.DisplayName: 友好蝙蝠弹
+	FriendlyFairyProjectile.DisplayName: 友好精灵弹
+	StableUnicornMount.DisplayName: 马厩独角兽坐骑
+	PoopVisualProjectile.DisplayName: 粪便视觉弹
+	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Boiling Water
+}
+
+DeathReason.SpikedPallisade: 被尖刺栅栏刺穿了！
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: 吊桥配置
+
+		DisableEasterEgg: {
+			Label: 禁用彩蛋
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: 静音时钟声音
+			Tooltip: 启用后，时钟将不会播放整点声音。
+		}
+
+		MuteStableNoises: {
+			Label: 静音马厩噪音
+			Tooltip: 启用后，马厩不会发出声音。
+		}
+
+		DisableHorseStablePooping: {
+			Label: 禁用马厩掉粪
+			Tooltip: 启用后，马厩中的马不会掉粪。
+		}
+	}
+}
+
+// Tooltips.HorseDefense: When riding a horse, gain {0} defense
+// Wall.BlackCulvertWall: Black Culvert
+// Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: 黑色涵洞墙
+	CulvertDecorationTile.MapEntry: 涵洞装饰
+}
+
+NPCs: {
+	// ObsidianSerpent.DisplayName: Obsidian Serpent
+	// ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	// ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+// "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+// Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile

@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: Gold Bell Clapper
+	GoldBellAnimation.DisplayName: Gold Bell Animation
+	ClockHand.DisplayName: Clock Hand
+	GraveyardBellClapper.DisplayName: Graveyard Bell Clapper
+	GraveyardBellAnimation.DisplayName: Graveyard Bell Animation
+	FriendlyBatProjectile.DisplayName: Friendly Bat Projectile
+	FriendlyFairyProjectile.DisplayName: Friendly Fairy Projectile
+	StableUnicornMount.DisplayName: Stable Unicorn Mount
+	PoopVisualProjectile.DisplayName: Poop Visual Projectile
+	HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	HookProjectile.DisplayName: Hook Projectile
+	MachicolationWater.DisplayName: Boiling Water
+}
+
+DeathReason.SpikedPallisade: was impaled by a spiked pallisade!
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Drawbridge Config
+
+		DisableEasterEgg: {
+			Label: Disable Easter Egg
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Mute Clock Sound
+			Tooltip: If enabled, the clock will not play its hourly sound.
+		}
+
+		MuteStableNoises: {
+			Label: Mute Stable Noises
+			Tooltip: If enabled, horse stables will not play their stable noises.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Disable Horse Stable Pooping
+			Tooltip: If enabled, horses in stables will not drop Poo.
+		}
+	}
+}
+
+Tooltips.HorseDefense: When riding a horse, gain {0} defense
+Wall.BlackCulvertWall: Black Culvert
+Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Black Culvert Wall
+	CulvertDecorationTile.MapEntry: Culvert Decoration
+}
+
+NPCs: {
+	ObsidianSerpent.DisplayName: Obsidian Serpent
+	ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+"Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile

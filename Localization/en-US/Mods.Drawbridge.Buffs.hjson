@@ -1,0 +1,34 @@
+GoldenResonance: {
+	DisplayName: Golden Resonance
+	Description: Grants increased life regeneration and movement speed.
+}
+
+SpiritVeil: {
+	DisplayName: Spirit Veil
+	Description: Grants defense at night or in graveyards, and immunity to Cursed and Darkness.
+}
+
+SkyLionMane: {
+	DisplayName: Sky Lion Mane
+	Tooltip: The majestic mane of a sky lion
+}
+
+SkyLionCuirass: {
+	DisplayName: Sky Lion Cuirass
+	Tooltip: Protective chest armor of a sky lion
+}
+
+SkyLionGreaves: {
+	DisplayName: Sky Lion Greaves
+	Tooltip: Leg armor that grants the agility of a sky lion
+}
+
+SkyLionCloak: {
+	DisplayName: Sky Lion Cloak
+	Tooltip: A majestic cloak that flows like the wind
+}
+
+WightPalfreyBuff: {
+	DisplayName: Wight Palfrey
+	Description: Whispers tell of the Wight Palfrey, the skeletal horror riding the dark borders, drifting between worlds, whose very stride beckons the Necromancer Rise.
+}

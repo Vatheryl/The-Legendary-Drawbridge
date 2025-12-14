@@ -22,9 +22,10 @@ namespace Drawbridge.Tiles
             Main.tileWaterDeath[Type] = false;
             Main.tileSolid[Type] = true;
             Main.tileSolidTop[Type] = false;
-
             Main.tileLighted[Type] = true;
+
             TileID.Sets.DisableSmartCursor[Type] = true;
+            TileID.Sets.DrawsWalls[Type] = true;
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
             TileObjectData.newTile.Width = 2;

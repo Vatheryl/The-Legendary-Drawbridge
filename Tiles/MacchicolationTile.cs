@@ -1,3 +1,4 @@
+using Drawbridge.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -39,6 +40,7 @@ public class MacchicolationTile : ModTile
         Main.tileLavaDeath[Type] = false;
         Main.tileSolid[Type] = false;
         Main.tileSolidTop[Type] = false;
+
         TileID.Sets.DisableSmartCursor[Type] = true;
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
@@ -69,9 +71,10 @@ public class MacchicolationTile : ModTile
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 160, 96, ModContent.ItemType<Items.MacchicolationItem>());
+        
+        TileExtensions.GetTopLeft(ref i, ref j);
         ModContent.GetInstance<MacchicolationTileEntity>().Kill(i, j);
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 160, 96,
-            ModContent.ItemType<Items.MacchicolationItem>());
     }
 
     public override bool CanDrop(int i, int j) => false;
@@ -160,7 +163,7 @@ public class MacchicolationTile : ModTile
     }
 }
 
-public class MacchicolationTileEntity : ModTileEntity
+public class MacchicolationTileEntity : ModTileEntity, IClientSideTE
 {
     public enum AnimationState
     {
@@ -234,7 +237,7 @@ public class MacchicolationTileEntity : ModTileEntity
     void DropWater()
     {
         // Only drop water on the server or in single player
-        if (Main.netMode == NetmodeID.MultiplayerClient)
+        if (Main.netMode == NetmodeID.Server)
             return;
 
         // Only drop water every 10 ticks to reduce the amount
@@ -292,6 +295,7 @@ public class MacchicolationTileEntity : ModTileEntity
         Frame = 0;
         FrameCounter = 0;
         StateTimer = 180;
+
         if (Main.netMode == NetmodeID.Server)
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID, number2: Position.X, number3: Position.Y);
     }
@@ -302,6 +306,7 @@ public class MacchicolationTileEntity : ModTileEntity
         Frame = 0;
         FrameCounter = 0;
         StateTimer = 0;
+
         if (Main.netMode == NetmodeID.Server)
             NetMessage.SendData(MessageID.TileEntitySharing, number: ID, number2: Position.X, number3: Position.Y);
     }
@@ -320,10 +325,21 @@ public class MacchicolationTileEntity : ModTileEntity
 
     public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction, int alternate)
     {
+        TileExtensions.GetTopLeft(ref i, ref j);
+        var d = TileObjectData.GetTileData(Main.tile[i, j].TileType, 0);
+        var size = d is null ? new Point(1, 1) : new Point(d.Width, d.Height);
+
+        if (Main.tile[i, j].TileFrameX >= 180)
+        {
+            //i++;
+        }
+
+        Dust.NewDustPerfect(new Vector2(i + 0.5f, j + 0.5f) * 16, DustID.AncientLight, Vector2.Zero, Scale: 3f).noGravity = true;
+
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
-            NetMessage.SendTileSquare(Main.myPlayer, i, j, 10);
-            NetMessage.SendData(MessageID.TileEntityPlacement, number: i, number2: j, number3: Type, number4: 0f);
+            NetMessage.SendTileSquare(Main.myPlayer, i, j, size.X, size.Y);
+            NetMessage.SendData(MessageID.TileEntityPlacement, number: i, number2: j, number3: Type);
             return -1;
         }
 
@@ -333,7 +349,7 @@ public class MacchicolationTileEntity : ModTileEntity
     public override bool IsTileValidForEntity(int i, int j)
     {
         Tile tile = Main.tile[i, j];
-        return tile.HasTile && tile.TileType == ModContent.TileType<MacchicolationTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 0;
+        return tile.HasTile && tile.TileType == ModContent.TileType<MacchicolationTile>() && tile.TileFrameX % 180 == 0 && tile.TileFrameY == 0;
     }
 
     public override void SaveData(TagCompound tag)
@@ -352,8 +368,6 @@ public class MacchicolationTileEntity : ModTileEntity
         FrameCounter = tag.Get<int>("fc");
         StateTimer = tag.Get<int>("t");
         CooldownTimer = tag.Get<int>("cd");
-
-        ModContent.GetInstance<Drawbridge>().Logger.Debug("Egg");
     }
 
     public override void NetSend(BinaryWriter writer)

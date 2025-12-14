@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Подъёмный мост
+	WheelRender.DisplayName: Рендер колеса
+	PortcullisAnimation.DisplayName: Анимация решётчатых ворот
+	GoldBellClapper.DisplayName: Язычок золотого колокола
+	GoldBellAnimation.DisplayName: Анимация золотого колокола
+	ClockHand.DisplayName: Стрелка часов
+	GraveyardBellClapper.DisplayName: Язычок кладбищенского колокола
+	GraveyardBellAnimation.DisplayName: Анимация кладбищенского колокола
+	FriendlyBatProjectile.DisplayName: Дружественная летучая мышь — снаряд
+	FriendlyFairyProjectile.DisplayName: Дружественная фея — снаряд
+	StableUnicornMount.DisplayName: Единорог конюшни
+	PoopVisualProjectile.DisplayName: Визуальный снаряд — помет
+	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Boiling Water
+}
+
+// DeathReason.SpikedPallisade: was impaled by a spiked pallisade!
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Конфигурация разводного моста
+
+		DisableEasterEgg: {
+			Label: Отключить пасхалку
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Отключить звук часов
+			Tooltip: Если включено, часы не будут издавать звуки каждый час.
+		}
+
+		MuteStableNoises: {
+			Label: Отключить звуки конюшни
+			Tooltip: Если включено, конюшни не будут издавать звуки.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Отключить помет в конюшне
+			Tooltip: Если включено, лошади в конюшнях не будут оставлять помет.
+		}
+	}
+}
+
+// Tooltips.HorseDefense: When riding a horse, gain {0} defense
+// Wall.BlackCulvertWall: Black Culvert
+// Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Черная стена водоотвода
+	CulvertDecorationTile.MapEntry: Украшение водоотвода
+}
+
+NPCs: {
+	// ObsidianSerpent.DisplayName: Obsidian Serpent
+	// ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	// ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+// "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+// Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile
