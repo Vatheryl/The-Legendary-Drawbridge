@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: Badalo do Sino Dourado
+	GoldBellAnimation.DisplayName: Animação do Sino Dourado
+	ClockHand.DisplayName: Ponteiro do Relógio
+	GraveyardBellClapper.DisplayName: Badalo do sino do cemitério
+	GraveyardBellAnimation.DisplayName: Animação do sino do cemitério
+	FriendlyBatProjectile.DisplayName: Projétil de Morcego Amigável
+	FriendlyFairyProjectile.DisplayName: Projétil de Fada Amigável
+	StableUnicornMount.DisplayName: Montaria Unicórnio do Estábulo
+	PoopVisualProjectile.DisplayName: Projétil Visual de Cocô
+	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Boiling Water
+}
+
+DeathReason.SpikedPallisade: foi empalado por uma paliçada com espinhos!
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Configuração da Ponte Levadiça
+
+		DisableEasterEgg: {
+			Label: Desativar Easter Egg
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Silenciar Som do Relógio
+			Tooltip: Se ativado, o relógio não tocará seu som horário.
+		}
+
+		MuteStableNoises: {
+			Label: Silenciar Sons do Estábulo
+			Tooltip: Se ativado, estábulos de cavalos não farão seus sons.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Desativar Cocô no Estábulo
+			Tooltip: Se ativado, cavalos nos estábulos não soltarão cocô.
+		}
+	}
+}
+
+// Tooltips.HorseDefense: When riding a horse, gain {0} defense
+// Wall.BlackCulvertWall: Black Culvert
+// Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Parede de Bueiro Preto
+	CulvertDecorationTile.MapEntry: Decoração de Bueiro
+}
+
+NPCs: {
+	// ObsidianSerpent.DisplayName: Obsidian Serpent
+	// ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	// ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+// "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+// Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile

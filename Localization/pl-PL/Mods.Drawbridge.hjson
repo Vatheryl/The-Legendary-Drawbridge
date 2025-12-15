@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: Serce Złotego Dzwonu
+	GoldBellAnimation.DisplayName: Animacja Złotego Dzwonu
+	ClockHand.DisplayName: Wskazówka Zegara
+	GraveyardBellClapper.DisplayName: Serce dzwonu cmentarnego
+	GraveyardBellAnimation.DisplayName: Animacja dzwonu cmentarnego
+	FriendlyBatProjectile.DisplayName: Przyjazny Nietoperz - Pocisk
+	FriendlyFairyProjectile.DisplayName: Przyjazna Wróżka - Pocisk
+	StableUnicornMount.DisplayName: Jednorożec Stajni - Wierzchowiec
+	PoopVisualProjectile.DisplayName: Wizualny Pocisk Kupa
+	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Boiling Water
+}
+
+DeathReason.SpikedPallisade: został nabity na palisadę z kolcami!
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Konfiguracja Mostu Zwodzonego
+
+		DisableEasterEgg: {
+			Label: Wyłącz Easter Egg
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Wycisz Dźwięk Zegara
+			Tooltip: Jeśli włączone, zegar nie będzie odtwarzał dźwięku o pełnej godzinie.
+		}
+
+		MuteStableNoises: {
+			Label: Wycisz Dźwięki Stajni
+			Tooltip: Jeśli włączone, stajnie nie będą wydawać dźwięków.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Wyłącz Kupa w Stajni
+			Tooltip: Jeśli włączone, konie w stajniach nie będą zostawiać kupy.
+		}
+	}
+}
+
+// Tooltips.HorseDefense: When riding a horse, gain {0} defense
+// Wall.BlackCulvertWall: Black Culvert
+// Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Czarna Ściana Przepustu
+	CulvertDecorationTile.MapEntry: Dekoracja Przepustu
+}
+
+NPCs: {
+	// ObsidianSerpent.DisplayName: Obsidian Serpent
+	// ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	// ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+// "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+// Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile

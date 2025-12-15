@@ -8,6 +8,7 @@ using Terraria.ModLoader;
 using Terraria.ObjectData;
 using Drawbridge.Items;
 using Drawbridge.Systems;
+using Drawbridge.Items.HorseArmor;
 
 namespace Drawbridge.Tiles
 {
@@ -45,13 +46,14 @@ namespace Drawbridge.Tiles
 
             // If this tile stored armor, drop it
             GetTopLeft(i, j, out int left, out int top);
-            Point16 key = new Point16(left, top);
-            if (EquineArmatureWorld.TryGetType(key, out var overlayType) && overlayType != 0)
+            Point16 key = new(left, top);
+
+            if (EquineArmatureWorld.TryGetType(key, out int overlayType) && overlayType != 0)
             {
-                int itemType = overlayType == 5 ? ModContent.ItemType<SilverArmorItem>() : (overlayType == 4 ? ModContent.ItemType<CopperArmorItem>() : (overlayType == 3 ? ModContent.ItemType<MoltenArmorItem>() : (overlayType == 2 ? ModContent.ItemType<GoldArmorItem>() : ModContent.ItemType<IronFieldBardingItem>())));
-                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16 * 6, 16 * 5, itemType);
+                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16 * 6, 16 * 5, overlayType);
                 EquineArmatureWorld.SetType(key, 0);
             }
+
             // Clear flip state and sync so clients clean up state
             EquineArmatureWorld.SetAndSyncFlipped(key, false);
         }
@@ -60,21 +62,22 @@ namespace Drawbridge.Tiles
         {
             Player player = Main.LocalPlayer;
             GetTopLeft(i, j, out int left, out int top);
-            Point16 key = new Point16(left, top);
+            Point16 key = new(left, top);
+            int heldItemType = player.HeldItem.type; 
 
             // Toggle/equip overlay when holding an overlay item
-            if (player.HeldItem?.type == ModContent.ItemType<CopperArmorItem>() || player.HeldItem?.type == ModContent.ItemType<SilverArmorItem>() || player.HeldItem?.type == ModContent.ItemType<IronFieldBardingItem>() || player.HeldItem?.type == ModContent.ItemType<GoldArmorItem>() || player.HeldItem?.type == ModContent.ItemType<MoltenArmorItem>())
+            if (player.HeldItem.ModItem is HorseArmorItem)
             {
-                int desiredType = player.HeldItem.type == ModContent.ItemType<CopperArmorItem>() ? 4 : (player.HeldItem.type == ModContent.ItemType<SilverArmorItem>() ? 5 : (player.HeldItem.type == ModContent.ItemType<IronFieldBardingItem>() ? 1 : (player.HeldItem.type == ModContent.ItemType<GoldArmorItem>() ? 2 : 3)));
                 int currentType = EquineArmatureWorld.GetType(key);
-                if (currentType == desiredType)
+
+                if (currentType == player.HeldItem.type)
                 {
                     // Remove current overlay - only handle item dropping on server/single player
                     if (Main.netMode == NetmodeID.SinglePlayer)
                     {
-                        int itemType = desiredType == 5 ? ModContent.ItemType<SilverArmorItem>() : (desiredType == 4 ? ModContent.ItemType<CopperArmorItem>() : (desiredType == 3 ? ModContent.ItemType<MoltenArmorItem>() : (desiredType == 2 ? ModContent.ItemType<GoldArmorItem>() : ModContent.ItemType<IronFieldBardingItem>())));
-                        Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, itemType);
+                        Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, player.HeldItem.type);
                     }
+
                     EquineArmatureWorld.SetAndSyncType(key, 0);
                     Terraria.Audio.SoundEngine.PlaySound(SoundID.Grab);
                 }
@@ -86,9 +89,9 @@ namespace Drawbridge.Tiles
                         // Drop previous if any
                         if (currentType != 0)
                         {
-                            int oldItemType = currentType == 5 ? ModContent.ItemType<SilverArmorItem>() : (currentType == 4 ? ModContent.ItemType<CopperArmorItem>() : (currentType == 3 ? ModContent.ItemType<MoltenArmorItem>() : (currentType == 2 ? ModContent.ItemType<GoldArmorItem>() : ModContent.ItemType<IronFieldBardingItem>())));
-                            Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, oldItemType);
+                            Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, currentType);
                         }
+
                         // Consume the item used
                         player.ConsumeItem(player.HeldItem.type);
                     }
@@ -97,9 +100,11 @@ namespace Drawbridge.Tiles
                         // In multiplayer, client consumes item immediately; server handles drops via packet
                         player.ConsumeItem(player.HeldItem.type);
                     }
-                    EquineArmatureWorld.SetAndSyncType(key, desiredType);
+
+                    EquineArmatureWorld.SetAndSyncType(key, heldItemType);
                     Terraria.Audio.SoundEngine.PlaySound(SoundID.Grab);
                 }
+
                 return true;
             }
 
@@ -107,14 +112,15 @@ namespace Drawbridge.Tiles
             if (player.HeldItem == null || player.HeldItem.IsAir)
             {
                 int currentType = EquineArmatureWorld.GetType(key);
+
                 if (currentType != 0)
                 {
                     // Only drop items in single player; server handles drops via packet in multiplayer
                     if (Main.netMode == NetmodeID.SinglePlayer)
                     {
-                        int dropType = currentType == 5 ? ModContent.ItemType<SilverArmorItem>() : (currentType == 4 ? ModContent.ItemType<CopperArmorItem>() : (currentType == 3 ? ModContent.ItemType<MoltenArmorItem>() : (currentType == 2 ? ModContent.ItemType<GoldArmorItem>() : ModContent.ItemType<IronFieldBardingItem>())));
-                        Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, dropType);
+                        Item.NewItem(new EntitySource_TileInteraction(player, left, top), left * 16, top * 16, 16 * 6, 16 * 5, currentType);
                     }
+
                     EquineArmatureWorld.SetAndSyncType(key, 0);
                     Terraria.Audio.SoundEngine.PlaySound(SoundID.Grab);
                     return true;
@@ -130,6 +136,7 @@ namespace Drawbridge.Tiles
             GetTopLeft(i, j, out int left, out int top);
             Point16 key = new Point16(left, top);
             bool flipped = Main.LocalPlayer.direction == -1;
+
             if (Main.netMode == NetmodeID.SinglePlayer)
             {
                 EquineArmatureWorld.SetFlipped(key, flipped);

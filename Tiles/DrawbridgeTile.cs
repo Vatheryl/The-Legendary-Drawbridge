@@ -1,14 +1,10 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Drawbridge.Tiles;
-using Terraria.GameContent;
 using Drawbridge.Systems;
 
 namespace Drawbridge.Tiles;
@@ -16,6 +12,7 @@ namespace Drawbridge.Tiles;
 public class DrawbridgeTile : ModTile, IToggleTile
 {
     private static bool suppressToggleDrop = false;
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;
@@ -25,12 +22,10 @@ public class DrawbridgeTile : ModTile, IToggleTile
         Main.tileWaterDeath[Type] = false;
         Main.tileSolid[Type] = true;
         Main.tileSolidTop[Type] = false;
-
-        // Make it triggerable by wire
         Main.tileLighted[Type] = true;
 
-        // TileID.Sets.HasOutlines[Type] = true; // Commented out - requires _Highlight texture
         TileID.Sets.DisableSmartCursor[Type] = true;
+        TileID.Sets.DrawsWalls[Type] = true;
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
         TileObjectData.newTile.Width = 2;
@@ -135,13 +130,6 @@ public class DrawbridgeTile : ModTile, IToggleTile
             }
         }
 
-        // The projectile will now handle the sound
-        // SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove") {
-        //     Volume = 0.8f,
-        //     Pitch = 0.0f,
-        //     MaxInstances = 1
-        // }, new Vector2(originX * 16, originY * 16));
-
         // Start animation
         if (Main.netMode != NetmodeID.MultiplayerClient)
             StartDrawbridgeAnimation(originX, originY, true);
@@ -149,9 +137,9 @@ public class DrawbridgeTile : ModTile, IToggleTile
     }
 
     // Map a tile frameY pixel offset into its segment index (0–14)
-    private int GetVerticalSegmentIndex(int frameY)
+    private static int GetVerticalSegmentIndex(int frameY)
     {
-        int[] heights = new int[] { 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16 };
+        int[] heights = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16];
         int cum = 0;
         for (int s = 0; s < heights.Length; s++)
         {
@@ -163,7 +151,7 @@ public class DrawbridgeTile : ModTile, IToggleTile
         return heights.Length - 1;
     }
 
-    private void StartDrawbridgeAnimation(int originX, int originY, bool raising)
+    private static void StartDrawbridgeAnimation(int originX, int originY, bool raising)
     {
         // Spawn projectile at hinge (bottom-right of 2-tile base)
         int projType = ModContent.ProjectileType<Projectiles.DrawbridgeAnimation>();
@@ -174,11 +162,6 @@ public class DrawbridgeTile : ModTile, IToggleTile
         Projectile.NewProjectile(null, pivot, Vector2.Zero, projType, 0, 0, Main.myPlayer, ai0, ai1);
     }
 
-    public override void AnimateTile(ref int frame, ref int frameCounter)
-    {
-        // Static frames - animation handled by projectile
-    }
-
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
         if (suppressToggleDrop)
@@ -186,11 +169,5 @@ public class DrawbridgeTile : ModTile, IToggleTile
         // Drop item when destroyed
         Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16,
             ModContent.ItemType<Items.DrawbridgeItem>());
-    }
-
-    // Draw decorative wheel behind drawbridge base when static (vertical orientation)
-    public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-    {
-        // Static wheel drawing is now handled in WheelRenderSystem.PostDrawTiles
     }
 }

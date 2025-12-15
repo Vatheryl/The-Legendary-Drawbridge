@@ -24,8 +24,10 @@ namespace Drawbridge.Tiles
             Main.tileObsidianKill[Type] = true;
             Main.tileLavaDeath[Type] = false;
             Main.tileWaterDeath[Type] = false;
-            TileID.Sets.DisableSmartCursor[Type] = true;
             Main.tileLighted[Type] = true;
+
+            TileID.Sets.DisableSmartCursor[Type] = true;
+            TileID.Sets.DrawsWalls[Type] = true;
 
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
             TileObjectData.newTile.Width = 15;

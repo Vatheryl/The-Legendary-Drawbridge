@@ -1,0 +1,332 @@
+DrawbridgeItem: {
+	DisplayName: 吊桥
+	Tooltip: ""
+}
+
+WheelItem: {
+	DisplayName: 轮子
+	Tooltip: ""
+}
+
+PortcullisItem: {
+	DisplayName: 闸门
+	Tooltip: ""
+}
+
+SpikedPallisadeItem: {
+	DisplayName: 尖刺栅栏
+	Tooltip: 放置后右键点击以激活。
+}
+
+GoldBellItem: {
+	DisplayName: 金钟
+	Tooltip: 可与塔钟用电线连接
+}
+
+ClockItem: {
+	DisplayName: 塔钟
+	Tooltip: 可与钟用电线连接
+}
+
+GraveyardBellItem: {
+	DisplayName: 墓地钟
+	Tooltip: ""
+}
+
+HorseStableItem: {
+	DisplayName: 马厩门
+	Tooltip: 单人模式可容纳1只坐骑。多人模式仅作装饰。
+}
+
+BlackCulvertWallItem: {
+	DisplayName: 黑色涵洞墙
+	Tooltip: ""
+}
+
+Item.CulvertDecorationTileItem: 涵洞装饰
+
+CulvertDecorationTileItem: {
+	$parentVal: 涵洞装饰
+	DisplayName: 涵洞
+	Tooltip: ""
+}
+
+HorseStableExtendedItem: {
+	DisplayName: 扩展马厩门
+	Tooltip: 单人模式可容纳多达4只坐骑。多人模式仅作装饰。
+}
+
+HellDrawbridgeItem: {
+	// Tooltip: ""
+	// DisplayName: Hell Drawbridge
+}
+
+LionDrawbridgeItem: {
+	// Tooltip: ""
+	// DisplayName: Lion Drawbridge
+}
+
+EquineArmatureItem: {
+	DisplayName: 马匹护甲人偶
+	Tooltip: ""
+}
+
+IronFieldBardingItem: {
+	DisplayName: 铁制野战马甲
+	Tooltip: ""
+}
+
+GoldArmorItem: {
+	DisplayName: 黄金皇家马甲
+	Tooltip: ""
+}
+
+MoltenArmorItem: {
+	DisplayName: 地狱马甲
+	Tooltip: ""
+}
+
+TwinarchItem: {
+	// DisplayName: Twinarch
+	// Tooltip: ""
+}
+
+DoorcaseItem: {
+	// DisplayName: Doorcase
+	// Tooltip: ""
+}
+
+Fish_Sign_Item: {
+	// DisplayName: Fish Sign
+	// Tooltip: ""
+}
+
+Anvil_Sign_Item: {
+	// DisplayName: Anvil Sign
+	// Tooltip: ""
+}
+
+Spear_Inventory2: {
+	// DisplayName: Spear_ Inventory2
+	// Tooltip: ""
+}
+
+Sword_Hang_Inventory: {
+	// DisplayName: Sword_ Hang_ Inventory
+	// Tooltip: ""
+}
+
+TRident_Inventory: {
+	// DisplayName: T Rident_ Inventory
+	// Tooltip: ""
+}
+
+SpearSignItem: {
+	// DisplayName: Spear Sign
+	// Tooltip: ""
+}
+
+SwordSignItem: {
+	// DisplayName: Sword Sign
+	// Tooltip: ""
+}
+
+TridentSignItem: {
+	// DisplayName: Trident Sign
+	// Tooltip: ""
+}
+
+BlankSignItem: {
+	// DisplayName: Blank Sign
+	// Tooltip: ""
+}
+
+AnvilSignItem: {
+	// DisplayName: Anvil Sign
+	// Tooltip: ""
+}
+
+ClothierSignItem: {
+	// DisplayName: Clothier Sign
+	// Tooltip: ""
+}
+
+CyberSignItem: {
+	// DisplayName: Cyber Sign
+	// Tooltip: ""
+}
+
+DemolitionistSignItem: {
+	// DisplayName: Demolitionist Sign
+	// Tooltip: ""
+}
+
+DryadSignItem: {
+	// DisplayName: Dryad Sign
+	// Tooltip: ""
+}
+
+DyeSignItem: {
+	// DisplayName: Dye Sign
+	// Tooltip: ""
+}
+
+GolfSignItem: {
+	// DisplayName: Golf Sign
+	// Tooltip: ""
+}
+
+GunSignItem: {
+	// DisplayName: Gun Sign
+	// Tooltip: ""
+}
+
+MechanicSignItem: {
+	// DisplayName: Mechanic Sign
+	// Tooltip: ""
+}
+
+MerchantSignItem: {
+	// DisplayName: Merchant Sign
+	// Tooltip: ""
+}
+
+PirateSignItem: {
+	// DisplayName: Pirate Sign
+	// Tooltip: ""
+}
+
+PrincessSignItem: {
+	// DisplayName: Princess Sign
+	// Tooltip: ""
+}
+
+SteamSignItem: {
+	// DisplayName: Steam Sign
+	// Tooltip: ""
+}
+
+StylistSignItem: {
+	// DisplayName: Stylist Sign
+	// Tooltip: ""
+}
+
+TinkererSignItem: {
+	// DisplayName: Tinkerer Sign
+	// Tooltip: ""
+}
+
+TruffleSignItem: {
+	// DisplayName: Truffle Sign
+	// Tooltip: ""
+}
+
+ZooSignItem: {
+	// DisplayName: Zoo Sign
+	// Tooltip: ""
+}
+
+HookItem: {
+	// DisplayName: Hook
+	// Tooltip: Can hold fish
+}
+
+SkyLionCloak: {
+	// DisplayName: Sky Lion Cloak
+	// Tooltip: ""
+}
+
+SkyLionCuirass: {
+	// DisplayName: Sky Lion Cuirass
+	// Tooltip: ""
+}
+
+SkyLionGreaves: {
+	// DisplayName: Sky Lion Greaves
+	// Tooltip: ""
+}
+
+SkyLionMane: {
+	// DisplayName: Sky Lion Mane
+	// Tooltip: ""
+}
+
+SkyLionChestplate: {
+	// DisplayName: Sky Lion Cuirass
+	// Tooltip: ""
+}
+
+SkyLionHelmet: {
+	// DisplayName: Sky Lion Mane
+	// Tooltip: ""
+}
+
+SkyLionLeggings: {
+	// DisplayName: Sky Lion Greaves
+	// Tooltip: ""
+}
+
+CopperArmorItem: {
+	// DisplayName: Copper Barding
+	// Tooltip: ""
+}
+
+SilverArmorItem: {
+	// DisplayName: Silver Barding
+	// Tooltip: ""
+}
+
+CursedHorseshoeItem: {
+	// DisplayName: Cursed Horseshoe
+	// Tooltip: Summons a rideable skeletal horse
+}
+
+CursedHorseshoe: {
+	// DisplayName: Cursed Horseshoe
+	// Tooltip: ""
+}
+
+WastelanderBoots: {
+	// DisplayName: Wastelander Boots
+	// Tooltip: ""
+}
+
+WastelanderChestplate: {
+	// DisplayName: Wastelander Chestplate
+	// Tooltip: ""
+}
+
+WastelanderHood: {
+	// DisplayName: Wastelander Hood
+	// Tooltip: ""
+}
+
+MacchicolationItem: {
+	// DisplayName: Machicolation
+	// Tooltip: Medieval siege cauldron. Right click to drop boiling water on enemies.
+}
+
+MacchicolationItem_F: {
+	// DisplayName: Machicolation
+	// Tooltip: ""
+}
+
+MeteoriteHorseArmorItem: {
+	// DisplayName: Meteorite Barding
+	// Tooltip: ""
+}
+
+TinHorseArmorItem: {
+	// DisplayName: Tin Barding
+	// Tooltip: ""
+}
+
+PlatinumHorseArmorItem: {
+	// DisplayName: Platinum Barding
+	// Tooltip: ""
+}
+
+TungstenHorseArmorItem: {
+	// DisplayName: Tungsten Barding
+	// Tooltip: ""
+}

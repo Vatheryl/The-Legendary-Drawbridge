@@ -1,1 +1,14 @@
-copper and silver horse armor
+1.4.0.0 - Rename & Bugfixes
+- Added Tin, Meteorite, Platinum and Tungsten horse armor
+- Added defense tooltip to horse armor
+- Simplified A LOT of backend on the horse armor - this may impact existing Equine Armatures in your worlds, but shouldn't have a visible change
+- Cropped all horse armor items' images for consistency
+- Fixed issue with drawbridges where they'd hide walls behind them even in movement
+- Fixed Machicolation not working in multiplayer
+- Machicolation now uses a custom projectile for its attack instead of manually-tracked liquid
+- Fixed Copper (Horse) Armor
+- Removed "Tile" from all tile map entry localizations
+- Substantially improved tile map entry localization consistency & reuse
+- Removed "Item" from most item localizations
+- Renamed all horse armor items to '(Name) Barding'
+- Renamed mod to The Castle Era (from Legendary Drawbridge) to better fit themes

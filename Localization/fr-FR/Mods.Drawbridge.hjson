@@ -1,0 +1,64 @@
+Projectiles: {
+	DrawbridgeAnimation.DisplayName: Drawbridge
+	WheelRender.DisplayName: Wheel Render
+	PortcullisAnimation.DisplayName: Portcullis Animation
+	GoldBellClapper.DisplayName: Battant de la Cloche Dorée
+	GoldBellAnimation.DisplayName: Animation de la Cloche Dorée
+	ClockHand.DisplayName: Aiguille de l'Horloge
+	GraveyardBellClapper.DisplayName: Battant de la cloche du cimetière
+	GraveyardBellAnimation.DisplayName: Animation de la cloche du cimetière
+	FriendlyBatProjectile.DisplayName: Projectile Chauve-souris Amical
+	FriendlyFairyProjectile.DisplayName: Projectile Fée Amicale
+	StableUnicornMount.DisplayName: Licorne de l'Écurie
+	PoopVisualProjectile.DisplayName: Projectile Visuel de Crotte
+	// HellDrawbridgeAnimation.DisplayName: Hell Drawbridge Animation
+	// LionDrawbridgeAnimation.DisplayName: Lion Drawbridge Animation
+	// HookProjectile.DisplayName: Hook Projectile
+	// MachicolationWater.DisplayName: Boiling Water
+}
+
+DeathReason.SpikedPallisade: a été empalé par une palissade à pointes !
+
+Configs: {
+	DrawbridgeConfig: {
+		DisplayName: Configuration du Pont-levis
+
+		DisableEasterEgg: {
+			Label: Désactiver l'Easter Egg
+			Tooltip: ""
+		}
+
+		MuteClockSound: {
+			Label: Couper le Son de l'Horloge
+			Tooltip: Si activé, l'horloge ne jouera pas son son horaire.
+		}
+
+		MuteStableNoises: {
+			Label: Couper les Bruits de l'Écurie
+			Tooltip: Si activé, les écuries ne feront pas de bruit.
+		}
+
+		DisableHorseStablePooping: {
+			Label: Désactiver le Crottin dans l'Écurie
+			Tooltip: Si activé, les chevaux dans les écuries ne feront pas de crottin.
+		}
+	}
+}
+
+// Tooltips.HorseDefense: When riding a horse, gain {0} defense
+// Wall.BlackCulvertWall: Black Culvert
+// Item.BlackCulvertWallItem: Black Culvert Wall
+
+Walls: {
+	BlackCulvertWall.MapEntry: Mur de Buse Noire
+	CulvertDecorationTile.MapEntry: Décoration de Buse
+}
+
+NPCs: {
+	// ObsidianSerpent.DisplayName: Obsidian Serpent
+	// ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
+	// ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+}
+
+// "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
+// Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile

@@ -24,10 +24,10 @@ namespace Drawbridge.Tiles
             Main.tileObsidianKill[Type] = true;
             Main.tileLavaDeath[Type] = false;
             Main.tileWaterDeath[Type] = false;
-            TileID.Sets.DisableSmartCursor[Type] = true;
-
-            // Make it triggerable by wire
             Main.tileLighted[Type] = true;
+
+            TileID.Sets.DisableSmartCursor[Type] = true;
+            TileID.Sets.DrawsWalls[Type] = true;
 
             // Horizontal drawbridge: 15 tiles wide, 2 tiles tall
             TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);

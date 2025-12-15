@@ -1,0 +1,332 @@
+DrawbridgeItem: {
+	DisplayName: Подъёмный мост
+	Tooltip: ""
+}
+
+WheelItem: {
+	DisplayName: Колесо
+	Tooltip: ""
+}
+
+PortcullisItem: {
+	DisplayName: Решётчатые ворота
+	Tooltip: ""
+}
+
+SpikedPallisadeItem: {
+	DisplayName: Шипованная палисада
+	Tooltip: Щёлкните правой кнопкой мыши, чтобы привести в действие.
+}
+
+GoldBellItem: {
+	DisplayName: Золотой колокол
+	Tooltip: Можно соединить проводом с башенными часами
+}
+
+ClockItem: {
+	DisplayName: Башенные часы
+	Tooltip: Можно соединить проводом с колоколом
+}
+
+GraveyardBellItem: {
+	DisplayName: Кладбищенский колокол
+	Tooltip: ""
+}
+
+HorseStableItem: {
+	DisplayName: Ворота конюшни
+	Tooltip: Может содержать 1 маунта в одиночной игре. Только декоративно в мультиплеере.
+}
+
+BlackCulvertWallItem: {
+	DisplayName: Черная стена водоотвода
+	Tooltip: ""
+}
+
+Item.CulvertDecorationTileItem: Украшение водоотвода
+
+CulvertDecorationTileItem: {
+	$parentVal: Украшение водоотвода
+	DisplayName: Водоотвод
+	Tooltip: ""
+}
+
+HorseStableExtendedItem: {
+	DisplayName: Ворота расширенной конюшни
+	Tooltip: Может содержать до 4 маунтов в одиночной игре. Только декоративно в мультиплеере.
+}
+
+HellDrawbridgeItem: {
+	// Tooltip: ""
+	// DisplayName: Hell Drawbridge
+}
+
+LionDrawbridgeItem: {
+	// Tooltip: ""
+	// DisplayName: Lion Drawbridge
+}
+
+EquineArmatureItem: {
+	DisplayName: Манекен Конской Брони
+	Tooltip: ""
+}
+
+IronFieldBardingItem: {
+	DisplayName: Железная Полевая Броня
+	Tooltip: ""
+}
+
+GoldArmorItem: {
+	DisplayName: Золотая Королевская Броня
+	Tooltip: ""
+}
+
+MoltenArmorItem: {
+	DisplayName: Инфернальная Броня
+	Tooltip: ""
+}
+
+TwinarchItem: {
+	// DisplayName: Twinarch
+	// Tooltip: ""
+}
+
+DoorcaseItem: {
+	// DisplayName: Doorcase
+	// Tooltip: ""
+}
+
+Fish_Sign_Item: {
+	// DisplayName: Fish Sign
+	// Tooltip: ""
+}
+
+Anvil_Sign_Item: {
+	// DisplayName: Anvil Sign
+	// Tooltip: ""
+}
+
+Spear_Inventory2: {
+	// DisplayName: Spear_ Inventory2
+	// Tooltip: ""
+}
+
+Sword_Hang_Inventory: {
+	// DisplayName: Sword_ Hang_ Inventory
+	// Tooltip: ""
+}
+
+TRident_Inventory: {
+	// DisplayName: T Rident_ Inventory
+	// Tooltip: ""
+}
+
+SpearSignItem: {
+	// DisplayName: Spear Sign
+	// Tooltip: ""
+}
+
+SwordSignItem: {
+	// DisplayName: Sword Sign
+	// Tooltip: ""
+}
+
+TridentSignItem: {
+	// DisplayName: Trident Sign
+	// Tooltip: ""
+}
+
+BlankSignItem: {
+	// DisplayName: Blank Sign
+	// Tooltip: ""
+}
+
+AnvilSignItem: {
+	// DisplayName: Anvil Sign
+	// Tooltip: ""
+}
+
+ClothierSignItem: {
+	// DisplayName: Clothier Sign
+	// Tooltip: ""
+}
+
+CyberSignItem: {
+	// DisplayName: Cyber Sign
+	// Tooltip: ""
+}
+
+DemolitionistSignItem: {
+	// DisplayName: Demolitionist Sign
+	// Tooltip: ""
+}
+
+DryadSignItem: {
+	// DisplayName: Dryad Sign
+	// Tooltip: ""
+}
+
+DyeSignItem: {
+	// DisplayName: Dye Sign
+	// Tooltip: ""
+}
+
+GolfSignItem: {
+	// DisplayName: Golf Sign
+	// Tooltip: ""
+}
+
+GunSignItem: {
+	// DisplayName: Gun Sign
+	// Tooltip: ""
+}
+
+MechanicSignItem: {
+	// DisplayName: Mechanic Sign
+	// Tooltip: ""
+}
+
+MerchantSignItem: {
+	// DisplayName: Merchant Sign
+	// Tooltip: ""
+}
+
+PirateSignItem: {
+	// DisplayName: Pirate Sign
+	// Tooltip: ""
+}
+
+PrincessSignItem: {
+	// DisplayName: Princess Sign
+	// Tooltip: ""
+}
+
+SteamSignItem: {
+	// DisplayName: Steam Sign
+	// Tooltip: ""
+}
+
+StylistSignItem: {
+	// DisplayName: Stylist Sign
+	// Tooltip: ""
+}
+
+TinkererSignItem: {
+	// DisplayName: Tinkerer Sign
+	// Tooltip: ""
+}
+
+TruffleSignItem: {
+	// DisplayName: Truffle Sign
+	// Tooltip: ""
+}
+
+ZooSignItem: {
+	// DisplayName: Zoo Sign
+	// Tooltip: ""
+}
+
+HookItem: {
+	// DisplayName: Hook
+	// Tooltip: Can hold fish
+}
+
+SkyLionCloak: {
+	// DisplayName: Sky Lion Cloak
+	// Tooltip: ""
+}
+
+SkyLionCuirass: {
+	// DisplayName: Sky Lion Cuirass
+	// Tooltip: ""
+}
+
+SkyLionGreaves: {
+	// DisplayName: Sky Lion Greaves
+	// Tooltip: ""
+}
+
+SkyLionMane: {
+	// DisplayName: Sky Lion Mane
+	// Tooltip: ""
+}
+
+SkyLionChestplate: {
+	// DisplayName: Sky Lion Cuirass
+	// Tooltip: ""
+}
+
+SkyLionHelmet: {
+	// DisplayName: Sky Lion Mane
+	// Tooltip: ""
+}
+
+SkyLionLeggings: {
+	// DisplayName: Sky Lion Greaves
+	// Tooltip: ""
+}
+
+CopperArmorItem: {
+	// DisplayName: Copper Barding
+	// Tooltip: ""
+}
+
+SilverArmorItem: {
+	// DisplayName: Silver Barding
+	// Tooltip: ""
+}
+
+CursedHorseshoeItem: {
+	// DisplayName: Cursed Horseshoe
+	// Tooltip: Summons a rideable skeletal horse
+}
+
+CursedHorseshoe: {
+	// DisplayName: Cursed Horseshoe
+	// Tooltip: ""
+}
+
+WastelanderBoots: {
+	// DisplayName: Wastelander Boots
+	// Tooltip: ""
+}
+
+WastelanderChestplate: {
+	// DisplayName: Wastelander Chestplate
+	// Tooltip: ""
+}
+
+WastelanderHood: {
+	// DisplayName: Wastelander Hood
+	// Tooltip: ""
+}
+
+MacchicolationItem: {
+	// DisplayName: Machicolation
+	// Tooltip: Medieval siege cauldron. Right click to drop boiling water on enemies.
+}
+
+MacchicolationItem_F: {
+	// DisplayName: Machicolation
+	// Tooltip: ""
+}
+
+MeteoriteHorseArmorItem: {
+	// DisplayName: Meteorite Barding
+	// Tooltip: ""
+}
+
+TinHorseArmorItem: {
+	// DisplayName: Tin Barding
+	// Tooltip: ""
+}
+
+PlatinumHorseArmorItem: {
+	// DisplayName: Platinum Barding
+	// Tooltip: ""
+}
+
+TungstenHorseArmorItem: {
+	// DisplayName: Tungsten Barding
+	// Tooltip: ""
+}
