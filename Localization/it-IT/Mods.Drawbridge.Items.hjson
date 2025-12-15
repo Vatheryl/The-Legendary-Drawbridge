@@ -87,12 +87,12 @@ MoltenArmorItem: {
 }
 
 TwinarchItem: {
-	// DisplayName: Twinarch Item
+	// DisplayName: Twinarch
 	// Tooltip: ""
 }
 
 DoorcaseItem: {
-	// DisplayName: Doorcase Item
+	// DisplayName: Doorcase
 	// Tooltip: ""
 }
 
@@ -122,21 +122,20 @@ TRident_Inventory: {
 }
 
 SpearSignItem: {
-	// DisplayName: Spear Sign Item
+	// DisplayName: Spear Sign
 	// Tooltip: ""
 }
 
 SwordSignItem: {
-	// DisplayName: Sword Sign Item
+	// DisplayName: Sword Sign
 	// Tooltip: ""
 }
 
 TridentSignItem: {
-	// DisplayName: Trident Sign Item
+	// DisplayName: Trident Sign
 	// Tooltip: ""
 }
 
-// New NPC-themed signs
 BlankSignItem: {
 	// DisplayName: Blank Sign
 	// Tooltip: ""
@@ -268,12 +267,12 @@ SkyLionLeggings: {
 }
 
 CopperArmorItem: {
-	// DisplayName: Copper Horse Armor
+	// DisplayName: Copper Barding
 	// Tooltip: ""
 }
 
 SilverArmorItem: {
-	// DisplayName: Silver Horse Armor
+	// DisplayName: Silver Barding
 	// Tooltip: ""
 }
 
@@ -313,21 +312,21 @@ MacchicolationItem_F: {
 }
 
 MeteoriteHorseArmorItem: {
-	// DisplayName: Meteorite Horse Armor
+	// DisplayName: Meteorite Barding
 	// Tooltip: ""
 }
 
 TinHorseArmorItem: {
-	// DisplayName: Tin Horse Armor
+	// DisplayName: Tin Barding
 	// Tooltip: ""
 }
 
 PlatinumHorseArmorItem: {
-	// DisplayName: Platinum Horse Armor Item
+	// DisplayName: Platinum Barding
 	// Tooltip: ""
 }
 
 TungstenHorseArmorItem: {
-	// DisplayName: Tungsten Horse Armor Item
+	// DisplayName: Tungsten Barding
 	// Tooltip: ""
 }

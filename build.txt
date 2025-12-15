@@ -1,3 +1,3 @@
-displayName = Legendary Drawbridge
-author = Dice & Vatheryl & Space Dolphin & GabeHasWon
-version = 1.3.0.1
+displayName = The Castle Era
+author = Dice, Vatheryl, Space Dolphin & GabeHasWon
+version = 1.4.0.0

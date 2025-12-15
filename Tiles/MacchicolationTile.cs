@@ -329,11 +329,6 @@ public class MacchicolationTileEntity : ModTileEntity, IClientSideTE
         var d = TileObjectData.GetTileData(Main.tile[i, j].TileType, 0);
         var size = d is null ? new Point(1, 1) : new Point(d.Width, d.Height);
 
-        if (Main.tile[i, j].TileFrameX >= 180)
-        {
-            //i++;
-        }
-
         Dust.NewDustPerfect(new Vector2(i + 0.5f, j + 0.5f) * 16, DustID.AncientLight, Vector2.Zero, Scale: 3f).noGravity = true;
 
         if (Main.netMode == NetmodeID.MultiplayerClient)

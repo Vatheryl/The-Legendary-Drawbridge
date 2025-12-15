@@ -1,4 +1,4 @@
-1.3.0.1
+1.4.0.0 - Rename & Bugfixes
 - Added Tin, Meteorite, Platinum and Tungsten horse armor
 - Added defense tooltip to horse armor
 - Simplified A LOT of backend on the horse armor - this may impact existing Equine Armatures in your worlds, but shouldn't have a visible change
@@ -11,3 +11,4 @@
 - Substantially improved tile map entry localization consistency & reuse
 - Removed "Item" from most item localizations
 - Renamed all horse armor items to '(Name) Barding'
+- Renamed mod to The Castle Era (from Legendary Drawbridge) to better fit themes
