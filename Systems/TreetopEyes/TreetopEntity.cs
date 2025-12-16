@@ -45,6 +45,8 @@ internal class TreetopEntity : GlobalTile
 
     private class TreetopIO : ModSystem
     {
+        public override bool IsLoadingEnabled(Mod mod) => false;
+
         public override void SaveWorldData(TagCompound tag)
         {
             tag.Add("count", Treetops.Count);
@@ -91,6 +93,8 @@ internal class TreetopEntity : GlobalTile
     private static Vector2[] Offsets => [new Vector2(-16, -18), new(-4, -60), new(8, -4), new(6, -32), new(18, -20), new(10, -46)];
 
     private static Asset<Texture2D> HangingEye = null;
+
+    public override bool IsLoadingEnabled(Mod mod) => false;
 
     public override void Load()
     {
@@ -160,7 +164,7 @@ internal class TreetopEntity : GlobalTile
     {
         Tile tile = Main.tile[i, j];
 
-        while (tile.TileType == 5)
+        while (tile.TileType == TileID.Trees)
         {
             j++;
             tile = Main.tile[i, j];
@@ -187,7 +191,7 @@ internal class TreetopEntity : GlobalTile
         TryAddTreetop(i, j);
         Treetop top = Treetops[new Point16(i, j)];
 
-        if (WorldGen.genRand.NextBool(25) && top.eyeCount < Treetop.MaxEyes)
+        if (WorldGen.genRand.NextBool(180) && top.eyeCount < Treetop.MaxEyes)
         {
             top.variants[top.eyeCount] = (byte)Main.rand.Next(Treetop.MaxEyes);
             top.eyeCount++;

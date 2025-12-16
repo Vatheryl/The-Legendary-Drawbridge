@@ -14,6 +14,7 @@ internal class AwokenEyeNPC : GlobalNPC
 
     private bool _lastDayTime = false;
 
+    public override bool IsLoadingEnabled(Mod mod) => false;
     public override bool AppliesToEntity(NPC entity, bool lateInstantiation) => entity.type is NPCID.SleepyEye or NPCID.SleepyEye2;
 
     public override bool PreAI(NPC npc)
