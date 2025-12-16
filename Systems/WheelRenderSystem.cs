@@ -7,6 +7,8 @@ using Terraria.GameContent;
 using Drawbridge.Tiles;
 using System.Collections.Generic;
 using ReLogic.Content;
+using System.Runtime.CompilerServices;
+using System.Dynamic;
 
 namespace Drawbridge.Systems;
 
@@ -47,8 +49,14 @@ public class WheelRenderSystem : ModSystem
 
     public override void PostDrawTiles()
     {
-        // Begin a new sprite batch for world drawing
+        // Not sure why this is necessary?
+        if (GetBeginCalled(Main.spriteBatch))
+            Main.spriteBatch.End();
 
+        [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "beginCalled")]
+        static extern ref bool GetBeginCalled(SpriteBatch batch);
+
+        // Begin a new sprite batch for world drawing
         SpriteBatch sb = Main.spriteBatch;
         Matrix matrix = Main.GameViewMatrix.TransformationMatrix;
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
