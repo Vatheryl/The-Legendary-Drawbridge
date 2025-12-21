@@ -1,3 +1,4 @@
+using Drawbridge.Common.Tiles;
 using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -9,7 +10,9 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-public class HellDrawbridgeTile : ModTile, IToggleTile
+#nullable enable
+
+public class HellDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeCover, IDrawbridgeWheels
 {
     public override string Texture => "Drawbridge/Tiles/Hell_Drawbridge";
 
@@ -49,13 +52,16 @@ public class HellDrawbridgeTile : ModTile, IToggleTile
 
     public override bool CanPlace(int i, int j)
     {
-        if (j < 14) return false;
+        if (j < 14) 
+            return false;
+
         for (int dx = -1; dx <= 0; dx++)
         {
             Tile bottomTile = Main.tile[i + dx, j + 1];
             if (!bottomTile.HasTile || !Main.tileSolid[bottomTile.TileType])
                 return false;
         }
+
         for (int dx = -1; dx <= 0; dx++)
         {
             for (int dy = 0; dy < 15; dy++)
@@ -65,6 +71,7 @@ public class HellDrawbridgeTile : ModTile, IToggleTile
                     return false;
             }
         }
+
         return true;
     }
 
@@ -122,12 +129,14 @@ public class HellDrawbridgeTile : ModTile, IToggleTile
     {
         int[] heights = new int[] { 16,16,16,16,16,16,16,16,16,16,16,16,16,16,16 };
         int cum = 0;
+
         for (int s = 0; s < heights.Length; s++)
         {
             if (frameY < cum + heights[s])
                 return s;
             cum += heights[s];
         }
+
         return heights.Length - 1;
     }
 
@@ -151,5 +160,21 @@ public class HellDrawbridgeTile : ModTile, IToggleTile
             return;
         Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16,
             ModContent.ItemType<Items.HellDrawbridgeItem>());
+    }
+
+    bool IDrawbridgeCover.CanDraw(Tile tile, out WheelRenderSystem.DrawType drawType, out string mainTex, out string glowTex, ref Vector2 offset)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        mainTex = "hellCover";
+        glowTex = "hellGlowMask";
+        return tile.TileFrameX == 16 && tile.TileFrameY == 224;
+    }
+
+    bool IDrawbridgeWheels.DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        textureName = "hellWheel";
+        glowName = "hellWheelGlowMask";
+        return tile.TileFrameX == 16 && tile.TileFrameY == 224;
     }
 }

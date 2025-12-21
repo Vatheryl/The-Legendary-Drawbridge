@@ -7,6 +7,7 @@ using Terraria.DataStructures;
 using Drawbridge.Players;
 using Drawbridge.Systems;
 using Drawbridge.Systems.Synchronization;
+using Drawbridge.Common.Tiles;
 
 namespace Drawbridge;
 

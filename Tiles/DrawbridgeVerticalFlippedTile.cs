@@ -1,3 +1,4 @@
+using Drawbridge.Common.Tiles;
 using Drawbridge.Projectiles;
 using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
@@ -10,7 +11,7 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-public class DrawbridgeVerticalFlippedTile : ModTile, IToggleTile
+public class DrawbridgeVerticalFlippedTile : ModTile, IToggleTile, IDrawbridgeWheels
 {
     public override string Texture => "Drawbridge/Tiles/DrawbridgeFlippedTile";
 
@@ -147,5 +148,13 @@ public class DrawbridgeVerticalFlippedTile : ModTile, IToggleTile
     {
         Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16,
             ModContent.ItemType<Items.DrawbridgeItem>());
+    }
+
+    bool IDrawbridgeWheels.DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType)
+    {
+        drawType = WheelRenderSystem.DrawType.Flipped;
+        textureName = "wheelV";
+        glowName = "";
+        return tile.TileFrameX == 0 && tile.TileFrameY == 224;
     }
 }

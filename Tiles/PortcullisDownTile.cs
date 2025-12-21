@@ -1,6 +1,6 @@
+using Drawbridge.Common.Tiles;
 using Drawbridge.Items;
 using Drawbridge.Projectiles;
-using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;

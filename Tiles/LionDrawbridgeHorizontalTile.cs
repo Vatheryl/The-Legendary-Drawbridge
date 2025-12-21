@@ -1,20 +1,17 @@
-using Drawbridge.Items;
+using Drawbridge.Common.Tiles;
 using Drawbridge.Projectiles;
 using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.Enums;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-public class LionDrawbridgeHorizontalTile : ModTile, IToggleTile
+public class LionDrawbridgeHorizontalTile : ModTile, IToggleTile, IDrawbridgeCover, IDrawbridgeWheels, IDrawbridgeChains
 {
     public override string Texture => "Drawbridge/Tiles/Lion_DrawbridgeHorizontal";
 
@@ -90,6 +87,7 @@ public class LionDrawbridgeHorizontalTile : ModTile, IToggleTile
             {
                 Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16, 16, ModContent.ItemType<Items.LionDrawbridgeItem>());
             }
+
             noItem = true;
 
             for (int x = anchorX; x < anchorX + 15; x++)
@@ -147,8 +145,11 @@ public class LionDrawbridgeHorizontalTile : ModTile, IToggleTile
 
     public override bool RightClick(int i, int j)
     {
-        if (Main.netMode == NetmodeID.MultiplayerClient) PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
-        else Toggle(i, j);
+        if (Main.netMode == NetmodeID.MultiplayerClient) 
+            PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
+        else 
+            Toggle(i, j);
+        
         return true;
     }
 
@@ -158,5 +159,28 @@ public class LionDrawbridgeHorizontalTile : ModTile, IToggleTile
     public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
     {
         // Static wheel drawing is now handled in WheelRenderSystem.PostDrawTiles
+    }
+
+    bool IDrawbridgeCover.CanDraw(Tile tile, out WheelRenderSystem.DrawType drawType, out string mainTex, out string glowTex, ref Vector2 offset)
+    {
+        drawType = WheelRenderSystem.DrawType.Horizontal;
+        mainTex = "lionCoverHorizontal";
+        glowTex = "";
+        offset = new Vector2(0, 4);
+        return tile.TileFrameX == 224 && tile.TileFrameY == 16;
+    }
+
+    bool IDrawbridgeWheels.DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        textureName = "wheelH";
+        glowName = "";
+        return tile.TileFrameX == 224 && tile.TileFrameY == 16;
+    }
+
+    bool IDrawbridgeChains.DrawChains(Tile tile, out WheelRenderSystem.DrawType drawType, ref Color chainColor)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        return tile.TileFrameX == 224 && tile.TileFrameY == 16;
     }
 }

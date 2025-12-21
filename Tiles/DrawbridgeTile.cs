@@ -1,3 +1,5 @@
+using Drawbridge.Common.Tiles;
+using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -5,11 +7,10 @@ using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using Drawbridge.Systems;
 
 namespace Drawbridge.Tiles;
 
-public class DrawbridgeTile : ModTile, IToggleTile
+public class DrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWheels
 {
     private static bool suppressToggleDrop = false;
 
@@ -169,5 +170,13 @@ public class DrawbridgeTile : ModTile, IToggleTile
         // Drop item when destroyed
         Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16,
             ModContent.ItemType<Items.DrawbridgeItem>());
+    }
+
+    bool IDrawbridgeWheels.DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        textureName = "wheelV";
+        glowName = "";
+        return tile.TileFrameX == 16 && tile.TileFrameY == 224;
     }
 }
