@@ -115,35 +115,36 @@ public class DrawbridgeHorizontalTile : ModTile, IToggleTile, IDrawbridgeWheels,
 
     public void Toggle(int i, int j)
     {
-            // Determine which segment was clicked
-            Tile tile = Main.tile[i, j];
-            int frameX = tile.TileFrameX;
-            int frameY = tile.TileFrameY;
-            int segmentX = frameX / 16;
-            int segmentY = frameY / 16;
-            // Compute removal origin (rightmost of the horizontal board)
-            int removalOriginX = i - segmentX + 14;
-            // Compute pivot origin (leftmost of the hinge base)
-            int originX = removalOriginX - 1;
-            int originY = j - segmentY + 1;
-            // Hide the static horizontal drawbridge tiles
-            for (int x = 0; x < 15; x++)
+        // Determine which segment was clicked
+        Tile tile = Main.tile[i, j];
+        int frameX = tile.TileFrameX;
+        int frameY = tile.TileFrameY;
+        int segmentX = frameX / 16;
+        int segmentY = frameY / 16;
+        // Compute removal origin (rightmost of the horizontal board)
+        int removalOriginX = i - segmentX + 14;
+        // Compute pivot origin (leftmost of the hinge base)
+        int originX = removalOriginX - 1;
+        int originY = j - segmentY + 1;
+        // Hide the static horizontal drawbridge tiles
+        for (int x = 0; x < 15; x++)
+        {
+            for (int y = 0; y < 2; y++)
             {
-                for (int y = 0; y < 2; y++)
+                Tile currentTile = Main.tile[removalOriginX - x, originY - y];
+                if (currentTile.HasTile && currentTile.TileType == Type)
                 {
-                    Tile currentTile = Main.tile[removalOriginX - x, originY - y];
-                    if (currentTile.HasTile && currentTile.TileType == Type)
-                    {
-                        currentTile.HasTile = false;
-                        if (Main.netMode == NetmodeID.Server)
-                            NetMessage.SendTileSquare(-1, removalOriginX - x, originY - y, 1, 1);
-                    }
+                    currentTile.HasTile = false;
+                    if (Main.netMode == NetmodeID.Server)
+                        NetMessage.SendTileSquare(-1, removalOriginX - x, originY - y, 1, 1);
                 }
             }
-            // The projectile will now handle the sound
-            // SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove") { Volume = 0.8f, Pitch = 0f, MaxInstances = 1 },
-            //     new Vector2(originX * 16, originY * 16));
-            // Spawn animation (raising = false), packing hinge in ai[1]
+        }
+
+        // The projectile will now handle the sound
+        // SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove") { Volume = 0.8f, Pitch = 0f, MaxInstances = 1 },
+        //     new Vector2(originX * 16, originY * 16));
+        // Spawn animation (raising = false), packing hinge in ai[1]
         if (Main.netMode != NetmodeID.MultiplayerClient)
         {
             int projType = ModContent.ProjectileType<DrawbridgeAnimation>();

@@ -20,10 +20,10 @@ namespace Drawbridge.Systems
             {
                 if (!proj.active || proj.ModProjectile == null)
                     continue;
-                if (proj.ModProjectile is DrawbridgeAnimation || proj.ModProjectile is PortcullisAnimation || proj.ModProjectile is GoldBellClapper || proj.ModProjectile is GraveyardBellClapper || proj.ModProjectile is ClockHand)
+                if (proj.ModProjectile is BaseDrawbridgeAnimation || proj.ModProjectile is PortcullisAnimation || proj.ModProjectile is GoldBellClapper || proj.ModProjectile is GraveyardBellClapper || proj.ModProjectile is ClockHand)
                 {
                     int timerValue = 0;
-                    if (proj.ModProjectile is DrawbridgeAnimation da)
+                    if (proj.ModProjectile is BaseDrawbridgeAnimation da)
                         timerValue = da.AnimationTimer;
                     else if (proj.ModProjectile is PortcullisAnimation pa)
                         timerValue = pa.AnimationTimer;
@@ -63,7 +63,7 @@ namespace Drawbridge.Systems
 					if (index >= 0 && index < Main.maxProjectiles && Main.projectile[index].active)
 					{
 						var mp = Main.projectile[index].ModProjectile;
-						if (mp is DrawbridgeAnimation da)
+						if (mp is BaseDrawbridgeAnimation da)
 							da.AnimationTimer = timerValue;
 						else if (mp is PortcullisAnimation pa)
 							pa.AnimationTimer = timerValue;

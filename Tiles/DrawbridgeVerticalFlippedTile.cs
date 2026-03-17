@@ -138,7 +138,7 @@ public class DrawbridgeVerticalFlippedTile : ModTile, IToggleTile, IDrawbridgeWh
             int projType = ModContent.ProjectileType<DrawbridgeAnimation>();
             Vector2 pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
             // Store originX in ai[0] (using bits 2+), raising flag in bit 0, flipped flag in bit 1
-            float ai0 = (originX << 2) | 1 | 2; // raising + flipped
+            float ai0 = (originX << 2) | 0; // lowering (not raising, not flipped)
             float ai1 = originY; // Store originY directly in ai[1]
             Projectile.NewProjectile(null, pivot, Vector2.Zero, projType, 0, 0, Main.myPlayer, ai0, ai1);
         }

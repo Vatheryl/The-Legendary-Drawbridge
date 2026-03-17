@@ -4,13 +4,15 @@ using Terraria.ModLoader;
 
 namespace Drawbridge.Tiles;
 
+/// <summary>
+/// Tile used solely to fake collision.
+/// </summary>
 public class DrawbridgeSolidTile : ModTile
 {
     public override void SetStaticDefaults()
     {
         Main.tileSolid[Type] = true;
         Main.tileBlockLight[Type] = false;
-        // No texture, no map entry, no item drop. Purely for collision.
 
         TileID.Sets.DrawsWalls[Type] = true;
     }
