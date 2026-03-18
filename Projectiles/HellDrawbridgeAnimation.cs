@@ -13,7 +13,8 @@ public class HellDrawbridgeAnimation : BaseDrawbridgeAnimation
     public override string Texture => "Drawbridge/Tiles/Hell_Drawbridge";
 
     protected override DrawbridgeData SetDrawbridgeData() 
-        => DrawbridgeData.Generic<HellDrawbridgeTile, HellDrawbridgeVerticalFlippedTile, HellDrawbridgeHorizontalTile, HellDrawbridgeHorizontalFlippedTile, HellDrawbridgeItem>(Color.Lerp(baseLight, new Color(20, 40, 120), 0.8f));
+        => DrawbridgeData.Generic<HellDrawbridgeTile, HellDrawbridgeVerticalFlippedTile, HellDrawbridgeHorizontalTile, HellDrawbridgeHorizontalFlippedTile, HellDrawbridgeItem>(
+            (originalColor) => Color.Lerp(originalColor, new Color(20, 40, 120), 0.8f));
 
     protected override void DrawDrawbridgeExtras(Vector2 drawPos, Color baseLight, float rot, float scale)
     {

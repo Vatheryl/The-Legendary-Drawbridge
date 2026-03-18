@@ -12,7 +12,8 @@ public class LionDrawbridgeAnimation : BaseDrawbridgeAnimation
     public override string Texture => "Drawbridge/Tiles/Lion_Drawbridge";
 
     protected override DrawbridgeData SetDrawbridgeData()
-        => DrawbridgeData.Generic<LionDrawbridgeTile, LionDrawbridgeVerticalFlippedTile, LionDrawbridgeHorizontalTile, LionDrawbridgeHorizontalFlippedTile, LionDrawbridgeItem>(Color.White);
+        => DrawbridgeData.Generic<LionDrawbridgeTile, LionDrawbridgeVerticalFlippedTile, LionDrawbridgeHorizontalTile, LionDrawbridgeHorizontalFlippedTile, LionDrawbridgeItem>(
+            originalColor => Color.Lerp(originalColor, new Color(255, 215, 0), 0.3f));
 
     protected override void DrawDrawbridgeExtras(Vector2 drawPos, Color baseLight, float rot, float scale)
     {
