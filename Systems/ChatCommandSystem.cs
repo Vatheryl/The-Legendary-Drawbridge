@@ -4,7 +4,7 @@ using System.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Drawbridge.Tiles;
+using Drawbridge.Tiles.Drawbridges;
 
 namespace Drawbridge.Systems
 {

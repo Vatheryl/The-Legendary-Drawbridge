@@ -6,6 +6,7 @@ using Terraria.ModLoader.IO;
 using Terraria.DataStructures;
 using Drawbridge.Projectiles;
 using Terraria.ID;
+using Drawbridge.Tiles.Drawbridges;
 
 namespace Drawbridge.Systems
 {

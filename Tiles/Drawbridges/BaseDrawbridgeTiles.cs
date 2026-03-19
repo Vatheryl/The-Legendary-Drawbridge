@@ -1,5 +1,4 @@
 using Drawbridge.Common.Tiles;
-using Drawbridge.Projectiles;
 using Drawbridge.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -9,7 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace Drawbridge.Tiles;
+namespace Drawbridge.Tiles.Drawbridges;
 
 public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWheels, IDrawbridgeCover
 {
@@ -18,7 +17,6 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
     protected abstract int ProjectileId { get; }
     protected abstract int ItemId { get; }
     protected virtual bool Flipped => false;
-
 
     public override void SetStaticDefaults()
     {
@@ -67,14 +65,12 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
 
         // Check if 2x15 area is clear
         for (int dx = -1; dx <= 0; dx++)
-        {
             for (int dy = 0; dy < 15; dy++)
             {
                 Tile tile = Main.tile[i + dx, j - 14 + dy];
                 if (tile.HasTile)
                     return false;
             }
-        }
 
         return true;
     }
@@ -116,7 +112,6 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
         // Hide the static drawbridge immediately so only the projectile is visible
         // Remove 2x15 vertical multi-tile by manually clearing them to avoid item drops
         for (int x = 0; x < 2; x++)
-        {
             for (int y = 0; y < 15; y++)
             {
                 int tileX = originX + x;
@@ -129,7 +124,6 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
                         NetMessage.SendTileSquare(-1, tileX, tileY, 1, 1);
                 }
             }
-        }
 
         // Start animation
         if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -155,12 +149,11 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
     private void StartDrawbridgeAnimation(int originX, int originY, bool raising)
     {
         // Spawn projectile at hinge (bottom-right of 2-tile base)
-        int projType = ProjectileId;
-        Vector2 pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+        var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
         // Store originX in ai[0] (using bits 2+), raising flag in bit 0, flipped flag in bit 1
         float ai0 = originX; // Normal drawbridge is not flipped
         float ai1 = originY; // Store originY directly in ai[1]
-        int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, projType, 0, 0, Main.myPlayer, ai0, ai1);
+        int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, ai0, ai1);
         Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
         Main.projectile[proj].netUpdate = true;
     }
@@ -174,6 +167,7 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
         Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemId);
     }
 
+    /// <inheritdoc/>
     public abstract bool DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType);
 
     /// <summary>
@@ -188,7 +182,7 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
     }
 }
 
-public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile, IToggleTile, IDrawbridgeWheels
+public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile
 {
     protected override bool Flipped => true;
 
@@ -208,14 +202,12 @@ public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile, IT
 
         // Check if 2x15 area is clear (i, j-14) to (i+1, j)
         for (int dx = 0; dx <= 1; dx++)
-        {
             for (int dy = 0; dy < 15; dy++)
             {
                 Tile tile = Main.tile[i + dx, j - 14 + dy];
                 if (tile.HasTile)
                     return false;
             }
-        }
 
         return true;
     }
@@ -257,7 +249,6 @@ public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile, IT
 
         // clear static tiles
         for (int x = 0; x < 2; x++)
-        {
             for (int y = 0; y < 15; y++)
             {
                 int tx = originX + x;
@@ -270,29 +261,25 @@ public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile, IT
                         NetMessage.SendTileSquare(-1, tx, ty, 1, 1);
                 }
             }
-        }
 
         if (Main.netMode != NetmodeID.MultiplayerClient)
         {
-            int projType = ModContent.ProjectileType<DrawbridgeAnimation>();
-            Vector2 pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+            var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
             // Store originX in ai[0] (using bits 2+), raising flag in bit 0, flipped flag in bit 1
             float ai0 = originX; // lowering (not raising, not flipped)
             float ai1 = originY; // Store originY directly in ai[1]
-            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, projType, 0, 0, Main.myPlayer, ai0, ai1);
+            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, ai0, ai1);
             Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
             Main.projectile[proj].netUpdate = true;
         }
     }
 }
 
-public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
+public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile, IDrawbridgeChains
 {
     protected virtual int AnchorX => 14;
 
     private static bool isKillingBridge = false;
-
-    protected virtual int FlipData(int originX) => (originX << 2) | 0;
 
     public override void SetStaticDefaults()
     {
@@ -337,9 +324,7 @@ public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
         if (isKillingBridge || fail)
-        {
             return;
-        }
 
         isKillingBridge = true;
         try
@@ -358,15 +343,9 @@ public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
             noItem = true;
 
             for (int x = anchorX; x < anchorX + 15; x++)
-            {
                 for (int y = anchorY; y < anchorY + 2; y++)
-                {
                     if ((x != i || y != j) && Main.tile[x, y].HasTile && Main.tile[x, y].TileType == Type)
-                    {
                         WorldGen.KillTile(x, y, false, false, false);
-                    }
-                }
-            }
         }
         finally
         {
@@ -389,7 +368,6 @@ public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
         int originY = j - segmentY + 1;
         // Hide the static horizontal drawbridge tiles
         for (int x = 0; x < 15; x++)
-        {
             for (int y = 0; y < 2; y++)
             {
                 Tile currentTile = Main.tile[removalOriginX - x, originY - y];
@@ -400,7 +378,6 @@ public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
                         NetMessage.SendTileSquare(-1, removalOriginX - x, originY - y, 1, 1);
                 }
             }
-        }
 
         // The projectile will now handle the sound
         // SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove") { Volume = 0.8f, Pitch = 0f, MaxInstances = 1 },
@@ -408,19 +385,16 @@ public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile
         // Spawn animation (raising = false), packing hinge in ai[1]
         if (Main.netMode != NetmodeID.MultiplayerClient)
         {
-            int projType = ModContent.ProjectileType<DrawbridgeAnimation>();
-            Vector2 pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+            var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
 
             if (Flipped)
             {
-                pivot.X -= 12 * 16;
-                originX -= 12;
+                pivot.X -= 13 * 16;
+                originX -= 13;
             }
 
-            float ai0 = originX;
-            float ai1 = originY;
-            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, projType, 0, 0, Main.myPlayer, ai0, ai1, 1);
-            Main.projectile[proj].localAI[0] = 1;
+            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, originX, originY, 1);
+            Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
             Main.projectile[proj].netUpdate = true;
         }
     }
@@ -434,6 +408,4 @@ public abstract class BaseDrawbridgeHorizontalFlippedTile : BaseDrawbridgeHorizo
 {
     protected override int AnchorX => 0;
     protected override bool Flipped => true;
-
-    protected override int FlipData(int originX) => (originX << 2) | 2;
 }

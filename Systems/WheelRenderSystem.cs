@@ -24,38 +24,20 @@ public class WheelRenderSystem : ModSystem
         HorizontalFlipped,
     }
 
-    private static readonly Dictionary<string, Asset<Texture2D>> TextureLookup = [];
+    internal static readonly Dictionary<string, Asset<Texture2D>> Textures = [];
+
+    public static void AddTexture(string name, string path) => Textures.Add(name, ModContent.Request<Texture2D>(path));
 
     public override void Load()
     {
-        TextureLookup.Clear();
+        Textures.Add("wheelV", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelTile"));
+        Textures.Add("wheelH", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelHorizontalTile"));
 
-        // Old textures, directly mirrored in PostDrawTiles by a named variable
-        TextureLookup.Add("wheelV", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelTile"));
-        TextureLookup.Add("wheelH", ModContent.Request<Texture2D>("Drawbridge/Tiles/WheelHorizontalTile"));
-        TextureLookup.Add("hellWheel", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel"));
-        TextureLookup.Add("hellWheelHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_WheelHorizontalTile"));
-        TextureLookup.Add("hellGlowMask", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_Mask"));
-        TextureLookup.Add("hellGlowMaskFlipped",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_MaskFlipped"));
-        TextureLookup.Add("hellGlowMaskHorizontal",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_MaskHorizontal"));
-        TextureLookup.Add("hellGlowMaskHorizontalFlipped",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge-Glow_MaskHorizontalFlipped"));
-        TextureLookup.Add("hellWheelGlowMask",  ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_mask"));
-        TextureLookup.Add("hellWheelGlowMaskHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_maskHorizontal"));
-        TextureLookup.Add("lionWheel", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_Wheel"));
-        TextureLookup.Add("lionWheelHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_WheelHorizontal"));
-        TextureLookup.Add("stableMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableMiddle"));
-        TextureLookup.Add("stableExtendedMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableExtendedMiddle"));
-        TextureLookup.Add("lionCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_Drawbridge_cover"));
-        TextureLookup.Add("lionCoverFlipped", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeFlipped_cover"));
-        TextureLookup.Add("lionCoverHorizontal", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeHorizontal_cover"));
-        TextureLookup.Add("lionCoverHorizontalFlipped", ModContent.Request<Texture2D>("Drawbridge/Tiles/Lion_DrawbridgeHorizontalFlipped_cover"));
-
-        // New values
-        TextureLookup.Add("hellCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Drawbridge_cover"));
-        TextureLookup.Add("hellFlippedCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeFlipped_cover"));
-        TextureLookup.Add("hellHoriCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontal_cover"));
-        TextureLookup.Add("hellHoriFlippedCover", ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_DrawbridgeHorizontalFlipped_cover"));
+        Textures.Add("stableMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableMiddle"));
+        Textures.Add("stableExtendedMiddle", ModContent.Request<Texture2D>("Drawbridge/Tiles/HorseStableExtendedMiddle"));
     }
+
+    public override void Unload() => Textures.Clear();
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "beginCalled")]
     static extern ref bool GetBeginCalled(SpriteBatch batch);
@@ -71,11 +53,8 @@ public class WheelRenderSystem : ModSystem
         Matrix matrix = Main.GameViewMatrix.TransformationMatrix;
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
 
-        Texture2D wheelH = TextureLookup["wheelH"].Value;
-        Texture2D lionWheel = TextureLookup["lionWheel"].Value;
-        Texture2D lionWheelHorizontal = TextureLookup["lionWheelHorizontal"].Value;
-        Texture2D stableMiddle = TextureLookup["stableMiddle"].Value;
-        Texture2D stableExtendedMiddle = TextureLookup["stableExtendedMiddle"].Value;
+        Texture2D stableMiddle = Textures["stableMiddle"].Value;
+        Texture2D stableExtendedMiddle = Textures["stableExtendedMiddle"].Value;
 
         Vector2 screenPos = Main.screenPosition;
         int screenW = Main.screenWidth;
@@ -108,185 +87,6 @@ public class WheelRenderSystem : ModSystem
 
                 if (ModContent.GetModTile(tile.TileType) is IDrawbridgeChains chains && chains.DrawChains(tile, out DrawType chainType, ref chainColor))
                     DrawChains(i, j, chainType, chainColor);
-
-                if (tile.TileType == ModContent.TileType<LionDrawbridgeTile>() && tile.TileFrameX == 16 && tile.TileFrameY == 224)
-                {
-                    const float tileOffset = 12 * 16f;
-                    Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
-                                                j * 16f + 16f + tileOffset) - screenPos;
-                    pivot -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 origin = new Vector2(lionWheel.Width * 0.5f, lionWheel.Height * 0.5f);
-                    sb.Draw(lionWheel, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.None, 0f);
-                }
-                // Static Lion vertical hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeVerticalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 224)
-                {
-                    const float tileOffset = 12 * 16f;
-                    // Wheel pivot (shifted left one tile)
-                    Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
-                                                j * 16f + 16f + tileOffset) - screenPos;
-                    pivot -= new Vector2(12 * 16f, 12 * 16f);
-                    pivot.X += 16f; // Shift one more tile right
-                    Vector2 originFlipped = new Vector2(lionWheel.Width * 0.5f, lionWheel.Height * 0.5f);
-                    sb.Draw(lionWheel, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, originFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
-                    // Draw static chain for flipped vertical drawbridge (to left)
-                    Texture2D chainTex2 = TextureAssets.Chain.Value;
-                    Vector2 chainOrigin2 = new Vector2(chainTex2.Width * 0.5f, chainTex2.Height * 0.5f);
-                    int segmentY2 = 2; // 13th tile from bottom
-                    Vector2 worldStart2 = new Vector2((i + 1) * 16f + 8f + tileOffset,
-                                                     (j - 14 + segmentY2) * 16f + 8f + tileOffset);
-                    Vector2 worldEnd2 = new Vector2((i + 2) * 16f + 8f + tileOffset,
-                                                   (j - 14 + segmentY2) * 16f + 8f + tileOffset);
-                    Vector2 start2 = worldStart2 - screenPos;
-                    start2 -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 end2 = worldEnd2 - screenPos;
-                    end2 -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 dir2 = end2 - start2;
-                    float distance2 = dir2.Length();
-                    if (distance2 > 0f)
-                    {
-                        dir2 /= distance2;
-                        float rotationChain2 = dir2.ToRotation() + MathHelper.PiOver2;
-                        float step2 = chainTex2.Height * 0.9f;
-                        for (float t2 = step2; t2 < distance2 - step2; t2 += step2)
-                        {
-                            Vector2 pos2 = start2 + dir2 * t2;
-                            // Apply golden tint for lion drawbridge chains
-                            Color lionChainColor = Color.Lerp(Lighting.GetColor(i, j), new Color(255, 215, 0), 0.3f);
-                            sb.Draw(chainTex2, pos2, null, lionChainColor, rotationChain2, chainOrigin2, 1f, SpriteEffects.FlipHorizontally, 0f);
-                        }
-                    }
-                }
-                // Static Lion horizontal hinge segment (normal)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalTile>() && tile.TileFrameX == 224 && tile.TileFrameY == 16)
-                {
-                    const float tileOffset = 12 * 16f;
-                    Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
-                                                j * 16f + 16f + tileOffset) - screenPos;
-                    pivot -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 origin = new Vector2(lionWheelHorizontal.Width * 0.5f, lionWheelHorizontal.Height * 0.5f);
-                    sb.Draw(lionWheelHorizontal, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.FlipHorizontally, 0f);
-                    
-                    // Draw static chain for lion horizontal drawbridge (left pivot)
-                    Texture2D chainTexture = TextureAssets.Chain.Value;
-                    Vector2 chainOrigin = new Vector2(chainTexture.Width * 0.5f, chainTexture.Height * 0.5f);
-                    int segmentY = 2; // 13th tile from bottom
-                    int originX = i - 1;
-                    int originY = j;
-                    int attachX = i - (14 - segmentY);
-                    int attachY = j;
-                    Vector2 worldStart = new Vector2(attachX * 16f + 8f + tileOffset,
-                                                     attachY * 16f + 8f + tileOffset - 16f);
-                    Vector2 worldEnd = new Vector2((originX + 2) * 16f + 8f + tileOffset,
-                                                   (originY - 14 + segmentY) * 16f + 8f + tileOffset);
-                    Vector2 start = worldStart - screenPos;
-                    start -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 end = worldEnd - screenPos;
-                    end -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 dir = end - start;
-                    float distance = dir.Length();
-                    if (distance > 0f)
-                    {
-                        dir /= distance;
-                        float rotationChain = dir.ToRotation() + MathHelper.PiOver2;
-                        float step = chainTexture.Height * 0.9f;
-                        for (float t = step; t < distance - step; t += step)
-                        {
-                            Vector2 pos = start + dir * t;
-                            // Apply golden tint for lion drawbridge chains
-                            Color lionChainColor = Color.Lerp(Lighting.GetColor(i, j), new Color(255, 215, 0), 0.3f);
-                            sb.Draw(chainTexture, pos, null, lionChainColor,
-                                    rotationChain, chainOrigin, 1f, SpriteEffects.None, 0f);
-                        }
-                    }
-                }
-                // Static Lion horizontal hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<LionDrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
-                {
-                    const float tileOffset = 12 * 16f;
-                    Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
-                                                j * 16f + 16f + tileOffset) - screenPos;
-                    pivot -= new Vector2(12 * 16f, 12 * 16f);
-                    pivot.X += 16f;
-                    Vector2 origin = new Vector2(lionWheelHorizontal.Width * 0.5f, lionWheelHorizontal.Height * 0.5f);
-                    sb.Draw(lionWheelHorizontal, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.None, 0f);
-                    
-                    // Draw static chain for lion horizontal drawbridge (right pivot)
-                    Texture2D chainTextureFlipped = TextureAssets.Chain.Value;
-                    Vector2 chainOriginFlipped = new Vector2(chainTextureFlipped.Width * 0.5f, chainTextureFlipped.Height * 0.5f);
-                    int segmentYFlipped = 2; // 13th tile from bottom
-                    int originXFlipped = i;
-                    int originYFlipped = j;
-                    int attachXFlipped = i + (14 - segmentYFlipped);
-                    int attachYFlipped = j;
-                    Vector2 worldStartFlipped = new Vector2(attachXFlipped * 16f + 8f + tileOffset,
-                                                             attachYFlipped * 16f + 8f + tileOffset - 16f);
-                    Vector2 worldEndFlipped = new Vector2((originXFlipped - 1) * 16f + 8f + tileOffset,
-                                                           (originYFlipped - 14 + segmentYFlipped) * 16f + 8f + tileOffset);
-                    Vector2 startFlipped = worldStartFlipped - screenPos;
-                    startFlipped -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 endFlipped = worldEndFlipped - screenPos;
-                    endFlipped -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 dirFlipped = endFlipped - startFlipped;
-                    float distanceFlipped = dirFlipped.Length();
-                    if (distanceFlipped > 0f)
-                    {
-                        dirFlipped /= distanceFlipped;
-                        float rotationChainFlipped = dirFlipped.ToRotation() + MathHelper.PiOver2;
-                        float stepFlipped = chainTextureFlipped.Height * 0.9f;
-                        for (float tFlipped = stepFlipped; tFlipped < distanceFlipped - stepFlipped; tFlipped += stepFlipped)
-                        {
-                            Vector2 posFlipped = startFlipped + dirFlipped * tFlipped;
-                            // Apply golden tint for lion drawbridge chains
-                            Color lionChainColorFlipped = Color.Lerp(Lighting.GetColor(i, j), new Color(255, 215, 0), 0.3f);
-                            sb.Draw(chainTextureFlipped, posFlipped, null, lionChainColorFlipped,
-                                    rotationChainFlipped, chainOriginFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
-                        }
-                    }
-                }
-                // Static horizontal hinge segment (flipped)
-                else if (tile.TileType == ModContent.TileType<DrawbridgeHorizontalFlippedTile>() && tile.TileFrameX == 0 && tile.TileFrameY == 16)
-                {
-                    const float tileOffset = 12 * 16f;
-                    Vector2 pivot = new Vector2(i * 16f + 16f + tileOffset - 16f,
-                                                j * 16f + 16f + tileOffset) - screenPos;
-                    // Move pivot up and left by 13 tiles
-                    pivot -= new Vector2(12 * 16f, 12 * 16f);
-                    // Shift wheel pivot one tile right for flipped horizontal
-                    pivot.X += 16f;
-                    Vector2 origin = new Vector2(wheelH.Width * 0.5f, wheelH.Height * 0.5f);
-                    sb.Draw(wheelH, pivot, null, Lighting.GetColor(i, j) * 0.9f, 0f, origin, 1f, SpriteEffects.FlipHorizontally, 0f);
-                    // Draw static chain for horizontal drawbridge (right pivot)
-                    Texture2D chainTextureFlipped = TextureAssets.Chain.Value;
-                    Vector2 chainOriginFlipped = new Vector2(chainTextureFlipped.Width * 0.5f, chainTextureFlipped.Height * 0.5f);
-                    int segmentYFlipped = 2; // 13th tile from bottom
-                    int originXFlipped = i;
-                    int originYFlipped = j;
-                    int attachXFlipped = i + (14 - segmentYFlipped);
-                    int attachYFlipped = j;
-                    Vector2 worldStartFlipped = new Vector2(attachXFlipped * 16f + 8f + tileOffset,
-                                                             attachYFlipped * 16f + 8f + tileOffset - 16f);
-                    Vector2 worldEndFlipped = new Vector2((originXFlipped - 1) * 16f + 8f + tileOffset,
-                                                           (originYFlipped - 14 + segmentYFlipped) * 16f + 8f + tileOffset);
-                    Vector2 startFlipped = worldStartFlipped - screenPos;
-                    startFlipped -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 endFlipped = worldEndFlipped - screenPos;
-                    endFlipped -= new Vector2(12 * 16f, 12 * 16f);
-                    Vector2 dirFlipped = endFlipped - startFlipped;
-                    float distanceFlipped = dirFlipped.Length();
-                    if (distanceFlipped > 0f)
-                    {
-                        dirFlipped /= distanceFlipped;
-                        float rotationChainFlipped = dirFlipped.ToRotation() + MathHelper.PiOver2;
-                        float stepFlipped = chainTextureFlipped.Height * 0.9f;
-                        for (float tFlipped = stepFlipped; tFlipped < distanceFlipped - stepFlipped; tFlipped += stepFlipped)
-                        {
-                            Vector2 posFlipped = startFlipped + dirFlipped * tFlipped;
-                            sb.Draw(chainTextureFlipped, posFlipped, null, Lighting.GetColor(i, j),
-                                    rotationChainFlipped, chainOriginFlipped, 1f, SpriteEffects.FlipHorizontally, 0f);
-                        }
-                    }
-                }
 
                 if (tile.TileType == ModContent.TileType<HorseStableTile>())
                 {
@@ -342,13 +142,15 @@ public class WheelRenderSystem : ModSystem
         Vector2 worldStart = type switch
         {
             DrawType.Default => new((i + 1) * 16f + 8f + tileOffset, (j - 14 + segmentY) * 16f + 8f + tileOffset),
-            DrawType.Flipped => new Vector2((i - 1) * 16f + 8f + tileOffset, (j - 13 + segmentY) * 16f + 8f + tileOffset - 16f)
+            DrawType.Flipped => new Vector2((i - 1) * 16f + 8f + tileOffset, (j - 13 + segmentY) * 16f + 8f + tileOffset - 16f),
+            _ => throw null!,
         };
 
         Vector2 worldEnd = type switch
         {
             DrawType.Default => new((i - 13) * 16f + 8f + 12 * 16f, j * 16f + 8f + 12 * 16f),
-            DrawType.Flipped => new Vector2((attachX + 1) * 16f + 8f + tileOffset, j * 16f + 8f + tileOffset)
+            DrawType.Flipped => new Vector2((attachX + 1) * 16f + 8f + tileOffset, j * 16f + 8f + tileOffset),
+            _ => throw null!,
         };
 
         Vector2 start = worldStart - Main.screenPosition;
@@ -375,7 +177,7 @@ public class WheelRenderSystem : ModSystem
     {
         const float Offset = 12 * 16f;
 
-        Texture2D tex = TextureLookup[textureName].Value;
+        Texture2D tex = Textures[textureName].Value;
 
         Vector2 pivot = type switch
         {
@@ -393,14 +195,14 @@ public class WheelRenderSystem : ModSystem
         if (glowName == "")
             return;
 
-        Texture2D glow = TextureLookup[glowName].Value;
+        Texture2D glow = Textures[glowName].Value;
         float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
         Main.spriteBatch.Draw(glow, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, effects, 0f);
     }
 
     private static void DrawCoverSprite(int i, int j, string textureName, string glowMaskName, DrawType type, Vector2 offset)
     {
-        Texture2D texture = TextureLookup[textureName].Value;
+        Texture2D texture = Textures[textureName].Value;
         Vector2 pivot = new Vector2(i * 16f, j * 16f + 16f) - Main.screenPosition;
 
         Vector2 origin = type switch
@@ -420,6 +222,6 @@ public class WheelRenderSystem : ModSystem
 
         // Draw glow mask overlay with pulsing effect
         float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
-        Main.spriteBatch.Draw(TextureLookup[glowMaskName].Value, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, SpriteEffects.None, 0f);
+        Main.spriteBatch.Draw(Textures[glowMaskName].Value, pivot, null, (Color.White * glowPulse) with { A = 0 }, 0f, origin, 1f, SpriteEffects.None, 0f);
     }
 }

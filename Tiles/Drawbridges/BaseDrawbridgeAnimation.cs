@@ -6,13 +6,15 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework.Graphics;
-using Drawbridge.Tiles;
 using ReLogic.Utilities;
 using Terraria.GameContent;
 using System.IO;
 using System;
+using Drawbridge.Tiles.Drawbridges.Hell;
+using Drawbridge.Tiles.Drawbridges.Lion;
+using Drawbridge.Systems;
 
-namespace Drawbridge.Projectiles;
+namespace Drawbridge.Tiles.Drawbridges;
 
 public abstract class BaseDrawbridgeAnimation : ModProjectile
 {
@@ -125,13 +127,11 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
             // On the server, place the final static tile. Clients will receive this via net message.
             if (Main.netMode != NetmodeID.MultiplayerClient)
-            {
                 // Swap the tile in the world to its new orientation
                 if (Lowering)
                     SwitchToHorizontal();
                 else
                     SwitchToVertical();
-            }
 
             Projectile.Kill();
             return; // Stop further AI processing
@@ -149,9 +149,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
         // Unblocked, ensure volume
         if (movementSound != null)
-        {
             movementSound.Volume = SOUND_VOLUME;
-        }
 
         animationTimer++;
         if (Main.netMode == NetmodeID.Server)
@@ -190,9 +188,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
                 // adjust audio for reversal: restart the movement sound
                 if (SoundEngine.TryGetActiveSound(_soundId, out var activeSound))
-                {
                     activeSound.Stop();
-                }
 
                 _soundId = SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove")
                 {
@@ -219,7 +215,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         raw = MathHelper.Clamp(raw, 0f, 1f);
         float shiftEased = Lowering ? EaseOut(raw) : EaseIn(1 - raw);
         float hingeX = OriginX * 16f + (Flipped ? 0f : 32f);
-        Vector2 hinge = new Vector2(hingeX, OriginY * 16f + 16f - shiftEased * 32f);
+        var hinge = new Vector2(hingeX, OriginY * 16f + 16f - shiftEased * 32f);
         // Full-sprite scale so 32x270 -> 32x240
         float scale = (float)Projectile.height / tex.Height;
         SpriteEffects spriteEffects = Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
@@ -232,17 +228,17 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
         // Draw chain connecting drawbridge to adjacent support tile
         Texture2D chainTexture = TextureAssets.Chain.Value;
-        Vector2 chainOrigin = new Vector2(chainTexture.Width * 0.5f, chainTexture.Height * 0.5f);
+        var chainOrigin = new Vector2(chainTexture.Width * 0.5f, chainTexture.Height * 0.5f);
         int xIndex = 1; // second tile column (0-based)
         int segmentY = 2; // 13th tile from bottom
         // Compute attach offset relative to hinge
-        Vector2 baseLocal = new Vector2(-Projectile.width + (xIndex * 16 + 8), -Projectile.height + (segmentY * 16 + 8));
+        var baseLocal = new Vector2(-Projectile.width + (xIndex * 16 + 8), -Projectile.height + (segmentY * 16 + 8));
         float chainRotFactor = Projectile.rotation * (Flipped ? -1f : 1f);
-        Vector2 offset = new Vector2(Flipped ? -baseLocal.X : baseLocal.X, baseLocal.Y);
+        var offset = new Vector2(Flipped ? -baseLocal.X : baseLocal.X, baseLocal.Y);
         Vector2 attachPoint = hinge + offset.RotatedBy(chainRotFactor);
         // Compute static support tile position
         int supportIndex = Flipped ? OriginX - 1 : OriginX + 2;
-        Vector2 supportPoint = new Vector2(supportIndex * 16f + 8f, (OriginY - 14 + segmentY) * 16f + 8f);
+        var supportPoint = new Vector2(supportIndex * 16f + 8f, (OriginY - 14 + segmentY) * 16f + 8f);
         Vector2 start = attachPoint - Main.screenPosition;
         Vector2 end = supportPoint - Main.screenPosition;
         Vector2 dir = end - start;
@@ -271,39 +267,26 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     public override void PostDraw(Color lightColor)
     {
         Color baseLight = Lighting.GetColor(OriginX, OriginY);
-        
-        // Use appropriate wheels for different drawbridge types - always use vertical wheel during animation
-        string wheelTexturePath;
-        if (Projectile.type == ModContent.ProjectileType<HellDrawbridgeAnimation>())
-        {
-            wheelTexturePath = "Drawbridge/Tiles/Hell_Wheel";
-        }
-        else if (Projectile.type == ModContent.ProjectileType<LionDrawbridgeAnimation>())
-        {
-            wheelTexturePath = "Drawbridge/Tiles/Lion_Wheel";
-        }
-        else
-        {
-            wheelTexturePath = "Drawbridge/Tiles/WheelTile";
-        }
-        
-        Texture2D wheelTex = ModContent.Request<Texture2D>(wheelTexturePath).Value;
+        var baseTile = ModContent.GetModTile(ProjectileIdToData[Type].Normal) as BaseDrawbridgeTile;
+        baseTile.DrawWheel(new Tile(), out string wheelName, out string glowName, out _);
+        Texture2D wheelTex = WheelRenderSystem.Textures[wheelName].Value;
+
         float hingeX = OriginX * 16f + (Flipped ? 0f : 32f);
-        Vector2 hinge = new Vector2(hingeX, OriginY * 16f + 16f);
+        var hinge = new Vector2(hingeX, OriginY * 16f + 16f);
         Vector2 wheelPivot = new Vector2(hinge.X - 16f, hinge.Y) - Main.screenPosition;
-        // Draw wheel with flipped hinge if needed
         float wheelRot = Projectile.rotation * (Flipped ? -1f : 1f);
         SpriteEffects wheelEffect = Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        Vector2 wheelOrigin = new Vector2(wheelTex.Width * 0.5f, wheelTex.Height * 0.5f);
+        var wheelOrigin = new Vector2(wheelTex.Width * 0.5f, wheelTex.Height * 0.5f);
+
         if (Flipped)
             wheelPivot.X += 32f; // shift wheel right 2 tiles when flipped
+
         Main.spriteBatch.Draw(wheelTex, wheelPivot, null, baseLight * 0.9f, wheelRot, wheelOrigin, 1f, wheelEffect, 0f);
         
-        // Draw hell wheel glow mask for hell drawbridge animations
-        if (Projectile.type == ModContent.ProjectileType<HellDrawbridgeAnimation>())
+        if (glowName != string.Empty)
         {
             // Always use vertical hell wheel glow mask during animation
-            Texture2D hellWheelGlowMask = ModContent.Request<Texture2D>("Drawbridge/Tiles/Hell_Wheel-Glow_mask").Value;
+            Texture2D hellWheelGlowMask = WheelRenderSystem.Textures[glowName].Value;
             float glowPulse = 0.6f + 0.4f * (float)Math.Sin(Main.GameUpdateCount * 0.03f);
             Main.spriteBatch.Draw(hellWheelGlowMask, wheelPivot, null, (Color.White * glowPulse) with { A = 0 }, wheelRot, wheelOrigin, 1f, wheelEffect, 0f);
         }
@@ -312,9 +295,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     public override void OnKill(int timeLeft)
     {
         if (SoundEngine.TryGetActiveSound(_soundId, out var sound))
-        {
             sound.Stop();
-        }
 
         ClearSolidTiles();
     }
@@ -327,7 +308,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         float rotation = -MathHelper.PiOver2 * eased * (Flipped ? -1f : 1f);
         float shiftEased = Lowering ? EaseOut(raw) : EaseIn(1 - raw);
         float hingeX = OriginX * 16f + (Flipped ? 0f : 32f);
-        Vector2 hinge = new Vector2(hingeX, OriginY * 16f + 16f - shiftEased * 32f);
+        var hinge = new Vector2(hingeX, OriginY * 16f + 16f - shiftEased * 32f);
 
         // Define the four corners of the drawbridge rectangle relative to the hinge
         Vector2 v_tl, v_tr, v_bl, v_br;
@@ -340,7 +321,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
             // User reported solid tiles are 1 tile too far left.
             // Shift the quad to the right by 8 pixels (1/2 tile)
-            Vector2 shift = new Vector2(8, 0);
+            var shift = new Vector2(8, 0);
             v_tl += shift;
             v_tr += shift;
             v_bl += shift;
@@ -370,13 +351,10 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         Rectangle nextBoundingBox = GetBoundingBoxForQuad(next_p_tl, next_p_tr, next_p_br, next_p_bl);
 
         for (int i = nextBoundingBox.X / 16; i <= nextBoundingBox.Right / 16; i++)
-        {
             for (int j = nextBoundingBox.Y / 16; j <= nextBoundingBox.Bottom / 16; j++)
             {
                 if (!WorldGen.InWorld(i, j))
-                {
                     continue;
-                }
 
                 Vector2 tileCenter = new(i * 16f + 8f, j * 16f + 8f);
 
@@ -384,12 +362,9 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                 {
                     Tile tile = Main.tile[i, j];
                     if (tile != null && tile.HasTile && Main.tileSolid[tile.TileType] && tile.TileType != _solidTileType)
-                    {
                         return true; // Found an obstruction.
-                    }
                 }
             }
-        }
 
         return false; // No obstructions found.
     }
@@ -435,10 +410,8 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         int startY = OriginY;
         
         if (!Flipped)
-        {
             // For normal bridge, start from the hinge and go left
             startX -= bridgeLength;
-        }
         
         // Add all tiles directly under the bridge to our list
         for (int i = 0; i < bridgeLength; i++)
@@ -447,9 +420,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             int tileY = startY + 1; // One tile below the bridge base
             
             if (WorldGen.InWorld(tileX, tileY))
-            {
                 tilesUnderBridge.Add(new Point(tileX, tileY));
-            }
         }
 
         // Check players
@@ -457,10 +428,8 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         {
             Player player = Main.player[i];
             if (player.active && !player.dead && !player.ghost)
-            {
                 CheckCrush(quad_p1, quad_p2, quad_p3, quad_p4, damageBoundingBox, tilesUnderBridge, player, 
                     (entity) => ((Player)entity).Hurt(PlayerDeathReason.ByProjectile(i, Projectile.whoAmI), 50, 0));
-            }
         }
 
         // Check NPCs
@@ -468,7 +437,6 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         {
             NPC npc = Main.npc[i];
             if (npc.active && !npc.friendly && npc.lifeMax > 5 && !npc.noGravity)
-            {
                 CheckCrush(quad_p1, quad_p2, quad_p3, quad_p4, damageBoundingBox, tilesUnderBridge, npc, static (entity) =>
                 {
                     NPC.HitInfo hit = new();
@@ -476,7 +444,6 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                     hit.Crit = true;
                     ((NPC)entity).StrikeNPC(hit);
                 });
-            }
         }
     }
 
@@ -488,7 +455,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         if (hitbox.Intersects(damageBoundingBox) && IsRectInQuad(hitbox, quad_p1, quad_p2, quad_p3, quad_p4))
         {
             // Define the player's head area (top third of their hitbox)
-            Rectangle headHitbox = new Rectangle(
+            var headHitbox = new Rectangle(
                 hitbox.X,
                 hitbox.Y,
                 hitbox.Width,
@@ -498,49 +465,38 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             // Check if the bridge is touching the player's head
             bool bridgeTouchingHead = false;
             if (IsRectInQuad(headHitbox, quad_p1, quad_p2, quad_p3, quad_p4))
-            {
                 bridgeTouchingHead = true;
-            }
 
             // If the bridge isn't touching the player's head, skip damage check
             if (!bridgeTouchingHead)
-            {
                 return false;
-            }
 
             // Check if the player is being crushed against tiles directly under the bridge
             bool crushed = false;
-            Point playerTileMin = (hitbox.TopLeft() / 16f).ToPoint();
-            Point playerTileMax = (hitbox.BottomRight() / 16f).ToPoint();
+            var playerTileMin = (hitbox.TopLeft() / 16f).ToPoint();
+            var playerTileMax = (hitbox.BottomRight() / 16f).ToPoint();
 
             for (int x = playerTileMin.X; x <= playerTileMax.X; x++)
             {
                 for (int y = playerTileMin.Y; y <= playerTileMax.Y; y++)
-                {
                     if (WorldGen.InWorld(x, y))
                     {
                         Tile tile = Main.tile[x, y];
                         if (tile != null && tile.HasTile && Main.tileSolid[tile.TileType] && tile.TileType != _solidTileType)
-                        {
                             // Check if this tile is in our list of tiles under the bridge
                             if (tilesUnderBridge.Contains(new Point(x, y)))
                             {
                                 crushed = true;
                                 break;
                             }
-                        }
                     }
-                }
 
                 if (crushed)
                     break;
             }
 
             if (crushed)
-            {
                 hurtAction(entity);
-                //entity.Hurt(PlayerDeathReason.ByProjectile(i, Projectile.whoAmI), 50, 0);
-            }
         }
 
         return true;
@@ -590,7 +546,6 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     private void ClearSolidTiles()
     {
         foreach (Point p in _solidTiles)
-        {
             if (WorldGen.InWorld(p.X, p.Y))
             {
                 Tile tile = Main.tile[p.X, p.Y];
@@ -601,7 +556,6 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                         NetMessage.SendTileSquare(-1, p.X, p.Y, 1, 1);
                 }
             }
-        }
 
         _solidTiles.Clear();
     }
@@ -614,12 +568,10 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
         // Iterate through the bounding box and place tiles inside the polygon
         for (int i = bridgeBoundingBox.X / 16; i <= bridgeBoundingBox.Right / 16; i++)
-        {
             for (int j = bridgeBoundingBox.Y / 16; j <= bridgeBoundingBox.Bottom / 16; j++)
             {
-                Vector2 tileCenter = new Vector2(i * 16f + 8f, j * 16f + 8f);
+                var tileCenter = new Vector2(i * 16f + 8f, j * 16f + 8f);
                 if (IsPointInQuad(tileCenter, p_tl, p_tr, p_br, p_bl))
-                {
                     if (WorldGen.InWorld(i, j) && !Main.tile[i, j].HasTile)
                     {
                         Tile tile = Main.tile[i, j];
@@ -629,9 +581,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                         if (Main.netMode == NetmodeID.Server)
                             NetMessage.SendTileSquare(-1, i, j, 1, 1);
                     }
-                }
             }
-        }
     }
 
     private bool IsPointInQuad(Vector2 p, Vector2 a, Vector2 b, Vector2 c, Vector2 d) => IsPointInTriangle(p, a, b, c) || IsPointInTriangle(p, a, c, d);
@@ -641,8 +591,8 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         float d1 = Sign(pt, v1, v2);
         float d2 = Sign(pt, v2, v3);
         float d3 = Sign(pt, v3, v1);
-        bool has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        bool has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+        bool has_neg = d1 < 0 || d2 < 0 || d3 < 0;
+        bool has_pos = d1 > 0 || d2 > 0 || d3 > 0;
         return !(has_neg && has_pos);
     }
 
@@ -651,9 +601,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     private void ClearArea(int startX, int startY, int width, int height)
     {
         for (int i = startX; i < startX + width; i++)
-        {
             for (int j = startY; j < startY + height; j++)
-            {
                 if (WorldGen.InWorld(i, j))
                 {
                     Tile tile = Main.tile[i, j];
@@ -661,13 +609,9 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                     {
                         WorldGen.KillTile(i, j, false, false, false);
                         if (Main.netMode == NetmodeID.Server)
-                        {
                             NetMessage.SendTileSquare(-1, i, j, 1);
-                        }
                     }
                 }
-            }
-        }
     }
 
     private void SwitchToHorizontal()
@@ -730,7 +674,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
 
         // We must subtract the tile origin offset from the hinge coordinates
         // to get the correct tile placement origin
-        int placeX = originX + (Flipped ? 0 : 1);
+        int placeX = originX + 1;
         int placeY = originY;
 
         // Fix: Only clear the correct area for flipped case
@@ -755,7 +699,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             // placeX is the anchor, so we need to adjust for Flipped
             int netX = Flipped ? placeX : placeX - 1;
             int netY = placeY - 14;
-            NetMessage.SendTileSquare(-1, netX, netY, 2, 15);
+            NetMessage.SendTileSquare(-1, netX, netY, 4, 15);
         }
     }
 
