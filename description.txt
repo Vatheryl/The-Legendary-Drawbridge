@@ -1,4 +1,4 @@
-Legendary Drawbridge & Castle Additions
+--- Legendary Drawbridge & Castle Additions ---
 
 Mod commissioned by Vatheryl
 
@@ -80,4 +80,4 @@ Medieval siege defense - pour boiling water on invaders!
 Black Culvert wall type added (uses vanilla Wall_94 texture)
 
 Need help?
-Join our Discord server: discord.gg/dXazSyYxH3
+Join our Discord server: https://discord.gg/5rXhQjnHV9
