@@ -42,6 +42,11 @@ Configs: {
 			Label: Disattiva Cacca nella Stalla
 			Tooltip: Se abilitato, i cavalli nelle stalle non lasceranno cacca.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

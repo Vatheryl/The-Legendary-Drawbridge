@@ -9,6 +9,7 @@ using Drawbridge.Tiles;
 using ReLogic.Utilities;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace Drawbridge.Projectiles
 {
@@ -20,7 +21,19 @@ namespace Drawbridge.Projectiles
         private int OriginX => ((int)Projectile.ai[0]) >> 1; // Extract from ai[0] bits 1+
         private int OriginY => (int)Projectile.ai[1]; // Stored directly in ai[1]
         private bool Raising => ((int)Projectile.ai[0] & 1) != 0;
-        private int timer = 0;
+        private ref float Timer => ref Projectile.ai[2];
+
+        // Public access for world-save persistence
+        public float AnimationTimer
+        {
+            get => Timer;
+            set
+            {
+                Timer = value;
+                UpdateSolidTiles();
+            }
+        }
+
         private const int DURATION = 300;
 
         private List<Point> _solidTiles = new List<Point>();
@@ -55,14 +68,17 @@ namespace Drawbridge.Projectiles
                 }, Projectile.Center);
                 _soundPlaying = true;
             }
+
             Projectile.timeLeft = 2;
 
             UpdateSolidTiles();
 
-            timer++;
+            Timer += ModContent.GetInstance<DrawbridgeConfig>().PortcullisSpeed;
+
             if (Main.netMode == NetmodeID.Server)
                 Projectile.netUpdate = true;
-            if (timer >= DURATION)
+
+            if (Timer >= DURATION)
             {
                 ClearSolidTiles();
                 if (Raising)
@@ -101,6 +117,7 @@ namespace Drawbridge.Projectiles
             {
                 activeSound.Stop();
             }
+
             ClearSolidTiles();
         }
 
@@ -118,6 +135,7 @@ namespace Drawbridge.Projectiles
                     }
                 }
             }
+
             _solidTiles.Clear();
         }
 
@@ -125,7 +143,7 @@ namespace Drawbridge.Projectiles
         {
             ClearSolidTiles();
 
-            float t = MathHelper.Clamp(timer / (float)DURATION, 0f, 1f);
+            float t = MathHelper.Clamp(Timer / (float)DURATION, 0f, 1f);
             const float totalShift = 7 * 16f; // in pixels
 
             int topY, bottomY;
@@ -196,7 +214,7 @@ namespace Drawbridge.Projectiles
             Color baseLight = Lighting.GetColor(OriginX, OriginY);
             SpriteBatch sb = Main.spriteBatch;
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            float t = MathHelper.Clamp(timer / (float)DURATION, 0f, 1f);
+            float t = MathHelper.Clamp(Timer / DURATION, 0f, 1f);
 
             Rectangle sourceRect;
             Vector2 origin;
@@ -221,8 +239,7 @@ namespace Drawbridge.Projectiles
                 float e = t * t; // EaseIn
                 float shift = e * totalShift;
 
-                int visibleHeight = 16 + (int)shift;
-                if (visibleHeight > tex.Height) visibleHeight = tex.Height;
+                int visibleHeight = Math.Min(16 + (int)shift, tex.Height);
                 int sourceY = tex.Height - visibleHeight;
 
                 sourceRect = new Rectangle(0, sourceY, tex.Width, visibleHeight);
@@ -237,23 +254,12 @@ namespace Drawbridge.Projectiles
         // Sync timer so clients reconnecting see the current state
         public override void SendExtraAI(BinaryWriter writer)
         {
-            writer.Write(timer);
+            writer.Write(Timer);
         }
 
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            timer = reader.ReadInt32();
-        }
-
-        // Public access for world-save persistence
-        public int AnimationTimer
-        {
-            get => timer;
-            set
-            {
-                timer = value;
-                UpdateSolidTiles();
-            }
+            Timer = reader.ReadInt32();
         }
     }
 } 

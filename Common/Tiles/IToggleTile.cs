@@ -1,4 +1,4 @@
-﻿namespace Drawbridge.Systems;
+﻿namespace Drawbridge.Common.Tiles;
 
 internal interface IToggleTile
 {
