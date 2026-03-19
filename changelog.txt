@@ -1,4 +1,5 @@
-1.4.0.1 - Bugfixes
-- Removed Hanging Demon Eyes from trees
-- Fixed weird issue with WheelRenderSystem that I don't quite understand but it's not broken now I guess
-- Allowed Machicolations to be crafted with a Cooking Pot (alongside the existing Cauldron)
+1.4.0.2 - Rewrites & Bugfixes
+- Completely rewrote how Drawbridges work internally, making it both moderately more efficient for performance and orders of magnitude easier to update and create more
+- Added Portcullis Speed config option
+- Removed "Disable Easter Egg" config
+- Updated config name to match mod name

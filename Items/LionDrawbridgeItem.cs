@@ -1,7 +1,7 @@
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Drawbridge.Tiles;
+using Drawbridge.Tiles.Drawbridges.Lion;
 
 namespace Drawbridge.Items
 {
@@ -27,8 +27,8 @@ namespace Drawbridge.Items
             if (player.whoAmI == Main.myPlayer)
             {
                 Item.createTile = player.direction == 1
-                    ? ModContent.TileType<Tiles.LionDrawbridgeVerticalFlippedTile>()
-                    : ModContent.TileType<Tiles.LionDrawbridgeTile>();
+                    ? ModContent.TileType<LionDrawbridgeVerticalFlippedTile>()
+                    : ModContent.TileType<LionDrawbridgeTile>();
             }
         }
 

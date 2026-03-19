@@ -42,6 +42,11 @@ Configs: {
 			Label: 禁用马厩掉粪
 			Tooltip: 启用后，马厩中的马不会掉粪。
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

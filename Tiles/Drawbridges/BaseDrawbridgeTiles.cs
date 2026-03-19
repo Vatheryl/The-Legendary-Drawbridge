@@ -1,0 +1,411 @@
+using Drawbridge.Common.Tiles;
+using Drawbridge.Systems;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.Enums;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.ObjectData;
+
+namespace Drawbridge.Tiles.Drawbridges;
+
+public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWheels, IDrawbridgeCover
+{
+    private static bool suppressToggleDrop = false;
+
+    protected abstract int ProjectileId { get; }
+    protected abstract int ItemId { get; }
+    protected virtual bool Flipped => false;
+
+    public override void SetStaticDefaults()
+    {
+        Main.tileFrameImportant[Type] = true;
+        Main.tileNoAttach[Type] = true;
+        Main.tileObsidianKill[Type] = true;
+        Main.tileLavaDeath[Type] = false;
+        Main.tileWaterDeath[Type] = false;
+        Main.tileSolid[Type] = true;
+        Main.tileSolidTop[Type] = false;
+        Main.tileLighted[Type] = true;
+
+        TileID.Sets.DisableSmartCursor[Type] = true;
+        TileID.Sets.DrawsWalls[Type] = true;
+
+        TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
+        TileObjectData.newTile.Width = 2;
+        TileObjectData.newTile.Height = 15;
+        TileObjectData.newTile.Origin = new Point16(1, 14); // Bottom-right of 2x15
+        TileObjectData.newTile.CoordinateHeights = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16];
+        TileObjectData.newTile.CoordinateWidth = 16; // 16px per tile for 32px total
+        TileObjectData.newTile.CoordinatePadding = 0;
+        TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.SolidTile, TileObjectData.newTile.Width, 0);
+        TileObjectData.newTile.UsesCustomCanPlace = true;
+        TileObjectData.addTile(Type);
+
+        AddMapEntry(new Color(139, 137, 137), CreateMapEntryName());
+
+        DustType = DustID.Stone;
+        HitSound = SoundID.Tink;
+    }
+
+    public override bool CanPlace(int i, int j)
+    {
+        // Check if there's enough space and solid ground
+        if (j < 14)
+            return false; // Need room above
+
+        // Check if bottom is solid under both base tiles
+        for (int dx = -1; dx <= 0; dx++)
+        {
+            Tile bottomTile = Main.tile[i + dx, j + 1];
+            if (!bottomTile.HasTile || !Main.tileSolid[bottomTile.TileType])
+                return false;
+        }
+
+        // Check if 2x15 area is clear
+        for (int dx = -1; dx <= 0; dx++)
+            for (int dy = 0; dy < 15; dy++)
+            {
+                Tile tile = Main.tile[i + dx, j - 14 + dy];
+                if (tile.HasTile)
+                    return false;
+            }
+
+        return true;
+    }
+
+    public override bool RightClick(int i, int j)
+    {
+        if (Main.netMode == NetmodeID.MultiplayerClient)
+            PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
+        else
+            Toggle(i, j);
+
+        return true;
+    }
+
+    public override void HitWire(int i, int j)
+    {
+        // Lever-like behavior: only respond to the top-left tile.
+        Tile tile = Main.tile[i, j];
+        int partX = tile.TileFrameX / 16;
+        int partY = GetVerticalSegmentIndex(tile.TileFrameY);
+
+        if (partX == 0 && partY == 0)
+            Toggle(i, j);
+    }
+
+    public virtual void Toggle(int i, int j)
+    {
+        suppressToggleDrop = true;
+        Tile tile = Main.tile[i, j];
+
+        // Vertical tile: map frame to segment index
+        int frameX = tile.TileFrameX;
+        int frameY = tile.TileFrameY;
+        int segmentX = frameX / 16; // 16px tile width
+        int segmentY = GetVerticalSegmentIndex(frameY);
+        int originX = i - segmentX;
+        int originY = j - segmentY + 14;
+
+        // Hide the static drawbridge immediately so only the projectile is visible
+        // Remove 2x15 vertical multi-tile by manually clearing them to avoid item drops
+        for (int x = 0; x < 2; x++)
+            for (int y = 0; y < 15; y++)
+            {
+                int tileX = originX + x;
+                int tileY = originY - 14 + y; // originY is bottom, iterate up
+                Tile currentTile = Main.tile[tileX, tileY];
+                if (currentTile.HasTile && currentTile.TileType == Type)
+                {
+                    currentTile.HasTile = false;
+                    if (Main.netMode == NetmodeID.Server)
+                        NetMessage.SendTileSquare(-1, tileX, tileY, 1, 1);
+                }
+            }
+
+        // Start animation
+        if (Main.netMode != NetmodeID.MultiplayerClient)
+            StartDrawbridgeAnimation(originX, originY, true);
+        suppressToggleDrop = false;
+    }
+
+    // Map a tile frameY pixel offset into its segment index (0–14)
+    private static int GetVerticalSegmentIndex(int frameY)
+    {
+        int[] heights = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16];
+        int cum = 0;
+        for (int s = 0; s < heights.Length; s++)
+        {
+            if (frameY < cum + heights[s])
+                return s;
+            cum += heights[s];
+        }
+
+        return heights.Length - 1;
+    }
+
+    private void StartDrawbridgeAnimation(int originX, int originY, bool raising)
+    {
+        // Spawn projectile at hinge (bottom-right of 2-tile base)
+        var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+        // Store originX in ai[0] (using bits 2+), raising flag in bit 0, flipped flag in bit 1
+        float ai0 = originX; // Normal drawbridge is not flipped
+        float ai1 = originY; // Store originY directly in ai[1]
+        int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, ai0, ai1);
+        Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
+        Main.projectile[proj].netUpdate = true;
+    }
+
+    public override void KillMultiTile(int i, int j, int frameX, int frameY)
+    {
+        if (suppressToggleDrop)
+            return;
+
+        // Drop item when destroyed
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemId);
+    }
+
+    /// <inheritdoc/>
+    public abstract bool DrawWheel(Tile tile, out string textureName, out string glowName, out WheelRenderSystem.DrawType drawType);
+
+    /// <summary>
+    /// Implementation method for <see cref="IDrawbridgeCover"/>.
+    /// </summary>
+    public virtual bool CanDraw(Tile tile, out WheelRenderSystem.DrawType drawType, out string mainTex, out string glowTex, ref Vector2 offset)
+    {
+        drawType = WheelRenderSystem.DrawType.Default;
+        mainTex = string.Empty;
+        glowTex = string.Empty;
+        return false;
+    }
+}
+
+public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile
+{
+    protected override bool Flipped => true;
+
+    public override bool CanPlace(int i, int j)
+    {
+        // Check if there's enough space and solid ground for flipped (origin at bottom-left)
+        if (j < 14)
+            return false; // Need room above
+
+        // Check if bottom is solid under both base tiles (i, j+1) and (i+1, j+1)
+        for (int dx = 0; dx <= 1; dx++)
+        {
+            Tile bottomTile = Main.tile[i + dx, j + 1];
+            if (!bottomTile.HasTile || !Main.tileSolid[bottomTile.TileType])
+                return false;
+        }
+
+        // Check if 2x15 area is clear (i, j-14) to (i+1, j)
+        for (int dx = 0; dx <= 1; dx++)
+            for (int dy = 0; dy < 15; dy++)
+            {
+                Tile tile = Main.tile[i + dx, j - 14 + dy];
+                if (tile.HasTile)
+                    return false;
+            }
+
+        return true;
+    }
+
+    public override void HitWire(int i, int j)
+    {
+        // only respond on bottom-left segment
+        Tile tile = Main.tile[i, j];
+        int partX = tile.TileFrameX / 16;
+        int partY = tile.TileFrameY / 16;
+        if (partX == 0 && partY == 0)
+            Toggle(i, j);
+    }
+
+    // Compute which vertical segment (0-14) a given frameY corresponds to
+    private static int GetVerticalSegmentIndex(int frameY)
+    {
+        int cum = 0;
+        const int segmentCount = 15;
+        for (int s = 0; s < segmentCount; s++)
+        {
+            if (frameY < cum + 16)
+                return s;
+            cum += 16;
+        }
+
+        return segmentCount - 1;
+    }
+
+    public override void Toggle(int i, int j)
+    {
+        // replicate vertical toggle logic, but mark flipped in projectile ai
+        int frameX = Main.tile[i, j].TileFrameX;
+        int frameY = Main.tile[i, j].TileFrameY;
+        int segmentX = frameX / 16;
+        int segmentY = GetVerticalSegmentIndex(frameY);
+        int originX = i - segmentX;
+        int originY = j - segmentY + 14;
+
+        // clear static tiles
+        for (int x = 0; x < 2; x++)
+            for (int y = 0; y < 15; y++)
+            {
+                int tx = originX + x;
+                int ty = originY - 14 + y;
+                Tile t = Main.tile[tx, ty];
+                if (t.HasTile && t.TileType == Type)
+                {
+                    t.HasTile = false;
+                    if (Main.netMode == NetmodeID.Server)
+                        NetMessage.SendTileSquare(-1, tx, ty, 1, 1);
+                }
+            }
+
+        if (Main.netMode != NetmodeID.MultiplayerClient)
+        {
+            var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+            // Store originX in ai[0] (using bits 2+), raising flag in bit 0, flipped flag in bit 1
+            float ai0 = originX; // lowering (not raising, not flipped)
+            float ai1 = originY; // Store originY directly in ai[1]
+            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, ai0, ai1);
+            Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
+            Main.projectile[proj].netUpdate = true;
+        }
+    }
+}
+
+public abstract class BaseDrawbridgeHorizontalTile : BaseDrawbridgeTile, IDrawbridgeChains
+{
+    protected virtual int AnchorX => 14;
+
+    private static bool isKillingBridge = false;
+
+    public override void SetStaticDefaults()
+    {
+        Main.tileFrameImportant[Type] = true;
+        Main.tileNoAttach[Type] = true;
+        Main.tileObsidianKill[Type] = true;
+        Main.tileLavaDeath[Type] = false;
+        Main.tileWaterDeath[Type] = false;
+        Main.tileLighted[Type] = true;
+        Main.tileSolid[Type] = false; // Platform behavior: non-solid but solid-top, never breaks on unsupported
+        Main.tileSolidTop[Type] = true;
+        Main.tileMergeDirt[Type] = false;
+
+        TileID.Sets.DisableSmartCursor[Type] = true;
+        TileID.Sets.DrawsWalls[Type] = true;
+        TileID.Sets.Platforms[Type] = true;
+
+        // Horizontal drawbridge: 15 tiles wide, 2 tiles tall
+        TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
+        TileObjectData.newTile.Width = 15;
+        TileObjectData.newTile.Height = 2;
+        TileObjectData.newTile.Origin = new Point16(AnchorX, 1); // Bottom-right of 15x2
+        TileObjectData.newTile.CoordinateHeights = new int[] { 16, 16 }; // 16px per tile for 32px total
+        TileObjectData.newTile.CoordinateWidth = 16;
+        TileObjectData.newTile.CoordinatePadding = 0;
+        TileObjectData.newTile.UsesCustomCanPlace = true;
+        TileObjectData.newTile.AnchorBottom = AnchorData.Empty;
+        TileObjectData.addTile(Type);
+
+        AddMapEntry(new Color(139, 137, 137), CreateMapEntryName());
+        DustType = DustID.Stone;
+        HitSound = SoundID.Tink;
+    }
+
+    public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak) => false;
+    public override bool CanPlace(int i, int j) => true;
+
+    public override void KillMultiTile(int i, int j, int frameX, int frameY)
+    {
+    }
+
+    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
+    {
+        if (isKillingBridge || fail)
+            return;
+
+        isKillingBridge = true;
+        try
+        {
+            Tile tile = Main.tile[i, j];
+            int partX = tile.TileFrameX / 16;
+            int partY = tile.TileFrameY / 16;
+            int anchorX = i - partX;
+            int anchorY = j - partY;
+
+            // We must set noItem to true before recursively calling KillTile, 
+            // so that we only drop one item.
+            if (!noItem)
+                Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16, 16, ModContent.ItemType<Items.DrawbridgeItem>());
+            
+            noItem = true;
+
+            for (int x = anchorX; x < anchorX + 15; x++)
+                for (int y = anchorY; y < anchorY + 2; y++)
+                    if ((x != i || y != j) && Main.tile[x, y].HasTile && Main.tile[x, y].TileType == Type)
+                        WorldGen.KillTile(x, y, false, false, false);
+        }
+        finally
+        {
+            isKillingBridge = false;
+        }
+    }
+
+    public override void Toggle(int i, int j)
+    {
+        // Determine which segment was clicked
+        Tile tile = Main.tile[i, j];
+        int frameX = tile.TileFrameX;
+        int frameY = tile.TileFrameY;
+        int segmentX = frameX / 16;
+        int segmentY = frameY / 16;
+        // Compute removal origin (rightmost of the horizontal board)
+        int removalOriginX = i - segmentX + 14;
+        // Compute pivot origin (leftmost of the hinge base)
+        int originX = removalOriginX - 1;
+        int originY = j - segmentY + 1;
+        // Hide the static horizontal drawbridge tiles
+        for (int x = 0; x < 15; x++)
+            for (int y = 0; y < 2; y++)
+            {
+                Tile currentTile = Main.tile[removalOriginX - x, originY - y];
+                if (currentTile.HasTile && currentTile.TileType == Type)
+                {
+                    currentTile.HasTile = false;
+                    if (Main.netMode == NetmodeID.Server)
+                        NetMessage.SendTileSquare(-1, removalOriginX - x, originY - y, 1, 1);
+                }
+            }
+
+        // The projectile will now handle the sound
+        // SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/DrawbridgeMove") { Volume = 0.8f, Pitch = 0f, MaxInstances = 1 },
+        //     new Vector2(originX * 16, originY * 16));
+        // Spawn animation (raising = false), packing hinge in ai[1]
+        if (Main.netMode != NetmodeID.MultiplayerClient)
+        {
+            var pivot = new Vector2(originX * 16f + 32f, originY * 16f + 16f);
+
+            if (Flipped)
+            {
+                pivot.X -= 13 * 16;
+                originX -= 13;
+            }
+
+            int proj = Projectile.NewProjectile(null, pivot, Vector2.Zero, ProjectileId, 0, 0, Main.myPlayer, originX, originY, 1);
+            Main.projectile[proj].localAI[0] = Flipped ? 1 : 0;
+            Main.projectile[proj].netUpdate = true;
+        }
+    }
+
+    public override void HitWire(int i, int j) => Toggle(i, j);
+
+    public abstract bool DrawChains(Tile tile, out WheelRenderSystem.DrawType drawType, ref Color chainColor);
+}
+
+public abstract class BaseDrawbridgeHorizontalFlippedTile : BaseDrawbridgeHorizontalTile
+{
+    protected override int AnchorX => 0;
+    protected override bool Flipped => true;
+}

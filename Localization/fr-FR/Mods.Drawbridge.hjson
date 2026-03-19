@@ -42,6 +42,11 @@ Configs: {
 			Label: Désactiver le Crottin dans l'Écurie
 			Tooltip: Si activé, les chevaux dans les écuries ne feront pas de crottin.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

@@ -42,6 +42,11 @@ Configs: {
 			Label: Desactivar Caca en el Establo
 			Tooltip: Si está activado, los caballos en los establos no dejarán caca.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

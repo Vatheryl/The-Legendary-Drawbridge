@@ -42,6 +42,11 @@ Configs: {
 			Label: Desativar Cocô no Estábulo
 			Tooltip: Se ativado, cavalos nos estábulos não soltarão cocô.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 
