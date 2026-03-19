@@ -28,28 +28,4 @@ namespace Drawbridge
 		{
 		}
 	}
-
-	public class DrawbridgeConfig : ModConfig
-	{
-		public override ConfigScope Mode => ConfigScope.ServerSide;
-
-		[Label("Disable Easter Egg")]
-		[Tooltip("")]
-		[DefaultValue(false)]
-		public bool DisableEasterEgg { get; set; } = true;
-
-		[Label("Mute Clock Sound")]
-		[Tooltip("If enabled, the clock will not play its hourly sound.")]
-		[DefaultValue(false)]
-		public bool MuteClockSound { get; set; } = false;
-
-		[Label("Mute Stable Noises")]
-		[Tooltip("If enabled, horse stables will not play their stable noises.")]
-		[DefaultValue(false)]
-		public bool MuteStableNoises { get; set; } = false;
-		[Label("Disable Horse Stable Pooping")]
-		[Tooltip("If enabled, horses in stables will not drop Poo.")]
-		[DefaultValue(false)]
-		public bool DisableHorseStablePooping { get; set; } = false;
-	}
 }

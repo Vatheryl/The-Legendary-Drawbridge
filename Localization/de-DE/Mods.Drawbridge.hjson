@@ -42,6 +42,11 @@ Configs: {
 			Label: Pferdekot im Stall deaktivieren
 			Tooltip: Wenn aktiviert, hinterlassen Pferde im Stall keinen Kot.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

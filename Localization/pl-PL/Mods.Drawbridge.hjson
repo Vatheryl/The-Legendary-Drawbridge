@@ -42,6 +42,11 @@ Configs: {
 			Label: Wyłącz Kupa w Stajni
 			Tooltip: Jeśli włączone, konie w stajniach nie będą zostawiać kupy.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

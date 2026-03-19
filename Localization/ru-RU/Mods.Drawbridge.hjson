@@ -42,6 +42,11 @@ Configs: {
 			Label: Отключить помет в конюшне
 			Tooltip: Если включено, лошади в конюшнях не будут оставлять помет.
 		}
+
+		PortcullisSpeed: {
+			// Label: Portcullis Speed
+			// Tooltip: ""
+		}
 	}
 }
 

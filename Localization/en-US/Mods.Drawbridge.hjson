@@ -21,7 +21,7 @@ DeathReason.SpikedPallisade: was impaled by a spiked pallisade!
 
 Configs: {
 	DrawbridgeConfig: {
-		DisplayName: Drawbridge Config
+		DisplayName: Castle Era Config
 
 		DisableEasterEgg: {
 			Label: Disable Easter Egg
@@ -42,6 +42,11 @@ Configs: {
 			Label: Disable Horse Stable Pooping
 			Tooltip: If enabled, horses in stables will not drop Poo.
 		}
+
+		PortcullisSpeed: {
+			Label: Portcullis Speed
+			Tooltip: Controls how quickly Portcullis tiles raise/lower. The higher, the faster.
+		}
 	}
 }
 
@@ -60,5 +65,5 @@ NPCs: {
 	ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
 }
 
-"Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle  Mount  Armor  Overlay
-Mods.Drawbridge.Tiles.ClockTile: Mods.Drawbridge.Mods.Drawbridge.Tiles.ClockTile
+"Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle Mount Armor Overlay
+Mods.Drawbridge.Tiles.ClockTile: Clock
