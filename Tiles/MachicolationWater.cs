@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Drawbridge.Tiles;
 
@@ -21,7 +23,7 @@ internal class MachicolationWater : ModProjectile
     {
         Timer++;
 
-        if (Timer > 8)
+        if (Timer > 14)
         {
             Projectile.velocity.X *= 0.95f;
             Projectile.velocity.Y += 0.2f;
@@ -34,10 +36,23 @@ internal class MachicolationWater : ModProjectile
             }
         }
 
-        if (Main.rand.NextBool(30))
+        if (Main.rand.NextBool(20))
         {
             float x = Projectile.velocity.X * 0.3f + Main.rand.NextFloat(-1, 1);
-            Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Smoke, x, Main.rand.NextFloat(-1, 0), 220);
+            Dust.NewDustPerfect(Main.rand.NextVector2FromRectangle(Projectile.Hitbox), DustID.Smoke, new Vector2(x, Main.rand.NextFloat(-1, 0)), 150);
         }
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        const float SineSpeed = 0.5f;
+
+        Texture2D tex = TextureAssets.Projectile[Type].Value;
+        Vector2 scale = new(MathF.Sin(Timer * SineSpeed) * 0.5f + 1f, MathF.Cos(Timer * SineSpeed) * 0.5f + 1f);
+        byte alpha = (byte)MathHelper.Lerp(120, 255, Projectile.Opacity);
+        Color color = (lightColor * Projectile.Opacity) with { A = alpha };
+        
+        Main.spriteBatch.Draw(tex, Projectile.Center - Main.screenPosition, null, color, Projectile.rotation, tex.Size() / 2f, scale * Projectile.scale, SpriteEffects.None, 0);
+        return false;
     }
 }

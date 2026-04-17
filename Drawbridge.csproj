@@ -10,6 +10,11 @@
 	<ItemGroup>
 	  <Folder Include="Tiles\Drawbridges\Lion\" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="NPCUtils">
+	    <HintPath>Libraries\NPCUtils.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 	<!-- References -->
 

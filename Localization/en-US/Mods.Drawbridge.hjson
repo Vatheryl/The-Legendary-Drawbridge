@@ -63,6 +63,11 @@ NPCs: {
 	ObsidianSerpent.DisplayName: Obsidian Serpent
 	ObsidianSerpentBody.DisplayName: Obsidian Serpent Body
 	ObsidianSerpentTail.DisplayName: Obsidian Serpent Tail
+
+	Haulox: {
+		DisplayName: Haulox
+		Entry: A large, deceptively gentle beast of burden found occasionally in open, calm forests. Comes in several varieties.
+	}
 }
 
 "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle Mount Armor Overlay

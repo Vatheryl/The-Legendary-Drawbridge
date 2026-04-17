@@ -227,7 +227,7 @@ ZooSignItem: {
 }
 
 HookItem: {
-	DisplayName: Hook
+	DisplayName: Fish Hook
 	Tooltip: Can hold fish
 }
 

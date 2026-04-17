@@ -52,6 +52,7 @@ public class MacchicolationTile : ModTile
         TileObjectData.newTile.CoordinateHeights = [16, 16, 16, 16, 16, 16];
         TileObjectData.newTile.CoordinateWidth = 16;
         TileObjectData.newTile.CoordinatePadding = 2;
+        TileObjectData.newTile.DrawYOffset = 2;
         TileObjectData.newTile.UsesCustomCanPlace = true;
         TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook(ModContent.GetInstance<MacchicolationTileEntity>().Hook_AfterPlacement, -1, 0, true);
         TileObjectData.newTile.Direction = TileObjectDirection.PlaceLeft;
@@ -179,7 +180,7 @@ public class MacchicolationTileEntity : ModTileEntity, IClientSideTE
     public int StateTimer;
     public int CooldownTimer; // Cooldown before next use
 
-    private const int CooldownDuration = 10800; // 3 minutes at 60 fps (180 seconds)
+    private const int CooldownDuration = 30 * 60; // 30 seconds
 
     public override void Update()
     {
@@ -328,8 +329,6 @@ public class MacchicolationTileEntity : ModTileEntity, IClientSideTE
         TileExtensions.GetTopLeft(ref i, ref j);
         var d = TileObjectData.GetTileData(Main.tile[i, j].TileType, 0);
         var size = d is null ? new Point(1, 1) : new Point(d.Width, d.Height);
-
-        Dust.NewDustPerfect(new Vector2(i + 0.5f, j + 0.5f) * 16, DustID.AncientLight, Vector2.Zero, Scale: 3f).noGravity = true;
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {

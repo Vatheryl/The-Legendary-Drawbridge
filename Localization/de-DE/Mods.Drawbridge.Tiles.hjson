@@ -61,3 +61,4 @@ EquineArmatureTile.MapEntry: Pferderüstungsständer
 // HookTile.MapEntry: Hook
 // MacchicolationTile.MapEntry: Machicolation
 // MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"
+// HookTileNew.MapEntry: Hook Tile New

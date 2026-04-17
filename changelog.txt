@@ -1,5 +1,11 @@
-1.4.0.2 - Rewrites & Bugfixes
-- Completely rewrote how Drawbridges work internally, making it both moderately more efficient for performance and orders of magnitude easier to update and create more
-- Added Portcullis Speed config option
-- Removed "Disable Easter Egg" config
-- Updated config name to match mod name
+1.4.0.3 - Haulox
+- Added Haulox, a new passive creature found in Forests
+- Fixed Machicolation debug dust being left in
+- Improved Machicolation water visuals
+- Buffed Machicolation water life time
+- Renamed Hook to Fish Hook
+- Increased Fish Hook max stack from 99 to 9999
+- Allowed Fish Hooks to be placed in 1x2 areas properly
+- Allowed Fish Hooks to be placed under any rope or solid tile
+- Allowed Fish Hooks to be placed directionally
+- Fish Hooks now merge with their anchors properly
