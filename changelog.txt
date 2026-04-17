@@ -8,4 +8,6 @@
 - Allowed Fish Hooks to be placed in 1x2 areas properly
 - Allowed Fish Hooks to be placed under any rope or solid tile
 - Allowed Fish Hooks to be placed directionally
-- Fish Hooks now merge with their anchors properly
+- Made Fish Hooks merge with their anchors properly
+- Made Fish Hooks with fish on them sway in wind
+	For all of these changes, you will have to break and re-place existing fish hooks to use their new functionality.

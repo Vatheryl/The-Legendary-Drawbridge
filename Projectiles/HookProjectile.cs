@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.DataStructures;
 using Drawbridge.Tiles;
+using Terraria.GameContent.Drawing;
 
 namespace Drawbridge.Projectiles;
 
@@ -96,9 +97,10 @@ public class HookProjectile : ModProjectile
 
         // Position the fish at the bottom of the hook, 6px to the right, 4px lower
         Vector2 fishWorldPos = new Vector2(x * 16 + 16 - 4 + 6, y * 16 + 32 + 4) + offset ?? Vector2.Zero;
-        Vector2 fishDrawPos = fishWorldPos - Main.screenPosition;
-        Vector2 fishOrigin = new Vector2(fishTexture.Width * 0.5f, fishTexture.Height * 0.5f);
-        float fishRotation = MathHelper.ToRadians(135f); // 135 degrees clockwise
+        Vector2 fishDrawPos = fishWorldPos - Main.screenPosition - new Vector2(0, 24);
+        Vector2 fishOrigin = new Vector2(0, fishTexture.Height);
+        float windRotation = Main.instance.TilesRenderer.GetWindCycle(x, y, Main.instance.TilesRenderer._vineWindCounter) * 0.15f;
+        float fishRotation = MathHelper.ToRadians(135f) + windRotation; // 135 degrees clockwise
 
         if (tile.HasTile && tile.TileType == ModContent.TileType<HookTileNew>())
             fishDrawPos.X -= 9;
