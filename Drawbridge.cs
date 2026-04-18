@@ -1,5 +1,6 @@
 global using Terraria.ModLoader;
 global using ReLogic.Content;
+global using Microsoft.Xna.Framework;
 
 using System.IO;
 

@@ -33,12 +33,12 @@ internal class Haulox : ModNPC
         RunningAway
     }
 
-    private static Dictionary<Variants, Asset<Texture2D>> Textures = [];
+    private static readonly Dictionary<Variants, Asset<Texture2D>> Textures = [];
 
     public override string Texture => "Terraria/Images/NPC_0";
 
-    private ref Variants Variant => ref Unsafe.As<float, Variants>(ref NPC.ai[0]);
-    private ref States State => ref Unsafe.As<float, States>(ref NPC.ai[1]);
+    internal ref Variants Variant => ref Unsafe.As<float, Variants>(ref NPC.ai[0]);
+    internal ref States State => ref Unsafe.As<float, States>(ref NPC.ai[1]);
     private ref float Timer => ref NPC.ai[2];
     private ref float Twomer => ref NPC.ai[3];
 

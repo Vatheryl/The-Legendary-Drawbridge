@@ -65,4 +65,9 @@ internal class StakeTile : ModTile
         DustType = DustID.WoodFurniture;
         HitSound = SoundID.Dig;
     }
+
+    public override bool RightClick(int i, int j)
+    {
+
+    }
 }
