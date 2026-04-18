@@ -39,16 +39,7 @@ internal class CrossmodContent : ILoadable
                 return false;
             }
 
-            return value switch
-            {
-                ModItem item => item.Type == type,
-                ModTile tile => tile.Type == type,
-                ModNPC npc => npc.Type == type,
-                ModProjectile projectile => projectile.Type == type,
-                ModGore gore => gore.Type == type,
-                ModDust dust => dust.Type == type,
-                _ => false,
-            };
+            return SavingUtils.GetModTypeType(value) == type;
         }
     }
 

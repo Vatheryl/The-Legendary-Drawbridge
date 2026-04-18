@@ -11,3 +11,4 @@
 - Made Fish Hooks merge with their anchors properly
 - Made Fish Hooks with fish on them sway in wind
 	For all of these changes, you will have to break and re-place existing fish hooks to use their new functionality.
+- Improved Spiked Palisade sprite

@@ -16,6 +16,7 @@ internal class Haulox : ModNPC
 {
     public enum Variants : byte
     {
+        None = 0,
         Black,
         Brown,
         Ginger,
