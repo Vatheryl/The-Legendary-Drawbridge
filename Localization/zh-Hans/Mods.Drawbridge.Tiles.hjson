@@ -62,3 +62,4 @@ EquineArmatureTile.MapEntry: 马匹护甲人偶
 // MacchicolationTile.MapEntry: Machicolation
 // MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"
 // HookTileNew.MapEntry: Hook Tile New
+// StakeTile.MapEntry: Stake Tile

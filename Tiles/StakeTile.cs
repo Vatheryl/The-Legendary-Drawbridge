@@ -66,8 +66,8 @@ internal class StakeTile : ModTile
         HitSound = SoundID.Dig;
     }
 
-    public override bool RightClick(int i, int j)
-    {
+    //public override bool RightClick(int i, int j)
+    //{
 
-    }
+    //}
 }

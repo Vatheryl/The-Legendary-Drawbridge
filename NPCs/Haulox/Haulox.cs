@@ -115,7 +115,7 @@ internal class Haulox : ModNPC
 
     public override void OnSpawn(IEntitySource source)
     {
-        Variant = (Variants)Main.rand.Next((byte)Variants.Count);
+        Variant = (Variants)Main.rand.Next((byte)Variants.Count - 1) + 1;
         NPC.netUpdate = true;
     }
 
@@ -283,6 +283,11 @@ internal class Haulox : ModNPC
 
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
+        if (NPC.IsABestiaryIconDummy)
+        {
+            Variant = Variants.Black;
+        }
+
         Texture2D tex = Textures[Variant].Value;
         Rectangle src = new(0, NPC.frame.Y * 70, tex.Width, 70);
         Vector2 pos = NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY + 2);

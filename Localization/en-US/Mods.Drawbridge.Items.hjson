@@ -330,3 +330,28 @@ TungstenHorseArmorItem: {
 	DisplayName: Tungsten Barding
 	Tooltip: ""
 }
+
+BlackHauloxYoke: {
+	DisplayName: Black Haulox Yoke
+	Tooltip: ""
+}
+
+BrownHauloxYoke: {
+	DisplayName: Brown Haulox Yoke
+	Tooltip: ""
+}
+
+GingerHauloxYoke: {
+	DisplayName: Ginger Haulox Yoke
+	Tooltip: ""
+}
+
+SpottedHauloxYoke: {
+	DisplayName: Spotted Haulox Yoke
+	Tooltip: ""
+}
+
+WhiteHauloxYoke: {
+	DisplayName: White Haulox Yoke
+	Tooltip: ""
+}

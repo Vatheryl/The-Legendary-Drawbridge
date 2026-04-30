@@ -107,17 +107,17 @@ Anvil_Sign_Item: {
 }
 
 Spear_Inventory2: {
-	// DisplayName: Spear_ Inventory2
+	// DisplayName: Spear Inventory
 	// Tooltip: ""
 }
 
 Sword_Hang_Inventory: {
-	// DisplayName: Sword_ Hang_ Inventory
+	// DisplayName: Sword Hang
 	// Tooltip: ""
 }
 
 TRident_Inventory: {
-	// DisplayName: T Rident_ Inventory
+	// DisplayName: Trident
 	// Tooltip: ""
 }
 
@@ -228,7 +228,7 @@ ZooSignItem: {
 
 HookItem: {
 	// DisplayName: Fish Hook
-	// Tooltip: Can hold fish
+	// Tooltip: Can hold fish when right clicked
 }
 
 SkyLionCloak: {
@@ -328,5 +328,30 @@ PlatinumHorseArmorItem: {
 
 TungstenHorseArmorItem: {
 	// DisplayName: Tungsten Barding
+	// Tooltip: ""
+}
+
+BlackHauloxYoke: {
+	// DisplayName: Black Haulox Yoke
+	// Tooltip: ""
+}
+
+BrownHauloxYoke: {
+	// DisplayName: Brown Haulox Yoke
+	// Tooltip: ""
+}
+
+GingerHauloxYoke: {
+	// DisplayName: Ginger Haulox Yoke
+	// Tooltip: ""
+}
+
+SpottedHauloxYoke: {
+	// DisplayName: Spotted Haulox Yoke
+	// Tooltip: ""
+}
+
+WhiteHauloxYoke: {
+	// DisplayName: White Haulox Yoke
 	// Tooltip: ""
 }
