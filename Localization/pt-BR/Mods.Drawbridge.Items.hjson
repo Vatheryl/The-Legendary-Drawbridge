@@ -355,3 +355,8 @@ WhiteHauloxYoke: {
 	// DisplayName: White Haulox Yoke
 	// Tooltip: ""
 }
+
+StakeTileItem: {
+	// DisplayName: Stake
+	// Tooltip: Can be used to hold yokes
+}

@@ -1,7 +1,7 @@
 ﻿using Drawbridge.Common;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NPCUtils;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Terraria;
@@ -30,7 +30,8 @@ internal class Haulox : ModNPC
         Idle,
         Grazing,
         Walking,
-        RunningAway
+        BeingGuided,
+        Staked,
     }
 
     private static readonly Dictionary<Variants, Asset<Texture2D>> Textures = [];
@@ -41,6 +42,15 @@ internal class Haulox : ModNPC
     internal ref States State => ref Unsafe.As<float, States>(ref NPC.ai[1]);
     private ref float Timer => ref NPC.ai[2];
     private ref float Twomer => ref NPC.ai[3];
+
+    internal ref int GuidingPlayer => ref Unsafe.As<float, int>(ref NPC.localAI[0]);
+    internal ref bool Staked => ref Unsafe.As<float, bool>(ref NPC.localAI[1]);
+
+    private bool Initialized
+    {
+        get => NPC.localAI[1] == 1;
+        set => NPC.localAI[1] = value ? 1 : 0;
+    }
 
     public override void SetStaticDefaults()
     {
@@ -123,6 +133,18 @@ internal class Haulox : ModNPC
 
     public override void AI()
     {
+        if (!Initialized)
+        {
+            Initialized = true;
+
+            GuidingPlayer = -1;
+        }
+
+        if (GuidingPlayer != -1 && State != States.BeingGuided)
+        {
+            SetState(States.BeingGuided);
+        }
+
         if (State == States.Idle)
         {
             NPC.velocity.X *= 0.8f;
@@ -137,19 +159,7 @@ internal class Haulox : ModNPC
         }
         else if (State == States.Grazing)
         {
-            NPC.velocity.X *= 0.6f;
-
-            if (Timer <= 0)
-                SetState(States.Idle);
-
-            if (Timer > 10 && NPC.frameCounter > 15 && NPC.frameCounter % 26 == 15)
-            {
-                Point16 pos = GetEatingTilePosition();
-                Collision.HitTiles(pos.ToWorldCoordinates(), new Vector2(0, -2), 4, 4);
-
-                if (!Main.dedServ)
-                    SoundEngine.PlaySound(SoundID.Grass with { Volume = 0.2f, PitchRange = (-1f, -0.4f), MaxInstances = 6 });
-            }
+            GrazeFunctionality(ref Timer);
         }
         else if (State == States.Walking)
         {
@@ -169,6 +179,71 @@ internal class Haulox : ModNPC
 
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         }
+        else if (State == States.BeingGuided)
+        {
+            if (GuidingPlayer == -1)
+            {
+                SetState(States.Idle);
+                return;
+            }
+
+            Player guide = Main.player[GuidingPlayer];
+
+            if (!guide.active || guide.dead)
+            {
+                SetState(States.Idle);
+                GuidingPlayer = -1;
+                return;
+            }
+
+            const float Idle = 100;
+            const float SlowWalk = 300;
+
+            float distance = guide.DistanceSQ(NPC.Center);
+
+            Twomer++;
+
+            if (distance <= Idle * Idle)
+            {
+                NPC.velocity.X *= 0.9f;
+                Timer = 0;
+                Twomer = 0;
+            }
+            else if (distance <= SlowWalk * SlowWalk)
+            {
+                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * 2f;
+                Timer = 1;
+            }
+            else
+            {
+                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * (2f + (MathF.Sqrt(distance) - SlowWalk) / 20f);
+                Timer = 1;
+            }
+
+            if (MathF.Abs(NPC.velocity.X) > 0.1f)
+            {
+                NPC.spriteDirection = NPC.direction = MathF.Sign(NPC.velocity.X);
+            }
+
+            Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
+    }
+
+    private void GrazeFunctionality(ref float timer)
+    {
+        NPC.velocity.X *= 0.6f;
+
+        if (timer <= 0)
+            SetState(States.Idle);
+
+        if (timer > 10 && NPC.frameCounter > 15 && NPC.frameCounter % 26 == 15)
+        {
+            Point16 pos = GetEatingTilePosition();
+            Collision.HitTiles(pos.ToWorldCoordinates(), new Vector2(0, -2), 4, 4);
+
+            if (!Main.dedServ)
+                SoundEngine.PlaySound(SoundID.Grass with { Volume = 0.2f, PitchRange = (-1f, -0.4f), MaxInstances = 6 });
+        }
     }
 
     private bool BlockedInDirection(int dir) => dir == -1 
@@ -185,7 +260,7 @@ internal class Haulox : ModNPC
 
     private Point16 GetEatingTilePosition() => new(NPC.spriteDirection == -1 ? (int)(NPC.position.X / 16f) : (int)(NPC.Right.X / 16f), (int)(NPC.Bottom.Y + 8) / 16);
 
-    private void SetState(States state)
+    internal void SetState(States state)
     {
         State = state;
         NPC.frameCounter = 0;
@@ -278,6 +353,18 @@ internal class Haulox : ModNPC
         {
             NPC.frameCounter++;
             NPC.frame.Y = (int)(NPC.frameCounter * 0.14f) % 7 + 17;
+        }
+        else if (State == States.BeingGuided)
+        {
+            if (Timer == 1)
+            {
+                NPC.frameCounter += Math.Abs(NPC.velocity.X) * 0.75f;
+                NPC.frame.Y = (int)(NPC.frameCounter * 0.14f) % 7 + 17;
+            }
+            else
+            {
+                NPC.frameCounter = 0;
+            }
         }
     }
 

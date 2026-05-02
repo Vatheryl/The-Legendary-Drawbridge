@@ -13,6 +13,16 @@ internal abstract class YokeItem : ModItem
     public class YokePlayer : ModPlayer
     {
         public int attachedNPC = -1;
+
+        public override void PreUpdate()
+        {
+            if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: false } or { ModNPC: not Haulox })
+            {
+                attachedNPC = -1;
+            }
+        }
+
+        public override bool CanHitNPC(NPC target) => target.whoAmI != attachedNPC;
     }
 
     public class YokeLayer : PlayerDrawLayer
@@ -127,7 +137,6 @@ internal abstract class YokeItem : ModItem
     }
 
     public Haulox.Variants? storedVariant = null;
-    public int tiedNPC = -1;
 
     public override void SetDefaults()
     {
@@ -141,6 +150,14 @@ internal abstract class YokeItem : ModItem
     {
         if (storedVariant is null)
             return;
+
+        storedVariant = null;
+        ref int attachedNPC = ref player.GetModPlayer<YokePlayer>().attachedNPC;
+
+        if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: true } and { ModNPC: Haulox haul })
+            haul.GuidingPlayer = -1;
+
+        attachedNPC = -1;
     }
 
     public override bool? UseItem(Player player)
@@ -158,6 +175,7 @@ internal abstract class YokeItem : ModItem
             {
                 storedVariant = haulox.Variant;
                 attach = haulox.NPC.whoAmI;
+                haulox.GuidingPlayer = player.whoAmI;
                 break;
             }
         }
