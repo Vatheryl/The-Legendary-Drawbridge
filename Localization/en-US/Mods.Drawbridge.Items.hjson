@@ -332,31 +332,31 @@ TungstenHorseArmorItem: {
 }
 
 BlackHauloxYoke: {
-	DisplayName: Black Haulox Yoke
+	DisplayName: Black Yoke
 	Tooltip: ""
 }
 
 BrownHauloxYoke: {
-	DisplayName: Brown Haulox Yoke
+	DisplayName: Brown Yoke
 	Tooltip: ""
 }
 
 GingerHauloxYoke: {
-	DisplayName: Ginger Haulox Yoke
+	DisplayName: Ginger Yoke
 	Tooltip: ""
 }
 
 SpottedHauloxYoke: {
-	DisplayName: Spotted Haulox Yoke
+	DisplayName: Spotted Yoke
 	Tooltip: ""
 }
 
 WhiteHauloxYoke: {
-	DisplayName: White Haulox Yoke
+	DisplayName: White Yoke
 	Tooltip: ""
 }
 
 StakeTileItem: {
-	DisplayName: Stake
+	DisplayName: Ground Stake
 	Tooltip: Can be used to hold yokes
 }

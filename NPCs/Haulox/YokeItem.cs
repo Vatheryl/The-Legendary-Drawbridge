@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -50,20 +51,27 @@ internal abstract class YokeItem : ModItem
             if (gravity == -1f)
                 lineOrigin.Y -= 12f;
 
+            drawInfo.DrawDataCache.AddRange(DrawYokeConnection(plr.RotatedRelativePoint(lineOrigin + new Vector2(8f), true) - new Vector2(8f), haulox, ref lineOrigin));
+        }
+
+        internal static List<DrawData> DrawYokeConnection(Vector2 origin, NPC haulox, ref Vector2 lineOrigin)
+        {
             Vector2 hauloxCenter = haulox.Center;
 
-            lineOrigin = plr.RotatedRelativePoint(lineOrigin + new Vector2(8f), true) - new Vector2(8f);
+            lineOrigin = origin;
             Vector2 playerToProjectile = hauloxCenter - lineOrigin;
             bool canDraw = true;
 
             if (playerToProjectile.X == 0f && playerToProjectile.Y == 0f)
-                return;
+                return null;
 
             float playerToProjectileMagnitude = playerToProjectile.Length();
             playerToProjectileMagnitude = 12f / playerToProjectileMagnitude;
             playerToProjectile *= playerToProjectileMagnitude;
             lineOrigin -= playerToProjectile;
             playerToProjectile = hauloxCenter - lineOrigin;
+
+            List<DrawData> values = [];
 
             while (canDraw)
             {
@@ -131,8 +139,10 @@ internal abstract class YokeItem : ModItem
                 Texture2D texture = TextureAssets.FishingLine.Value;
                 var position = lineOrigin + texture.Size() / 2f - Main.screenPosition;
                 var src = new Rectangle(0, 0, texture.Width, (int)height);
-                drawInfo.DrawDataCache.Add(new DrawData(texture, position, src, lineColor, rotation, new Vector2(texture.Width * 0.5f, 0f), 1f, SpriteEffects.None, 0f));
+                values.Add(new DrawData(texture, position, src, lineColor, rotation, new Vector2(texture.Width * 0.5f, 0f), 1f, SpriteEffects.None, 0f));
             }
+
+            return values;
         }
     }
 

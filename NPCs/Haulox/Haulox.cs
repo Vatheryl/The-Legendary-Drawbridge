@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using NPCUtils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.Audio;
@@ -45,6 +46,8 @@ internal class Haulox : ModNPC
 
     internal ref int GuidingPlayer => ref Unsafe.As<float, int>(ref NPC.localAI[0]);
     internal ref bool Staked => ref Unsafe.As<float, bool>(ref NPC.localAI[1]);
+    internal ref int StakeID => ref Unsafe.As<float, int>(ref NPC.localAI[2]);
+    internal ref float Threemer => ref NPC.localAI[3];
 
     private bool Initialized
     {
@@ -139,6 +142,8 @@ internal class Haulox : ModNPC
 
             GuidingPlayer = -1;
         }
+        
+        const float IdleDistance = 100;
 
         if (GuidingPlayer != -1 && State != States.BeingGuided)
         {
@@ -196,27 +201,26 @@ internal class Haulox : ModNPC
                 return;
             }
 
-            const float Idle = 100;
-            const float SlowWalk = 300;
+            const float SlowWalkDistance = 300;
 
             float distance = guide.DistanceSQ(NPC.Center);
 
             Twomer++;
 
-            if (distance <= Idle * Idle)
+            if (distance <= IdleDistance * IdleDistance)
             {
                 NPC.velocity.X *= 0.9f;
                 Timer = 0;
                 Twomer = 0;
             }
-            else if (distance <= SlowWalk * SlowWalk)
+            else if (distance <= SlowWalkDistance * SlowWalkDistance)
             {
                 NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * 2f;
                 Timer = 1;
             }
             else
             {
-                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * (2f + (MathF.Sqrt(distance) - SlowWalk) / 20f);
+                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * (2f + (MathF.Sqrt(distance) - SlowWalkDistance) / 20f);
                 Timer = 1;
             }
 
@@ -226,6 +230,46 @@ internal class Haulox : ModNPC
             }
 
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
+        }
+        else if (State == States.Staked)
+        {
+            NPC.velocity.X *= 0.8f;
+            Vector2 stakeWorld = TileEntity.ByID[StakeID].Position.ToWorldCoordinates();
+
+            Timer++;
+
+            if (Twomer == 0 && Timer > 60) // Idle; do nothing
+                SetState(States.Staked);
+            else if (Twomer == 1) // Walk for a short distance, randomly directed & lengthed
+            {
+                if (Timer == 60)
+                {
+                    Threemer = (Main.rand.NextBool() ? -1 : 1) * Main.rand.NextFloat(40, 80);
+
+                    if (NPC.DistanceSQ(stakeWorld) > IdleDistance * IdleDistance)
+                        Threemer = Math.Sign(stakeWorld.X - NPC.Center.X) * 60;
+                }
+                else if (Timer > 60 && Timer < 60 + Math.Abs(Threemer))
+                {
+                    if (NPC.DistanceSQ(stakeWorld) > IdleDistance * IdleDistance && Timer > 70)
+                        Timer = 60 + Math.Abs(Threemer);
+                    else
+                        NPC.velocity.X = Math.Sign(Threemer) * 2;
+                }
+                else if (Timer >= 60 + Math.Abs(Threemer))
+                {
+                    SetState(States.Staked);
+                }
+            }
+            else if (Twomer == 2) // Graze
+            {
+                if (Timer == 40)
+                {
+                    Threemer = Main.rand.NextFloat(80);
+                }
+                else if (Timer >= 40 + Threemer)
+                    SetState(States.Staked);
+            }
         }
     }
 
@@ -266,6 +310,7 @@ internal class Haulox : ModNPC
         NPC.frameCounter = 0;
         Timer = 0;
         Twomer = 0;
+        Threemer = 0;
 
         if (Main.netMode == NetmodeID.MultiplayerClient)
             return;
@@ -294,6 +339,22 @@ internal class Haulox : ModNPC
             Timer = decisions.Dequeue();
             Twomer = Main.rand.Next(120, 180);
         }
+        else if (State == States.Staked)
+            Twomer = Main.rand.Next(3);
+    }
+
+    public override void SendExtraAI(BinaryWriter writer)
+    {
+        writer.Write(GuidingPlayer);
+        writer.Write(Staked);
+        writer.Write((short)StakeID);
+    }
+
+    public override void ReceiveExtraAI(BinaryReader reader)
+    {
+        GuidingPlayer = reader.ReadInt32();
+        Staked = reader.ReadBoolean();
+        StakeID = reader.ReadInt16();
     }
 
     public override void FindFrame(int frameHeight)
@@ -364,6 +425,13 @@ internal class Haulox : ModNPC
             else
             {
                 NPC.frameCounter = 0;
+            }
+        }
+        else if (State == States.Staked)
+        {
+            if (Twomer == 0)
+            {
+
             }
         }
     }
