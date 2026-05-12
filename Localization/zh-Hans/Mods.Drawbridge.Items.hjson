@@ -57,13 +57,13 @@ HorseStableExtendedItem: {
 }
 
 HellDrawbridgeItem: {
-	// Tooltip: ""
 	// DisplayName: Hell Drawbridge
+	// Tooltip: "{$DrawbridgeItem.Tooltip}"
 }
 
 LionDrawbridgeItem: {
-	// Tooltip: ""
 	// DisplayName: Lion Drawbridge
+	// Tooltip: "{$DrawbridgeItem.Tooltip}"
 }
 
 EquineArmatureItem: {

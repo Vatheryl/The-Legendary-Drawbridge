@@ -164,7 +164,7 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
             return;
 
         // Drop item when destroyed
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 32, 16, ItemId);
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, (j + 8) * 16, 32, 16, ItemId);
     }
 
     /// <inheritdoc/>

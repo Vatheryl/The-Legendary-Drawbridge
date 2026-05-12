@@ -1,6 +1,10 @@
 DrawbridgeItem: {
 	DisplayName: Drawbridge
-	Tooltip: ""
+	Tooltip:
+		'''
+		Can be raised and lowered with right click
+		Right click the moving drawbridge again to turn it around
+		'''
 }
 
 WheelItem: {
@@ -57,13 +61,13 @@ HorseStableExtendedItem: {
 }
 
 HellDrawbridgeItem: {
-	Tooltip: ""
 	DisplayName: Hell Drawbridge
+	Tooltip: "{$DrawbridgeItem.Tooltip}"
 }
 
 LionDrawbridgeItem: {
-	Tooltip: ""
 	DisplayName: Lion Drawbridge
+	Tooltip: "{$DrawbridgeItem.Tooltip}"
 }
 
 EquineArmatureItem: {

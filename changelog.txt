@@ -1,5 +1,6 @@
-1.4.0.2 - Rewrites & Bugfixes
-- Completely rewrote how Drawbridges work internally, making it both moderately more efficient for performance and orders of magnitude easier to update and create more
-- Added Portcullis Speed config option
-- Removed "Disable Easter Egg" config
-- Updated config name to match mod name
+1.4.0.3 - Bugfixes
+- Fixed Portcullis not working properly in multiplayer
+- Fixed Drawbridges not being able to be right clicked properly in multiplayer
+- Fixed Drawbridges not placing properly when facing right
+- Changed Drawbridges to drop their item from the halfway point, instead of the very top
+- Added tooltip to all Drawbridges to clarify their usage

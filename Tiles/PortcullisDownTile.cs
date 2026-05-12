@@ -45,22 +45,22 @@ public class PortcullisDownTile : ModTile, IToggleTile
     }
 
     public void Toggle(int i, int j)
+    {
+        Tile tile = Main.tile[i, j];
+        int segment = tile.TileFrameY / 16; // row 0=top .. 7=bottom
+        int originX = i;
+        int originY = j - segment + 7; // world Y of bottom tile
+        for (int y = 0; y < 8; y++)
         {
-            Tile tile = Main.tile[i, j];
-            int segment = tile.TileFrameY / 16; // row 0=top .. 7=bottom
-            int originX = i;
-            int originY = j - segment + 7; // world Y of bottom tile
-            for (int y = 0; y < 8; y++)
+            int killY = originY - y;
+            Tile currentTile = Main.tile[originX, killY];
+            if (currentTile.HasTile && currentTile.TileType == Type)
             {
-                int killY = originY - y;
-                Tile currentTile = Main.tile[originX, killY];
-                if (currentTile.HasTile && currentTile.TileType == Type)
-                {
-                    currentTile.HasTile = false;
-                    if (Main.netMode == NetmodeID.Server)
-                        NetMessage.SendTileSquare(-1, originX, killY, 1);
-                }
+                currentTile.HasTile = false;
+                if (Main.netMode == NetmodeID.Server)
+                    NetMessage.SendTileSquare(-1, originX, killY, 1);
             }
+        }
 
         if (Main.netMode != NetmodeID.MultiplayerClient)
         {
@@ -68,22 +68,17 @@ public class PortcullisDownTile : ModTile, IToggleTile
             float ai0 = (originX << 1) | 1; // raising
             float ai1 = originY; // Store originY directly in ai[1]
             Vector2 pivot = new Vector2(originX * 16f + 8f, originY * 16f + 8f);
-            Projectile.NewProjectile(null, pivot, Vector2.Zero,
-                ModContent.ProjectileType<PortcullisAnimation>(),
-                0, 0, Main.myPlayer, ai0, ai1);
+            Projectile.NewProjectile(null, pivot, Vector2.Zero, ModContent.ProjectileType<PortcullisAnimation>(), 0, 0, Main.myPlayer, ai0, ai1);
         }
     }
 
     public override bool RightClick(int i, int j)
     {
         if (Main.netMode == NetmodeID.MultiplayerClient)
-        {
             PacketHandler.SendContextPacket(MessageType.ToggleDrawbridge, i, j);
-        }
         else
-    {
-        Toggle(i, j);
-        }
+            Toggle(i, j);
+
         return true;
     }
 
