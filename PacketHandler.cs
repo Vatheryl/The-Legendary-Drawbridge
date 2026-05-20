@@ -26,6 +26,7 @@ internal enum MessageType : byte
 
     // New system message types
     RequestTreetops,
+    ForceProjectileAI,
 }
 
 // This is a static class for handling packets.
@@ -107,10 +108,10 @@ internal static class PacketHandler
                     Tile ptile = Main.tile[pi, pj];
                     if (ptile.HasTile)
                     {
-                        if (ptile.TileType == ModContent.TileType<Tiles.SpikedPallisadeTile>())
-                            ModContent.GetInstance<Tiles.SpikedPallisadeTile>().Toggle(pi, pj);
-                        else if (ptile.TileType == ModContent.TileType<Tiles.SpikedPallisadeFlippedTile>())
-                            ModContent.GetInstance<Tiles.SpikedPallisadeFlippedTile>().Toggle(pi, pj);
+                        if (ptile.TileType == ModContent.TileType<SpikedPallisadeTile>())
+                            ModContent.GetInstance<SpikedPallisadeTile>().Toggle(pi, pj);
+                        else if (ptile.TileType == ModContent.TileType<SpikedPallisadeFlippedTile>())
+                            ModContent.GetInstance<SpikedPallisadeFlippedTile>().Toggle(pi, pj);
                     }
                 }
 

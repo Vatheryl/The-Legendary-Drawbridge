@@ -40,7 +40,7 @@ namespace Drawbridge.Projectiles
         private int _solidTileType;
 
         private SlotId _soundId;
-        private bool _soundPlaying = false;
+        private bool _init = false;
         private const float SOUND_VOLUME = 0.8f;
 
         public override void SetDefaults()
@@ -57,7 +57,7 @@ namespace Drawbridge.Projectiles
 
         public override void AI()
         {
-            if (!_soundPlaying)
+            if (!_init)
             {
                 // Start the sound
                 _soundId = SoundEngine.PlaySound(new SoundStyle("Drawbridge/Sounds/PortcullisMove")
@@ -66,7 +66,10 @@ namespace Drawbridge.Projectiles
                     IsLooped = true,
                     SoundLimitBehavior = SoundLimitBehavior.IgnoreNew
                 }, Projectile.Center);
-                _soundPlaying = true;
+
+                Timer = 0;
+
+                _init = true;
             }
 
             Projectile.timeLeft = 2;
@@ -113,7 +116,7 @@ namespace Drawbridge.Projectiles
 
         public override void OnKill(int timeLeft)
         {
-            if (_soundPlaying && SoundEngine.TryGetActiveSound(_soundId, out var activeSound))
+            if (_init && SoundEngine.TryGetActiveSound(_soundId, out var activeSound))
             {
                 activeSound.Stop();
             }
@@ -249,17 +252,6 @@ namespace Drawbridge.Projectiles
 
             sb.Draw(tex, drawPos, sourceRect, baseLight, 0f, origin, 1f, SpriteEffects.None, 0f);
             return false;
-        }
-
-        // Sync timer so clients reconnecting see the current state
-        public override void SendExtraAI(BinaryWriter writer)
-        {
-            writer.Write(Timer);
-        }
-
-        public override void ReceiveExtraAI(BinaryReader reader)
-        {
-            Timer = reader.ReadInt32();
         }
     }
 } 

@@ -10,9 +10,9 @@ using ReLogic.Utilities;
 using Terraria.GameContent;
 using System.IO;
 using System;
-using Drawbridge.Tiles.Drawbridges.Hell;
-using Drawbridge.Tiles.Drawbridges.Lion;
 using Drawbridge.Systems;
+using Drawbridge.Systems.Synchronization.Handlers;
+using System.Runtime.CompilerServices;
 
 namespace Drawbridge.Tiles.Drawbridges;
 
@@ -30,15 +30,17 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     protected const int ANIMATION_DURATION = 300; // ~5 seconds
     protected const float SOUND_VOLUME = 0.8f;
 
+    protected static bool LastRight = false; // track previous right mouse state
+
     protected static Dictionary<int, DrawbridgeData> ProjectileIdToData = [];
 
     // Public access for world-save persistence
-    public int AnimationTimer
+    public int AnimationTimer_IO
     {
-        get => animationTimer;
+        get => AnimationTimer;
         set
         {
-            animationTimer = value;
+            AnimationTimer = value;
             UpdateCorners();
             UpdateSolidTiles();
         }
@@ -60,13 +62,14 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         set => Projectile.localAI[0] = value ? 1 : 0;
     }
 
-    protected int animationTimer = 0;
+    protected ref int AnimationTimer => ref Unsafe.As<float, int>(ref Projectile.localAI[1]);
+
     protected List<Point> _solidTiles = [];
     protected int _solidTileType;
     protected Vector2 p_tl, p_tr, p_bl, p_br; // World positions of corners
     protected SlotId _soundId;
     protected bool _soundPlaying = false;
-    protected bool _lastRight = false; // track previous right mouse state
+    protected int _spawnTimer = 0;
 
     public static void SpawnAnimation<T>(int originX, int originY, int mask) where T : BaseDrawbridgeAnimation
     {
@@ -103,8 +106,10 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     {
         // Prevent the projectile from expiring while the animation is running.
         Projectile.timeLeft = 2;
+        _spawnTimer++;
 
-        RightClickFunctionality();
+        if (Main.netMode != NetmodeID.Server && _spawnTimer > 10)
+            RightClickFunctionality();
 
         // Ensure movement sound is playing and at correct volume, looped
         var movementStyle = new SoundStyle("Drawbridge/Sounds/DrawbridgeMove")
@@ -114,24 +119,27 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             MaxInstances = 0,
             IsLooped = true
         };
+
         if (!SoundEngine.TryGetActiveSound(_soundId, out var movementSound))
         {
             _soundId = SoundEngine.PlaySound(movementStyle, Projectile.Center);
             SoundEngine.TryGetActiveSound(_soundId, out movementSound);
         }
 
-        if (animationTimer >= ANIMATION_DURATION)
+        if (AnimationTimer >= ANIMATION_DURATION)
         {
             // At end of swing, clear any remaining temp tiles.
             ClearSolidTiles();
 
             // On the server, place the final static tile. Clients will receive this via net message.
             if (Main.netMode != NetmodeID.MultiplayerClient)
+            {
                 // Swap the tile in the world to its new orientation
                 if (Lowering)
                     SwitchToHorizontal();
                 else
                     SwitchToVertical();
+            }
 
             Projectile.Kill();
             return; // Stop further AI processing
@@ -151,11 +159,11 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         if (movementSound != null)
             movementSound.Volume = SOUND_VOLUME;
 
-        animationTimer++;
+        AnimationTimer++;
         if (Main.netMode == NetmodeID.Server)
             Projectile.netUpdate = true;
 
-        float raw = (float)animationTimer / ANIMATION_DURATION;
+        float raw = (float)AnimationTimer / ANIMATION_DURATION;
         raw = MathHelper.Clamp(raw, 0f, 1f);
         float eased = Lowering ? EaseOut(raw) : EaseIn(1 - raw);
         Projectile.rotation = -MathHelper.PiOver2 * eased;
@@ -170,21 +178,24 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         // handle click to reverse animation
         bool right = Main.mouseRight;
 
-        if (animationTimer > 0 && right && !_lastRight)
+        if (AnimationTimer > 0 && right && !LastRight)
         {
-            CalculateCornersForTime(animationTimer, out Vector2 c1, out Vector2 c2, out Vector2 c3, out Vector2 c4);
+            CalculateCornersForTime(AnimationTimer, out Vector2 c1, out Vector2 c2, out Vector2 c3, out Vector2 c4);
 
             if (IsPointInQuad(Main.MouseWorld, c1, c2, c4, c3))
             {
-                float clickRaw = animationTimer / (float)ANIMATION_DURATION;
+                float clickRaw = AnimationTimer / (float)ANIMATION_DURATION;
                 float f0 = Lowering ? EaseOut(clickRaw) : EaseIn(1f - clickRaw);
                 // Preserve OriginX coordinate when updating flags during reversal
                 //Projectile.ai[0] = (OriginX << 2) | (Flipped ? 2 : 0) | (!Raising ? 1 : 0);
                 float reversedRaw = !Lowering
                     ? 1f - (float)Math.Sqrt(1f - f0)
                     : 1f - (float)Math.Sqrt(f0);
-                animationTimer = (int)(reversedRaw * ANIMATION_DURATION);
+                AnimationTimer = (int)(reversedRaw * ANIMATION_DURATION);
                 Lowering = !Lowering;
+
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                    ForceProjectileAIHandler.Send(Projectile, true);
 
                 // adjust audio for reversal: restart the movement sound
                 if (SoundEngine.TryGetActiveSound(_soundId, out var activeSound))
@@ -200,7 +211,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             }
         }
 
-        _lastRight = right;
+        LastRight = right;
     }
 
     private static float EaseOut(float t) => 1f - (1f - t) * (1f - t);
@@ -211,7 +222,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         Color baseLight = Lighting.GetColor(OriginX, OriginY);
         Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
         // Hinge shifts up 2 tiles over the swing
-        float raw = (float)animationTimer / ANIMATION_DURATION;
+        float raw = (float)AnimationTimer / ANIMATION_DURATION;
         raw = MathHelper.Clamp(raw, 0f, 1f);
         float shiftEased = Lowering ? EaseOut(raw) : EaseIn(1 - raw);
         float hingeX = OriginX * 16f + (Flipped ? 0f : 32f);
@@ -346,11 +357,12 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     private bool IsPathObstructed()
     {
         // Calculate the corners for the next animation frame.
-        CalculateCornersForTime(animationTimer + 1, out Vector2 next_p_tl, out Vector2 next_p_tr, out Vector2 next_p_bl, out Vector2 next_p_br);
+        CalculateCornersForTime(AnimationTimer + 1, out Vector2 next_p_tl, out Vector2 next_p_tr, out Vector2 next_p_bl, out Vector2 next_p_br);
 
         Rectangle nextBoundingBox = GetBoundingBoxForQuad(next_p_tl, next_p_tr, next_p_br, next_p_bl);
 
         for (int i = nextBoundingBox.X / 16; i <= nextBoundingBox.Right / 16; i++)
+        {
             for (int j = nextBoundingBox.Y / 16; j <= nextBoundingBox.Bottom / 16; j++)
             {
                 if (!WorldGen.InWorld(i, j))
@@ -365,11 +377,12 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                         return true; // Found an obstruction.
                 }
             }
+        }
 
         return false; // No obstructions found.
     }
 
-    private void UpdateCorners() => CalculateCornersForTime(animationTimer, out p_tl, out p_tr, out p_bl, out p_br);
+    private void UpdateCorners() => CalculateCornersForTime(AnimationTimer, out p_tl, out p_tr, out p_bl, out p_br);
 
     private void DealContactDamage()
     {
@@ -584,7 +597,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             }
     }
 
-    private bool IsPointInQuad(Vector2 p, Vector2 a, Vector2 b, Vector2 c, Vector2 d) => IsPointInTriangle(p, a, b, c) || IsPointInTriangle(p, a, c, d);
+    private static bool IsPointInQuad(Vector2 p, Vector2 a, Vector2 b, Vector2 c, Vector2 d) => IsPointInTriangle(p, a, b, c) || IsPointInTriangle(p, a, c, d);
 
     private static bool IsPointInTriangle(Vector2 pt, Vector2 v1, Vector2 v2, Vector2 v3)
     {
@@ -601,17 +614,21 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     private void ClearArea(int startX, int startY, int width, int height)
     {
         for (int i = startX; i < startX + width; i++)
+        {
             for (int j = startY; j < startY + height; j++)
+            {
                 if (WorldGen.InWorld(i, j))
                 {
                     Tile tile = Main.tile[i, j];
+
                     if (tile != null && tile.HasTile && tile.TileType != _solidTileType)
-                    {
                         WorldGen.KillTile(i, j, false, false, false);
-                        if (Main.netMode == NetmodeID.Server)
-                            NetMessage.SendTileSquare(-1, i, j, 1);
-                    }
                 }
+            }
+        }
+
+        if (Main.netMode == NetmodeID.Server)
+            NetMessage.SendTileSquare(-1, startX, startY, width, height);
     }
 
     private void SwitchToHorizontal()
@@ -677,13 +694,10 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         int placeX = originX + 1;
         int placeY = originY;
 
-        // Fix: Only clear the correct area for flipped case
-        if (Flipped)
-            ClearArea(placeX, placeY - 14, 2, 15);
-        else
-            ClearArea(placeX - 1, placeY - 14, 2, 15);
+        ClearArea(placeX, placeY - 14, 2, 15);
 
         bool placed = WorldGen.PlaceObject(placeX, placeY, tileType, mute: true, style: 0, alternate: 0, random: -1, direction: Flipped ? 1 : -1);
+
         if (!placed)
         {
             // If placement fails, drop the item for the player.
@@ -697,24 +711,22 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             // For multiplayer, we need to send the tile changes to clients.
             // The placement area is 2 wide by 15 high.
             // placeX is the anchor, so we need to adjust for Flipped
-            int netX = Flipped ? placeX : placeX - 1;
+            int netX = Flipped ? placeX : placeX;
             int netY = placeY - 14;
-            NetMessage.SendTileSquare(-1, netX, netY, 4, 15);
+            NetMessage.SendTileSquare(-1, netX - 1, netY, 6, 15);
         }
     }
 
     // Sync animationTimer and _lastRight so clients reconnecting see the current state
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write(animationTimer);
-        writer.Write(_lastRight);
+        writer.Write(AnimationTimer);
         writer.Write(Flipped);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        animationTimer = reader.ReadInt32();
-        _lastRight = reader.ReadBoolean();
+        AnimationTimer = reader.ReadInt32();
         Flipped = reader.ReadBoolean();
     }
 }

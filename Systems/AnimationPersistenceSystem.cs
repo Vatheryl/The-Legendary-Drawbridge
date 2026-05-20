@@ -25,7 +25,7 @@ public class AnimationPersistenceSystem : ModSystem
 			{
 				int timerValue = 0;
 				if (proj.ModProjectile is BaseDrawbridgeAnimation da)
-					timerValue = da.AnimationTimer;
+					timerValue = da.AnimationTimer_IO;
 				else if (proj.ModProjectile is PortcullisAnimation pa)
 					timerValue = (int)pa.AnimationTimer;
 
@@ -41,6 +41,7 @@ public class AnimationPersistenceSystem : ModSystem
 				});
 			}
 		}
+
 		tag[TagKey] = list;
 	}
 
@@ -66,7 +67,7 @@ public class AnimationPersistenceSystem : ModSystem
 				{
 					var mp = Main.projectile[index].ModProjectile;
 					if (mp is BaseDrawbridgeAnimation da)
-						da.AnimationTimer = timerValue;
+						da.AnimationTimer_IO = timerValue;
 					else if (mp is PortcullisAnimation pa)
 						pa.AnimationTimer = timerValue;
 					// Check for GoldBellClapper

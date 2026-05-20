@@ -3,7 +3,6 @@ using Drawbridge.Projectiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -85,10 +84,8 @@ public class PortcullisUpTile : ModTile, IToggleTile
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
         if (fail || noItem)
-        {
             return;
-        }
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16, 16,
-            ModContent.ItemType<Items.PortcullisItem>());
+        
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 16, 16, ModContent.ItemType<Items.PortcullisItem>());
     }
 }
