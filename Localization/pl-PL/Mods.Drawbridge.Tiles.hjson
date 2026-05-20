@@ -61,3 +61,5 @@ EquineArmatureTile.MapEntry: Manekin Zbroi Końskiej
 // HookTile.MapEntry: Hook
 // MacchicolationTile.MapEntry: Machicolation
 // MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"
+// HookTileNew.MapEntry: Hook Tile New
+// StakeTile.MapEntry: Stake Tile

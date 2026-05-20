@@ -263,7 +263,9 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
             for (float t = chainStep; t < length - chainStep; t += chainStep)
             {
                 Vector2 pos = start + dir * t;
-                Color chainColor = ProjectileIdToData[Type].GetChainColor?.Invoke(baseLight) ?? Color.White;
+                Vector2 lightPos = pos + Main.screenPosition;
+                Color light = Lighting.GetColor(lightPos.ToTileCoordinates());
+                Color chainColor = ProjectileIdToData[Type].GetChainColor?.Invoke(light) ?? light;
                 Main.spriteBatch.Draw(chainTexture, pos, null, chainColor, chainRotation, chainOrigin, 1f, spriteEffects, 0f);
             }
         }
@@ -694,7 +696,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         int placeX = originX + 1;
         int placeY = originY;
 
-        ClearArea(placeX, placeY - 14, 2, 15);
+        ClearArea(placeX - (Flipped ? 0 : 1), placeY - 14, 2, 15);
 
         bool placed = WorldGen.PlaceObject(placeX, placeY, tileType, mute: true, style: 0, alternate: 0, random: -1, direction: Flipped ? 1 : -1);
 

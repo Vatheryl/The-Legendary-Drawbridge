@@ -1,6 +1,15 @@
-1.4.0.3 - Bugfixes
-- Fixed Portcullis not working properly in multiplayer
-- Fixed Drawbridges not being able to be right clicked properly in multiplayer
-- Fixed Drawbridges not placing properly when facing right
-- Changed Drawbridges to drop their item from the halfway point, instead of the very top
-- Added tooltip to all Drawbridges to clarify their usage
+1.4.0.4 - Fish Hook Overhaul + Bugfixes
+- Fixed Machicolation debug dust being left in
+- Improved Machicolation water visuals
+- Buffed Machicolation water life time
+- Renamed Hook to Fish Hook
+- Increased Fish Hook max stack from 99 to 9999
+- Allowed Fish Hooks to be placed in 1x2 areas properly
+- Allowed Fish Hooks to be placed under any rope or solid tile
+- Allowed Fish Hooks to be placed directionally
+- Made Fish Hooks merge with their anchors properly
+- Made Fish Hooks with fish on them sway in wind
+	For all of these changes, you will have to break and re-place existing fish hooks to use their new functionality.
+- Improved Spiked Palisade sprite
+- Fixed left-facing Drawbridges clearing tiles to the right of the tile when vertical
+- Fixed Drawbridge animation chains not using lighting properly

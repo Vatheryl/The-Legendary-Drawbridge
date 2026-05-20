@@ -61,3 +61,5 @@ EquineArmatureTile.MapEntry: Манекен Конской Брони
 // HookTile.MapEntry: Hook
 // MacchicolationTile.MapEntry: Machicolation
 // MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"
+// HookTileNew.MapEntry: Hook Tile New
+// StakeTile.MapEntry: Stake Tile

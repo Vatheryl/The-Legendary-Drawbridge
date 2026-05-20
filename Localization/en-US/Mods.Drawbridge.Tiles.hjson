@@ -61,3 +61,5 @@ ZooSignTile.MapEntry: Zoo Sign
 HookTile.MapEntry: Hook
 MacchicolationTile.MapEntry: Machicolation
 MacchicolationTile_F.MapEntry: "{$MacchicolationTile.MapEntry}"
+HookTileNew.MapEntry: Hook Tile New
+StakeTile.MapEntry: Stake Tile
