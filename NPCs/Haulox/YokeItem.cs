@@ -15,6 +15,8 @@ internal abstract class YokeItem : ModItem
     {
         public int attachedNPC = -1;
 
+        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
+
         public override void PreUpdate()
         {
             if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: false } or { ModNPC: not Haulox })
@@ -28,6 +30,7 @@ internal abstract class YokeItem : ModItem
 
     public class YokeLayer : PlayerDrawLayer
     {
+        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
         public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.Head);
 
         protected override void Draw(ref PlayerDrawSet drawInfo)
@@ -147,6 +150,8 @@ internal abstract class YokeItem : ModItem
     }
 
     public Haulox.Variants? storedVariant = null;
+
+    public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
 
     public override void SetDefaults()
     {

@@ -15,6 +15,8 @@ namespace Drawbridge.NPCs.Haulox;
 
 internal class Haulox : ModNPC
 {
+    public const bool Enabled = false;
+
     public enum Variants : byte
     {
         None = 0,
@@ -54,6 +56,8 @@ internal class Haulox : ModNPC
         get => NPC.localAI[1] == 1;
         set => NPC.localAI[1] = value ? 1 : 0;
     }
+
+    public override bool IsLoadingEnabled(Mod mod) => Enabled;
 
     public override void SetStaticDefaults()
     {

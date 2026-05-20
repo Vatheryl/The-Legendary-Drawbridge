@@ -1,5 +1,4 @@
-1.4.0.4 - Haulox
-- Added Haulox, a new passive creature found in Forests
+1.4.0.4 - Fish Hook Overhaul + Bugfixes
 - Fixed Machicolation debug dust being left in
 - Improved Machicolation water visuals
 - Buffed Machicolation water life time
@@ -12,3 +11,5 @@
 - Made Fish Hooks with fish on them sway in wind
 	For all of these changes, you will have to break and re-place existing fish hooks to use their new functionality.
 - Improved Spiked Palisade sprite
+- Fixed left-facing Drawbridges clearing tiles to the right of the tile when vertical
+- Fixed Drawbridge animation chains not using lighting properly

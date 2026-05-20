@@ -11,7 +11,7 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-internal class StakeTile : ModTile, IAutoloadTileItem
+internal class StakeTile : ModTile//, IAutoloadTileItem
 {
     public class StakeTileEntity : ModTileEntity, IDrawableTE
     {
@@ -22,6 +22,8 @@ internal class StakeTile : ModTile, IAutoloadTileItem
         public bool HasData = false;
 
         private HauloxData Data = default;
+
+        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
 
         public ref HauloxData GetData(out bool value)
         {
@@ -102,6 +104,8 @@ internal class StakeTile : ModTile, IAutoloadTileItem
                 d.Draw(spriteBatch);
         }
     }
+
+    public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
 
     public override void SetStaticDefaults()
     {
