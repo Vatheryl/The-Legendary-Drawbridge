@@ -161,22 +161,25 @@ internal abstract class YokeItem : ModItem
         Item.rare = ItemRarityID.Green;
     }
 
-    public override void RightClick(Player player)
-    {
-        if (storedVariant is null)
-            return;
-
-        storedVariant = null;
-        ref int attachedNPC = ref player.GetModPlayer<YokePlayer>().attachedNPC;
-
-        if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: true } and { ModNPC: Haulox haul })
-            haul.GuidingPlayer = -1;
-
-        attachedNPC = -1;
-    }
+    public override bool AltFunctionUse(Player player) => true;
 
     public override bool? UseItem(Player player)
     {
+        if (player.altFunctionUse == 2)
+        {
+            if (storedVariant is null)
+                return true;
+
+            storedVariant = null;
+            ref int attachedNPC = ref player.GetModPlayer<YokePlayer>().attachedNPC;
+
+            if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: true } and { ModNPC: Haulox haul })
+                haul.GuidingPlayer = -1;
+
+            attachedNPC = -1;
+            return true;
+        }
+
         ref int attach = ref player.GetModPlayer<YokePlayer>().attachedNPC;
 
         if (attach >= 0)
@@ -186,11 +189,12 @@ internal abstract class YokeItem : ModItem
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is Haulox haulox)
+            if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 80 * 80)
             {
                 storedVariant = haulox.Variant;
                 attach = haulox.NPC.whoAmI;
                 haulox.GuidingPlayer = player.whoAmI;
+                haulox.AttachedYokeId = Item.type;
                 break;
             }
         }

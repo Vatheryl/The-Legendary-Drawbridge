@@ -11,7 +11,7 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-internal class StakeTile : ModTile//, IAutoloadTileItem
+internal class StakeTile : ModTile, IAutoloadTileItem
 {
     public class StakeTileEntity : ModTileEntity, IDrawableTE
     {
@@ -52,6 +52,7 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
                 if (data.NPC == -2)
                 {
                     data.NPC = NPC.NewNPC(new EntitySource_SpawnNPC(), Position.X * 16, (Position.Y - 1) * 16, ModContent.NPCType<Haulox>(), 0, (float)data.Variant);
+                    (Main.npc[data.NPC].ModNPC as Haulox).Variant = data.Variant;
                     SetHauloxStaked(data.Yoke, this, Main.npc[data.NPC]);
                 }
 

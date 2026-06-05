@@ -8,14 +8,16 @@ using System.Runtime.CompilerServices;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
 using Terraria.ID;
+using Terraria.UI.Chat;
 
 namespace Drawbridge.NPCs.Haulox;
 
 internal class Haulox : ModNPC
 {
-    public const bool Enabled = false;
+    public const bool Enabled = true;
 
     public enum Variants : byte
     {
@@ -51,17 +53,14 @@ internal class Haulox : ModNPC
     internal ref int StakeID => ref Unsafe.As<float, int>(ref NPC.localAI[2]);
     internal ref float Threemer => ref NPC.localAI[3];
 
-    private bool Initialized
-    {
-        get => NPC.localAI[1] == 1;
-        set => NPC.localAI[1] = value ? 1 : 0;
-    }
+    internal int AttachedYokeId = -1;
+    internal bool Initialized = false;
 
     public override bool IsLoadingEnabled(Mod mod) => Enabled;
 
     public override void SetStaticDefaults()
     {
-        Main.npcFrameCount[Type] = 24;
+        Main.npcFrameCount[Type] = 32;
 
         NPCID.Sets.CountsAsCritter[Type] = true;
 
@@ -158,7 +157,9 @@ internal class Haulox : ModNPC
         {
             NPC.velocity.X *= 0.8f;
 
-            if (Timer >= 3)
+            if (NPC.justHit)
+                SetState(States.Walking);
+            else if (Timer >= 3)
             {
                 if (HasGrazeableGrass() && Main.rand.NextBool(2))
                     SetState(States.Grazing);
@@ -197,21 +198,24 @@ internal class Haulox : ModNPC
             }
 
             Player guide = Main.player[GuidingPlayer];
+            float distance = guide.DistanceSQ(NPC.Center);
 
-            if (!guide.active || guide.dead)
+            if (!guide.active || guide.dead || distance > 600 * 600)
             {
                 SetState(States.Idle);
                 GuidingPlayer = -1;
+                guide.GetModPlayer<YokeItem.YokePlayer>().attachedNPC = -1;
+                DropYoke();
                 return;
             }
 
             const float SlowWalkDistance = 300;
 
-            float distance = guide.DistanceSQ(NPC.Center);
+            float offsetX = Math.Abs(NPC.Center.X - guide.Center.X);
 
             Twomer++;
 
-            if (distance <= IdleDistance * IdleDistance)
+            if (distance <= IdleDistance * IdleDistance || offsetX < 12)
             {
                 NPC.velocity.X *= 0.9f;
                 Timer = 0;
@@ -219,19 +223,21 @@ internal class Haulox : ModNPC
             }
             else if (distance <= SlowWalkDistance * SlowWalkDistance)
             {
-                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * 2f;
+                NPC.velocity.X = MathHelper.Lerp(NPC.velocity.X, MathF.Sign(guide.Center.X - NPC.Center.X) * 2f, 0.2f);
                 Timer = 1;
             }
             else
             {
-                NPC.velocity.X = MathF.Sign(guide.Center.X - NPC.Center.X) * (2f + (MathF.Sqrt(distance) - SlowWalkDistance) / 20f);
+                NPC.velocity.X = MathHelper.Lerp(NPC.velocity.X, MathF.Sign(guide.Center.X - NPC.Center.X) * (2f + (MathF.Sqrt(distance) - SlowWalkDistance) / 20f), 0.2f);
                 Timer = 1;
             }
 
-            if (MathF.Abs(NPC.velocity.X) > 0.1f)
+            if (MathF.Abs(NPC.velocity.X) > 0.1f && offsetX > 4)
             {
                 NPC.spriteDirection = NPC.direction = MathF.Sign(NPC.velocity.X);
             }
+
+            GuidingJump();
 
             Collision.StepUp(ref NPC.position, ref NPC.velocity, NPC.width, NPC.height, ref NPC.stepSpeed, ref NPC.gfxOffY);
         }
@@ -274,7 +280,26 @@ internal class Haulox : ModNPC
                 else if (Timer >= 40 + Threemer)
                     SetState(States.Staked);
             }
+
+            if (MathF.Abs(NPC.velocity.X) > 0.1f)
+                NPC.spriteDirection = NPC.direction = MathF.Sign(NPC.velocity.X);
         }
+    }
+
+    private void DropYoke()
+    {
+        //Item.NewItem(NPC.GetSource_FromThis(), NPC.Hitbox, AttachedYokeId);
+        SoundEngine.PlaySound(SoundID.Dig with { PitchRange = (-0.3f, 0.3f) }, NPC.Center);
+        AttachedYokeId = -1;
+    }
+
+    private void GuidingJump()
+    {
+        bool wall = NPC.spriteDirection == -1 ? Collision.SolidCollision(NPC.TopLeft - new Vector2(6, 0), 6, 14) : Collision.SolidCollision(NPC.TopRight, 6, 14);
+        wall |= Main.player[GuidingPlayer].Center.Y < NPC.Center.Y - 120;
+
+        if (wall && NPC.collideY)
+            NPC.velocity.Y = -8;
     }
 
     private void GrazeFunctionality(ref float timer)
@@ -363,22 +388,9 @@ internal class Haulox : ModNPC
 
     public override void FindFrame(int frameHeight)
     {
-        if (State == States.Idle)
+        if (State == States.Idle || NPC.IsABestiaryIconDummy)
         {
-            NPC.frameCounter += 0.3f;
-            NPC.frame.Y = (int)(NPC.frameCounter * 0.5f) % 10;
-
-            if (NPC.frameCounter > 20)
-            {
-                NPC.frame.Y = 0;
-
-                if (NPC.frameCounter > 40 + Twomer)
-                {
-                    NPC.frameCounter = 0;
-                    Timer++;
-                    Twomer = Main.rand.Next(3, 9) * 20;
-                }
-            }
+            IdleAnimation(true);
 
             if (NPC.IsABestiaryIconDummy)
             {
@@ -421,22 +433,163 @@ internal class Haulox : ModNPC
         }
         else if (State == States.BeingGuided)
         {
-            if (Timer == 1)
+            if (CheckJumping(out int frame))
             {
-                NPC.frameCounter += Math.Abs(NPC.velocity.X) * 0.75f;
-                NPC.frame.Y = (int)(NPC.frameCounter * 0.14f) % 7 + 17;
+                NPC.frame.Y = frame;
             }
             else
             {
-                NPC.frameCounter = 0;
+                if (Timer == 1)
+                {
+                    NPC.frameCounter += Math.Abs(NPC.velocity.X) * 0.75f;
+                    NPC.frame.Y = (int)(NPC.frameCounter * 0.14f) % 7 + 17;
+                }
+                else
+                {
+                    IdleAnimation(false);
+                }
             }
         }
         else if (State == States.Staked)
         {
-            if (Twomer == 0)
+            if (Math.Abs(NPC.velocity.X) < 0.1f)
+                IdleAnimation(false);
+            else
             {
-
+                NPC.frameCounter++;
+                NPC.frame.Y = (int)(NPC.frameCounter * 0.14f) % 7 + 17;
             }
+        }
+    }
+
+    private void IdleAnimation(bool behavior)
+    {
+        NPC.frameCounter += 0.3f;
+        NPC.frame.Y = (int)(NPC.frameCounter * 0.5f) % 10;
+
+        if (NPC.frameCounter > 20)
+        {
+            NPC.frame.Y = 0;
+
+            if (NPC.frameCounter > 40 + Twomer)
+            {
+                NPC.frameCounter = 0;
+
+                if (behavior)
+                    Timer++;
+
+                Twomer = Main.rand.Next(3, 9) * 20;
+            }
+        }
+    }
+
+    private bool CheckJumping(out int frame)
+    {
+        frame = 0;
+
+        if (Collision.SolidCollision(NPC.BottomLeft, NPC.width, 8, true) || PlatformCollision(NPC.BottomLeft - new Vector2(6, 0), NPC.width + 12, 8))
+            return false;
+
+        if (NPC.velocity.Y < 0)
+        {
+            frame = NPC.velocity.Y switch
+            {
+                < -5 => 24,
+                < -3 => 25,
+                < -1f => 26,
+                _ => 27,
+            };
+
+            return true;
+        }
+
+        frame = NPC.velocity.Y switch
+        {
+            <= 1f => 27,
+            < 3 => 28,
+            _ => 29,
+        };
+
+        return true;
+    }
+
+    public static bool PlatformCollision(Vector2 Position, int Width, int Height)
+    {
+        int value = (int)(Position.X / 16f) - 1;
+        int value2 = (int)((Position.X + Width) / 16f) + 2;
+        int value3 = (int)(Position.Y / 16f) - 1;
+        int value4 = (int)((Position.Y + Height) / 16f) + 2;
+        int num = Utils.Clamp(value, 0, Main.maxTilesX - 1);
+        value2 = Utils.Clamp(value2, 0, Main.maxTilesX - 1);
+        value3 = Utils.Clamp(value3, 0, Main.maxTilesY - 1);
+        value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
+        Vector2 vector = default;
+
+        for (int i = num; i < value2; i++)
+        {
+            for (int j = value3; j < value4; j++)
+            {
+                Tile tile = Main.tile[i, j];
+                if (tile == null || !tile.HasTile || tile.IsActuated)
+                    continue;
+
+                bool flag = TileID.Sets.Platforms[tile.TileType];
+
+                if (flag)
+                {
+                    vector.X = i * 16;
+                    vector.Y = j * 16;
+                    int num2 = 16;
+
+                    if (Position.X + Width > vector.X && Position.X < vector.X + 16f && Position.Y + Height > vector.Y && Position.Y < vector.Y + num2)
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public override void HitEffect(NPC.HitInfo hit)
+    {
+        if (!Main.dedServ)
+        {
+            bool dead = false;
+
+            if (NPC.life <= 0)
+            {
+                dead = true;
+                string variant = Variant.ToString();
+
+                if (variant == Variants.Ginger.ToString())
+                    variant = "Orange";
+
+                int bodyGore = Mod.Find<ModGore>("Haulox_Gore_Body_" + variant).Type;
+                int hornGore = Mod.Find<ModGore>("Haulox_Gore_Horn").Type;
+
+                if (variant == "Spotted")
+                {
+                    bodyGore = Mod.Find<ModGore>("Haulox_Gore_Body_" + variant).Type;
+                    variant = Variants.White.ToString();
+                }
+
+                int headGore = Mod.Find<ModGore>("Haulox_Gore_Head_" + variant).Type;
+                int leg1Gore = Mod.Find<ModGore>("Haulox_Gore_Leg1_" + variant).Type;
+                int leg2Gore = Mod.Find<ModGore>("Haulox_Gore_Leg2_" + variant).Type;
+                int tailGore = Mod.Find<ModGore>("Haulox_Gore_Tail_" + variant).Type;
+
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center, NPC.velocity, bodyGore);
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center + DirectionalOffset(38, -14), NPC.velocity, hornGore);
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center + DirectionalOffset(38, -22), NPC.velocity, headGore);
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center + DirectionalOffset(14, 22), NPC.velocity, leg1Gore);
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center + DirectionalOffset(-22, 22), NPC.velocity, leg2Gore);
+                Gore.NewGorePerfect(NPC.GetSource_Death(), NPC.Center + DirectionalOffset(-40, 10), NPC.velocity, tailGore);
+
+                Vector2 DirectionalOffset(float x, float y) => new(NPC.spriteDirection * x - 16, y);
+            }
+
+            for (int i = 0; i < (dead ? 8 : 28); ++i)
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Blood, NPC.velocity.X, NPC.velocity.Y, Scale: dead ? Main.rand.NextFloat(1, 2.5f) : 1);
         }
     }
 
@@ -448,8 +601,8 @@ internal class Haulox : ModNPC
         }
 
         Texture2D tex = Textures[Variant].Value;
-        Rectangle src = new(0, NPC.frame.Y * 70, tex.Width, 70);
-        Vector2 pos = NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY + 2);
+        Rectangle src = new(0, NPC.frame.Y * 94, tex.Width, 92);
+        Vector2 pos = NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY + 2 - 12);
 
         spriteBatch.Draw(tex, pos, src, drawColor, 0f, src.Size() / 2f, 1f, NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
         return false;

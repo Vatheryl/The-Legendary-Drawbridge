@@ -8,6 +8,7 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
+	  <Folder Include="NPCs\Haulox\Gores\" />
 	  <Folder Include="Tiles\Drawbridges\Lion\" />
 	</ItemGroup>
 	<ItemGroup>

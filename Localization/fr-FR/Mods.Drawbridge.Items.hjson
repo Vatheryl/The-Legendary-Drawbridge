@@ -333,30 +333,81 @@ TungstenHorseArmorItem: {
 
 BlackHauloxYoke: {
 	// DisplayName: Black Yoke
-	// Tooltip: ""
+	/* Tooltip:
+		'''
+		Can be used to lead Haulox by left clicking them while holding a yoke
+		When guiding a Haulox, you can tie them to a stake [i:Drawbridge/StakeTileItem] by right clicking the stake
+		Right click while guiding a Haulox to untie the yoke
+		Snaps at a distance
+		''' */
 }
 
 BrownHauloxYoke: {
 	// DisplayName: Brown Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 GingerHauloxYoke: {
 	// DisplayName: Ginger Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 SpottedHauloxYoke: {
 	// DisplayName: Spotted Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 WhiteHauloxYoke: {
 	// DisplayName: White Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 StakeTileItem: {
 	// DisplayName: Ground Stake
 	// Tooltip: Can be used to hold yokes
+}
+
+CrouchingGargoyleItem: {
+	// DisplayName: Crouching Gargoyle Item
+	// Tooltip: ""
+}
+
+LargeCrouchingGargoyleItem: {
+	// DisplayName: Large Crouching Gargoyle Item
+	// Tooltip: ""
+}
+
+LargeGargoyleItem: {
+	// DisplayName: Large Gargoyle Item
+	// Tooltip: ""
+}
+
+FeatheredGargoyleSpoutItem: {
+	// DisplayName: Feathered Gargoyle Spout Item
+	// Tooltip: ""
+}
+
+GargoyleSpoutItem: {
+	// DisplayName: Gargoyle Spout Item
+	// Tooltip: ""
+}
+
+LungingGargoyleSpoutItem: {
+	// DisplayName: Lunging Gargoyle Spout Item
+	// Tooltip: ""
+}
+
+LargeLurkingGargoyleItem: {
+	// DisplayName: Large Lurking Gargoyle Item
+	// Tooltip: ""
+}
+
+PoisedGargoyleItem: {
+	// DisplayName: Poised Gargoyle Item
+	// Tooltip: ""
+}
+
+TwistingGargoyleItem: {
+	// DisplayName: Twisting Gargoyle Item
+	// Tooltip: ""
 }

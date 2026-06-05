@@ -14,6 +14,7 @@ public interface IAutoloadTileItem
 	// These are already defined on ModTiles and shortens the autoloading code a bit.
 	public string Name { get; }
 	public string Texture { get; }
+	public Mod Mod { get; }
 
 	public void StaticItemDefaults(ModItem item) { }
 	public void SetItemDefaults(ModItem item) { }
@@ -64,4 +65,9 @@ public class AutoloadedTileItem(string name, string texture, IAutoloadTileItem h
 	}
 
 	public override void AddRecipes() => _hooks.AddItemRecipes(this);
+}
+
+public static class AutoloadedExtensions
+{
+	public static int ItemType(this IAutoloadTileItem tile) => tile.Mod.Find<ModItem>(tile.Name + "Item").Type;
 }
