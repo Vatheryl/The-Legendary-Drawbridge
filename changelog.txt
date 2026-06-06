@@ -1,15 +1,28 @@
-1.4.0.4 - Fish Hook Overhaul + Bugfixes
-- Fixed Machicolation debug dust being left in
-- Improved Machicolation water visuals
-- Buffed Machicolation water life time
-- Renamed Hook to Fish Hook
-- Increased Fish Hook max stack from 99 to 9999
-- Allowed Fish Hooks to be placed in 1x2 areas properly
-- Allowed Fish Hooks to be placed under any rope or solid tile
-- Allowed Fish Hooks to be placed directionally
-- Made Fish Hooks merge with their anchors properly
-- Made Fish Hooks with fish on them sway in wind
-	For all of these changes, you will have to break and re-place existing fish hooks to use their new functionality.
-- Improved Spiked Palisade sprite
-- Fixed left-facing Drawbridges clearing tiles to the right of the tile when vertical
-- Fixed Drawbridge animation chains not using lighting properly
+1.4.1 - Haulox & Gargoyles
+HAULOX ---
+- Added Haulox, a large, harmless creature spawning in the Forest (especially near Hay or Spirit Reforged's Wheatgrass!)
+	These come in 5 variations: Black, Brown, Ginger, Spotted, White
+- Added Yokes, which can be used to lead Haulox
+	There's a variation of these per Haulox variant as well
+- Added Ground Stakes, which can be used to hold Haulox
+
+GARGOYLES ---
+- Added 9 total Gargoyle statues:
+Standard:
+	- Crouching Gargoyle
+	- Large Crouching Gargoyle
+	- Large Lurking Gargoyle
+	- Large Gargoyle
+	- Poised Gargoyle
+	- Crouching Gargoyle
+
+Spouts: 
+	- Feathered Gargoyle Spout
+	- Lunging Gargoyle Spout
+	- Gargoyle Spout
+
+The Standard Gargoyles are just statues; the Spouts attach to walls and create a waterfall on their position.
+
+BUGFIXES ---
+- Delayed "functionality projectiles" (such as the Tower Clock's hands) from spawning (from load to right before the world is updated, and only when at least 1 player is joined)
+- 

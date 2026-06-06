@@ -23,8 +23,6 @@ internal class StakeTile : ModTile, IAutoloadTileItem
 
         private HauloxData Data = default;
 
-        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
-
         public ref HauloxData GetData(out bool value)
         {
             value = HasData;
@@ -105,8 +103,6 @@ internal class StakeTile : ModTile, IAutoloadTileItem
                 d.Draw(spriteBatch);
         }
     }
-
-    public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
 
     public override void SetStaticDefaults()
     {

@@ -2,13 +2,14 @@
 using Terraria;
 using Terraria.Enums;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles.Gargoyles;
 
 internal class CrouchingGargoyle : ModTile, IAutoloadTileItem
 {
+    void IAutoloadTileItem.AddItemRecipes(ModItem item) => item.CreateRecipe().AddIngredient(ItemID.StoneBlock).AddTile(25).Register();
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;

@@ -5,20 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameContent;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
-using Terraria.UI.Chat;
 
 namespace Drawbridge.NPCs.Haulox;
 
 internal class Haulox : ModNPC
 {
-    public const bool Enabled = true;
-
     public enum Variants : byte
     {
         None = 0,
@@ -39,6 +35,36 @@ internal class Haulox : ModNPC
         Staked,
     }
 
+    public class HasArmor : IItemDropRuleCondition, IProvideItemConditionDescription
+    {
+        public bool CanDrop(DropAttemptInfo info) => info.npc.ModNPC is Haulox haulox && haulox.ArmorId != -1;
+        public bool CanShowItemDropInUI() => false;
+        public string GetConditionDescription() => null;
+    }
+
+    public class ArmorDrop : IItemDropRule
+    {
+        List<IItemDropRuleChainAttempt> IItemDropRule.ChainedRules => [];
+
+        public ArmorDrop()
+        {
+        }
+
+        public virtual bool CanDrop(DropAttemptInfo info) => true;
+
+        public virtual ItemDropAttemptResult TryDroppingItem(DropAttemptInfo info)
+        {
+            CommonCode.DropItem(info, (info.npc.ModNPC as Haulox).ArmorId, 1);
+            ItemDropAttemptResult result = default;
+            result.State = ItemDropAttemptResultState.Success;
+            return result;
+        }
+
+        public virtual void ReportDroprates(List<DropRateInfo> drops, DropRateInfoChainFeed ratesInfo)
+        {
+        }
+    }
+
     private static readonly Dictionary<Variants, Asset<Texture2D>> Textures = [];
 
     public override string Texture => "Terraria/Images/NPC_0";
@@ -54,9 +80,9 @@ internal class Haulox : ModNPC
     internal ref float Threemer => ref NPC.localAI[3];
 
     internal int AttachedYokeId = -1;
+    internal Guid StoredGuid = Guid.Empty;
     internal bool Initialized = false;
-
-    public override bool IsLoadingEnabled(Mod mod) => Enabled;
+    internal int ArmorId = -1;
 
     public override void SetStaticDefaults()
     {
@@ -135,10 +161,30 @@ internal class Haulox : ModNPC
         NPC.netUpdate = true;
     }
 
+    public override void ModifyNPCLoot(NPCLoot npcLoot)
+    {
+        npcLoot.AddCommon(ItemID.Leather, 1, 2, 5);
+
+        LeadingConditionRule rule = new(new HasArmor());
+        rule.OnSuccess(new ArmorDrop());
+
+        npcLoot.Add(rule);
+    }
+
     public override void UpdateLifeRegen(ref int damage) => NPC.lifeRegen = 4;
 
     public override void AI()
     {
+        if (Main.netMode != NetmodeID.Server && Main.LocalPlayer.HeldItem.ModItem is YokeItem)
+            NPC.ShowNameOnHover = false;
+        else
+            NPC.ShowNameOnHover = true;
+
+        if (ArmorId != -1)
+            NPC.defense = NPC.defDefense + ContentSamples.ItemsByType[ArmorId].defense;
+        else
+            NPC.defense = NPC.defDefense;
+
         if (!Initialized)
         {
             Initialized = true;
@@ -149,9 +195,7 @@ internal class Haulox : ModNPC
         const float IdleDistance = 100;
 
         if (GuidingPlayer != -1 && State != States.BeingGuided)
-        {
             SetState(States.BeingGuided);
-        }
 
         if (State == States.Idle)
         {
@@ -200,7 +244,7 @@ internal class Haulox : ModNPC
             Player guide = Main.player[GuidingPlayer];
             float distance = guide.DistanceSQ(NPC.Center);
 
-            if (!guide.active || guide.dead || distance > 600 * 600)
+            if (!guide.active || guide.dead || distance > 600 * 600 || guide.HeldItem.ModItem is not YokeItem yoke || yoke.Guid != StoredGuid)
             {
                 SetState(States.Idle);
                 GuidingPlayer = -1;
@@ -288,7 +332,6 @@ internal class Haulox : ModNPC
 
     private void DropYoke()
     {
-        //Item.NewItem(NPC.GetSource_FromThis(), NPC.Hitbox, AttachedYokeId);
         SoundEngine.PlaySound(SoundID.Dig with { PitchRange = (-0.3f, 0.3f) }, NPC.Center);
         AttachedYokeId = -1;
     }
@@ -298,8 +341,8 @@ internal class Haulox : ModNPC
         bool wall = NPC.spriteDirection == -1 ? Collision.SolidCollision(NPC.TopLeft - new Vector2(6, 0), 6, 14) : Collision.SolidCollision(NPC.TopRight, 6, 14);
         wall |= Main.player[GuidingPlayer].Center.Y < NPC.Center.Y - 120;
 
-        if (wall && NPC.collideY)
-            NPC.velocity.Y = -8;
+        if (wall && Collision.SolidCollision(NPC.BottomLeft, NPC.width, NPC.height))
+            NPC.velocity.Y = -7;
     }
 
     private void GrazeFunctionality(ref float timer)
@@ -605,6 +648,10 @@ internal class Haulox : ModNPC
         Vector2 pos = NPC.Center - screenPos + new Vector2(0, NPC.gfxOffY + 2 - 12);
 
         spriteBatch.Draw(tex, pos, src, drawColor, 0f, src.Size() / 2f, 1f, NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+
+        if (ArmorId != -1 && HauloxArmor.ArmorSheetsById.TryGetValue(ArmorId, out var asset))
+            spriteBatch.Draw(asset.Value, pos, src, drawColor, 0f, src.Size() / 2f, 1f, NPC.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0);
+
         return false;
     }
 }

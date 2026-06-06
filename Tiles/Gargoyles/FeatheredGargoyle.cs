@@ -1,4 +1,5 @@
 ﻿using Drawbridge.Common.Tiles;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -10,6 +11,8 @@ namespace Drawbridge.Tiles.Gargoyles;
 
 internal class FeatheredGargoyleSpout : ModTile, IAutoloadTileItem, IWaterfallTile
 {
+    void IAutoloadTileItem.AddItemRecipes(ModItem i) => i.CreateRecipe().AddIngredient(ItemID.StoneBlock, 25).AddIngredient(ItemID.WaterBucket).AddTile(TileID.HeavyWorkBench).Register();
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;
@@ -42,8 +45,13 @@ internal class FeatheredGargoyleSpout : ModTile, IAutoloadTileItem, IWaterfallTi
     bool IWaterfallTile.HasWaterfall(ref int i, ref int j, Tile tile, ref int waterfallType)
     {
         waterfallType = 10;
-
         return tile.TileFrameX is 0 or 90 && tile.TileFrameY == 18;
+    }
+
+    void IWaterfallTile.ModifyDrawing(IWaterfallTile.WaterfallInstance inst, ref int type, ref int x, ref int y, ref float opacity, ref Vector2 pos, Rectangle src, ref Color col, ref SpriteEffects fx) 
+    {
+        if (inst.Tile.TileFrameX == 90)
+            pos.X += 6;
     }
 }
 

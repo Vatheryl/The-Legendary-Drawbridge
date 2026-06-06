@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace Drawbridge.NPCs.Haulox;
@@ -15,22 +16,33 @@ internal abstract class YokeItem : ModItem
     {
         public int attachedNPC = -1;
 
-        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
-
         public override void PreUpdate()
         {
             if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: false } or { ModNPC: not Haulox })
             {
                 attachedNPC = -1;
             }
+
+            if (Player.HeldItem.IsAir && Main.myPlayer == Player.whoAmI && Main.mouseRight && Main.mouseRightRelease)
+            {
+                foreach (NPC npc in Main.ActiveNPCs)
+                {
+                    if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(Player.Center) < 120 * 120 && haulox.ArmorId != -1)
+                    {
+                        Main.mouseRightRelease = false;
+                        Item.NewItem(npc.GetSource_FromThis(), npc.Hitbox, haulox.ArmorId);
+                        haulox.ArmorId = -1;
+                        break;
+                    }
+                }
+            }
         }
 
-        public override bool CanHitNPC(NPC target) => target.whoAmI != attachedNPC;
+        public override bool CanHitNPC(NPC target) => target.whoAmI != attachedNPC || target.ModNPC is not Haulox haulox || haulox.State != Haulox.States.Staked;
     }
 
     public class YokeLayer : PlayerDrawLayer
     {
-        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
         public override Position GetDefaultPosition() => new BeforeParent(PlayerDrawLayers.Head);
 
         protected override void Draw(ref PlayerDrawSet drawInfo)
@@ -149,9 +161,17 @@ internal abstract class YokeItem : ModItem
         }
     }
 
-    public Haulox.Variants? storedVariant = null;
+    private static LocalizedText Guide = null!;
 
-    public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
+    public Haulox.Variants? storedVariant = null;
+    public Guid Guid = Guid.NewGuid();
+
+    public override void SetStaticDefaults()
+    {
+        Item.ResearchUnlockCount = 3;
+
+        Guide = this.GetLocalization("GuideLine");
+    }
 
     public override void SetDefaults()
     {
@@ -159,6 +179,8 @@ internal abstract class YokeItem : ModItem
         Item.useTime = Item.useAnimation = 30;
         Item.useStyle = ItemUseStyleID.Swing;
         Item.rare = ItemRarityID.Green;
+        Item.noUseGraphic = true;
+        Item.noMelee = true;
     }
 
     public override bool AltFunctionUse(Player player) => true;
@@ -189,17 +211,31 @@ internal abstract class YokeItem : ModItem
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 80 * 80)
+            if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 120 * 120)
             {
                 storedVariant = haulox.Variant;
                 attach = haulox.NPC.whoAmI;
                 haulox.GuidingPlayer = player.whoAmI;
                 haulox.AttachedYokeId = Item.type;
+                haulox.StoredGuid = Guid;
                 break;
             }
         }
 
         return false;
+    }
+
+    public override void HoldItem(Player player)
+    {
+        foreach (NPC npc in Main.ActiveNPCs)
+        {
+            if (npc.ModNPC is Haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 120 * 120)
+            {
+                player.cursorItemIconEnabled = true;
+                player.cursorItemIconID = Type;
+                break;
+            }
+        }
     }
 
     public override void SaveData(TagCompound tag) => tag.Add("variantIfAny", (short)((int?)storedVariant ?? -1));
@@ -214,6 +250,8 @@ internal abstract class YokeItem : ModItem
                 storedVariant = null;
         }
     }
+
+    public override void AddRecipes() => CreateRecipe().AddRecipeGroup(RecipeGroupID.Wood, 12).AddIngredient(ItemID.Rope, 20).AddTile(TileID.Sawmill).Register();
 }
 
 internal class BlackHauloxYoke : YokeItem { }

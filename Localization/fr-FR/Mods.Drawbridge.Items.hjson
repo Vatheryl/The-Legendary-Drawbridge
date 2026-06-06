@@ -336,30 +336,35 @@ BlackHauloxYoke: {
 	/* Tooltip:
 		'''
 		Can be used to lead Haulox by left clicking them while holding a yoke
-		When guiding a Haulox, you can tie them to a stake [i:Drawbridge/StakeTileItem] by right clicking the stake
+		When guiding a Haulox, you can tie them to a stake [i:Drawbridge/StakeTileItem] by right clicking the placed stake
 		Right click while guiding a Haulox to untie the yoke
 		Snaps at a distance
 		''' */
+	// GuideLine: Guide Haulox
 }
 
 BrownHauloxYoke: {
 	// DisplayName: Brown Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
+	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 GingerHauloxYoke: {
 	// DisplayName: Ginger Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
+	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 SpottedHauloxYoke: {
 	// DisplayName: Spotted Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
+	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 WhiteHauloxYoke: {
 	// DisplayName: White Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
+	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 StakeTileItem: {
@@ -368,46 +373,51 @@ StakeTileItem: {
 }
 
 CrouchingGargoyleItem: {
-	// DisplayName: Crouching Gargoyle Item
+	// DisplayName: Crouching Gargoyle
 	// Tooltip: ""
 }
 
 LargeCrouchingGargoyleItem: {
-	// DisplayName: Large Crouching Gargoyle Item
+	// DisplayName: Large Crouching Gargoyle
 	// Tooltip: ""
 }
 
 LargeGargoyleItem: {
-	// DisplayName: Large Gargoyle Item
+	// DisplayName: Large Gargoyle
 	// Tooltip: ""
 }
 
 FeatheredGargoyleSpoutItem: {
-	// DisplayName: Feathered Gargoyle Spout Item
-	// Tooltip: ""
+	// DisplayName: Feathered Gargoyle Spout
+	// Tooltip: Creates a waterfall when placed
 }
 
 GargoyleSpoutItem: {
-	// DisplayName: Gargoyle Spout Item
-	// Tooltip: ""
+	// DisplayName: Gargoyle Spout
+	// Tooltip: "{$FeatheredGargoyleSpoutItem.Tooltip}"
 }
 
 LungingGargoyleSpoutItem: {
-	// DisplayName: Lunging Gargoyle Spout Item
-	// Tooltip: ""
+	// DisplayName: Lunging Gargoyle Spout
+	// Tooltip: "{$FeatheredGargoyleSpoutItem.Tooltip}"
 }
 
 LargeLurkingGargoyleItem: {
-	// DisplayName: Large Lurking Gargoyle Item
+	// DisplayName: Large Lurking Gargoyle
 	// Tooltip: ""
 }
 
 PoisedGargoyleItem: {
-	// DisplayName: Poised Gargoyle Item
+	// DisplayName: Poised Gargoyle
 	// Tooltip: ""
 }
 
 TwistingGargoyleItem: {
-	// DisplayName: Twisting Gargoyle Item
+	// DisplayName: Twisting Gargoyle
+	// Tooltip: ""
+}
+
+IronHauloxArmor: {
+	// DisplayName: Iron Haulox Armor
 	// Tooltip: ""
 }

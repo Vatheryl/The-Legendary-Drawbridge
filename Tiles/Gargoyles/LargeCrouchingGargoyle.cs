@@ -10,6 +10,8 @@ namespace Drawbridge.Tiles.Gargoyles;
 
 internal class LargeCrouchingGargoyle : ModTile, IAutoloadTileItem
 {
+    void IAutoloadTileItem.AddItemRecipes(ModItem item) => item.CreateRecipe().AddIngredient(ItemID.StoneBlock, 70).AddTile(TileID.HeavyWorkBench).Register();
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;

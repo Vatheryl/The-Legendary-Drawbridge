@@ -9,6 +9,8 @@ namespace Drawbridge.Tiles.Gargoyles;
 
 internal class TwistingGargoyle : ModTile, IAutoloadTileItem
 {
+    void IAutoloadTileItem.AddItemRecipes(ModItem item) => item.CreateRecipe().AddIngredient(ItemID.StoneBlock, 30).AddTile(TileID.HeavyWorkBench).Register();
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;
