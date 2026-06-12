@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Drawbridge.Systems.Synchronization;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using Terraria;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.Localization;
-using Terraria.ModLoader.IO;
 
 namespace Drawbridge.NPCs.Haulox;
 
@@ -30,7 +29,12 @@ internal abstract class YokeItem : ModItem
                     if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(Player.Center) < 120 * 120 && haulox.ArmorId != -1)
                     {
                         Main.mouseRightRelease = false;
-                        Item.NewItem(npc.GetSource_FromThis(), npc.Hitbox, haulox.ArmorId);
+
+                        if (Main.netMode == NetmodeID.MultiplayerClient)
+                            HauloxArmor.HauloxArmorHandler.SendUnarmor((short)npc.whoAmI);
+                        else
+                            Item.NewItem(npc.GetSource_FromThis(), npc.Hitbox, haulox.ArmorId);
+
                         haulox.ArmorId = -1;
                         break;
                     }
@@ -38,7 +42,7 @@ internal abstract class YokeItem : ModItem
             }
         }
 
-        public override bool CanHitNPC(NPC target) => target.whoAmI != attachedNPC || target.ModNPC is not Haulox haulox || haulox.State != Haulox.States.Staked;
+        public override bool CanHitNPC(NPC target) =>  target.whoAmI != attachedNPC || target.ModNPC is not Haulox haulox || haulox.State is not Haulox.States.Staked and not Haulox.States.BeingGuided;
     }
 
     public class YokeLayer : PlayerDrawLayer
@@ -161,17 +165,60 @@ internal abstract class YokeItem : ModItem
         }
     }
 
-    private static LocalizedText Guide = null!;
-
-    public Haulox.Variants? storedVariant = null;
-    public Guid Guid = Guid.NewGuid();
-
-    public override void SetStaticDefaults()
+    public class YokePlayerHandler : Handler
     {
-        Item.ResearchUnlockCount = 3;
+        public override MessageType Message => MessageType.YokePlayer;
 
-        Guide = this.GetLocalization("GuideLine");
+        public static void SendAttach(short npcWho, byte? who = null)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.YokePlayer);
+            packet.Write(true);
+
+            if (who is { } whoAm)
+                packet.Write(whoAm);
+
+            packet.Write(npcWho);
+            packet.Send();
+        }
+
+        public static void SendDetatch(byte? who = null)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.YokePlayer);
+            packet.Write(false);
+
+            if (who is { } whoAm)
+                packet.Write(whoAm);
+
+            packet.Send();
+        }
+
+        public override void Recieve(int whoAmI, BinaryReader reader, bool onServer)
+        {
+            bool added = reader.ReadBoolean();
+            byte who = onServer ? (byte)whoAmI : reader.ReadByte();
+            Player player = Main.player[who];
+
+            if (added)
+            {
+                short npcWho = reader.ReadInt16();
+                player.GetModPlayer<YokePlayer>().attachedNPC = npcWho;
+
+                if (onServer)
+                    SendAttach(npcWho, who);
+            }
+            else
+            {
+                player.GetModPlayer<YokePlayer>().attachedNPC = -1;
+
+                if (onServer)
+                    SendDetatch(who);
+            }
+        }
     }
+
+    public bool attached = false;
+
+    public override void SetStaticDefaults() => Item.ResearchUnlockCount = 3;
 
     public override void SetDefaults()
     {
@@ -189,14 +236,22 @@ internal abstract class YokeItem : ModItem
     {
         if (player.altFunctionUse == 2)
         {
-            if (storedVariant is null)
+            if (!attached)
                 return true;
 
-            storedVariant = null;
+            attached = false;
             ref int attachedNPC = ref player.GetModPlayer<YokePlayer>().attachedNPC;
 
             if (attachedNPC != -1 && Main.npc[attachedNPC] is { active: true } and { ModNPC: Haulox haul })
+            {
                 haul.GuidingPlayer = -1;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient && player.whoAmI == Main.myPlayer)
+                {
+                    Haulox.YokeHauloxHandler.SendRelease((short)attachedNPC);
+                    YokePlayerHandler.SendDetatch();
+                }
+            }
 
             attachedNPC = -1;
             return true;
@@ -204,20 +259,25 @@ internal abstract class YokeItem : ModItem
 
         ref int attach = ref player.GetModPlayer<YokePlayer>().attachedNPC;
 
-        if (attach >= 0)
-        {
+        if (attach >= 0 || player.whoAmI != Main.myPlayer)
             return false;
-        }
 
         foreach (NPC npc in Main.ActiveNPCs)
         {
-            if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 120 * 120)
+            if (npc.ModNPC is Haulox haulox && npc.Hitbox.Contains(Main.MouseWorld.ToPoint()) && npc.DistanceSQ(player.Center) < 120 * 120 && haulox.GuidingPlayer == -1 && !haulox.Staked)
             {
-                storedVariant = haulox.Variant;
+                attached = true;
                 attach = haulox.NPC.whoAmI;
                 haulox.GuidingPlayer = player.whoAmI;
                 haulox.AttachedYokeId = Item.type;
-                haulox.StoredGuid = Guid;
+                haulox.StoredSlot = (sbyte)player.selectedItem;
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    Haulox.YokeHauloxHandler.SendYoked((short)npc.whoAmI, (short)Item.type, (sbyte)player.selectedItem);
+                    YokePlayerHandler.SendAttach((short)npc.whoAmI);
+                }
+
                 break;
             }
         }
@@ -235,19 +295,6 @@ internal abstract class YokeItem : ModItem
                 player.cursorItemIconID = Type;
                 break;
             }
-        }
-    }
-
-    public override void SaveData(TagCompound tag) => tag.Add("variantIfAny", (short)((int?)storedVariant ?? -1));
-
-    public override void LoadData(TagCompound tag)
-    {
-        if (tag.TryGet("variantIfAny", out short value))
-        {
-            if (value == -1)
-                storedVariant = (Haulox.Variants)value;
-            else
-                storedVariant = null;
         }
     }
 

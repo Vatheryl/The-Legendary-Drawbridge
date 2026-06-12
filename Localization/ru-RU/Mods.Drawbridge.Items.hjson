@@ -340,31 +340,26 @@ BlackHauloxYoke: {
 		Right click while guiding a Haulox to untie the yoke
 		Snaps at a distance
 		''' */
-	// GuideLine: Guide Haulox
 }
 
 BrownHauloxYoke: {
 	// DisplayName: Brown Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
-	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 GingerHauloxYoke: {
 	// DisplayName: Ginger Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
-	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 SpottedHauloxYoke: {
 	// DisplayName: Spotted Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
-	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 WhiteHauloxYoke: {
 	// DisplayName: White Yoke
 	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
-	// GuideLine: "{$BlackHauloxYoke.GuideLine}"
 }
 
 StakeTileItem: {
@@ -419,5 +414,10 @@ TwistingGargoyleItem: {
 
 IronHauloxArmor: {
 	// DisplayName: Iron Haulox Armor
-	// Tooltip: ""
+	/* Tooltip:
+		'''
+		Can be placed on Haulox with left Click
+		Can be removed from a Haulox by right clicking with an empty hand
+		Defense is granted to the Haulox
+		''' */
 }

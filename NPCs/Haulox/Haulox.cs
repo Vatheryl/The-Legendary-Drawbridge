@@ -1,4 +1,6 @@
 ﻿using Drawbridge.Common;
+using Drawbridge.Systems.Synchronization;
+using Drawbridge.Tiles;
 using Microsoft.Xna.Framework.Graphics;
 using NPCUtils;
 using System;
@@ -65,6 +67,53 @@ internal class Haulox : ModNPC
         }
     }
 
+    public class YokeHauloxHandler : Handler
+    {
+        public override MessageType Message => MessageType.YokeHaulox;
+
+        public static void SendYoked(short npcWho, short yokeId, sbyte slot)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.YokeHaulox);
+            packet.Write(true);
+            packet.Write(npcWho);
+            packet.Write(yokeId);
+            packet.Write(slot);
+            packet.Send();
+        }
+
+        public static void SendRelease(short npcWho)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.YokeHaulox);
+            packet.Write(false);
+            packet.Write(npcWho);
+            packet.Send();
+        }
+
+        public override void Recieve(int whoAmI, BinaryReader reader, bool onServer)
+        {
+            bool yoked = reader.ReadBoolean();
+            short npcWho = reader.ReadInt16();
+
+            NPC npc = Main.npc[npcWho];
+            var haul = npc.ModNPC as Haulox;
+
+            if (yoked)
+            {
+                short yokeId = reader.ReadInt16();
+                sbyte slot = reader.ReadSByte();
+
+                haul.GuidingPlayer = whoAmI;
+                haul.AttachedYokeId = yokeId;
+                haul.StoredSlot = slot;
+                haul.SetState(States.BeingGuided);
+            }
+            else
+                haul.GuidingPlayer = -1;
+
+            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, npcWho);
+        }
+    }
+
     private static readonly Dictionary<Variants, Asset<Texture2D>> Textures = [];
 
     public override string Texture => "Terraria/Images/NPC_0";
@@ -76,13 +125,15 @@ internal class Haulox : ModNPC
 
     internal ref int GuidingPlayer => ref Unsafe.As<float, int>(ref NPC.localAI[0]);
     internal ref bool Staked => ref Unsafe.As<float, bool>(ref NPC.localAI[1]);
-    internal ref int StakeID => ref Unsafe.As<float, int>(ref NPC.localAI[2]);
     internal ref float Threemer => ref NPC.localAI[3];
 
+    public StakeTile.StakeTileEntity StakeEntity => (StakeTile.StakeTileEntity)TileEntity.ByPosition[StakePosition];
+
     internal int AttachedYokeId = -1;
-    internal Guid StoredGuid = Guid.Empty;
+    internal sbyte StoredSlot = -1;
     internal bool Initialized = false;
     internal int ArmorId = -1;
+    internal Point16 StakePosition = Point16.NegativeOne;
 
     public override void SetStaticDefaults()
     {
@@ -108,7 +159,10 @@ internal class Haulox : ModNPC
         NPC.lifeMax = 120;
         NPC.defense = 30;
         NPC.knockBackResist = 0.2f;
+        NPC.chaseable = false;
     }
+
+    public override bool CheckActive() => !Staked;
 
     public override void SetBestiary(BestiaryDatabase database, BestiaryEntry bestiaryEntry)
     {
@@ -244,12 +298,19 @@ internal class Haulox : ModNPC
             Player guide = Main.player[GuidingPlayer];
             float distance = guide.DistanceSQ(NPC.Center);
 
-            if (!guide.active || guide.dead || distance > 600 * 600 || guide.HeldItem.ModItem is not YokeItem yoke || yoke.Guid != StoredGuid)
+            if (Main.myPlayer == guide.whoAmI && (!guide.active || guide.dead || distance > 600 * 600 || guide.HeldItem.ModItem is not YokeItem || guide.selectedItem != StoredSlot))
             {
                 SetState(States.Idle);
                 GuidingPlayer = -1;
                 guide.GetModPlayer<YokeItem.YokePlayer>().attachedNPC = -1;
-                DropYoke();
+                ClearYoke();
+
+                if (Main.netMode == NetmodeID.MultiplayerClient)
+                {
+                    YokeHauloxHandler.SendRelease((short)NPC.whoAmI);
+                    YokeItem.YokePlayerHandler.SendDetatch();
+                }
+
                 return;
             }
 
@@ -277,9 +338,7 @@ internal class Haulox : ModNPC
             }
 
             if (MathF.Abs(NPC.velocity.X) > 0.1f && offsetX > 4)
-            {
                 NPC.spriteDirection = NPC.direction = MathF.Sign(NPC.velocity.X);
-            }
 
             GuidingJump();
 
@@ -288,7 +347,16 @@ internal class Haulox : ModNPC
         else if (State == States.Staked)
         {
             NPC.velocity.X *= 0.8f;
-            Vector2 stakeWorld = TileEntity.ByID[StakeID].Position.ToWorldCoordinates();
+
+            if (!TileEntity.ByPosition.ContainsKey(StakePosition))
+            {
+                Staked = false;
+                StakePosition = Point16.NegativeOne;
+                SetState(States.Idle);
+                return;
+            }
+
+            Vector2 stakeWorld = StakeEntity.Position.ToWorldCoordinates();
 
             Timer++;
 
@@ -330,10 +398,11 @@ internal class Haulox : ModNPC
         }
     }
 
-    private void DropYoke()
+    private void ClearYoke()
     {
         SoundEngine.PlaySound(SoundID.Dig with { PitchRange = (-0.3f, 0.3f) }, NPC.Center);
         AttachedYokeId = -1;
+        StoredSlot = -1;
     }
 
     private void GuidingJump()
@@ -341,7 +410,7 @@ internal class Haulox : ModNPC
         bool wall = NPC.spriteDirection == -1 ? Collision.SolidCollision(NPC.TopLeft - new Vector2(6, 0), 6, 14) : Collision.SolidCollision(NPC.TopRight, 6, 14);
         wall |= Main.player[GuidingPlayer].Center.Y < NPC.Center.Y - 120;
 
-        if (wall && Collision.SolidCollision(NPC.BottomLeft, NPC.width, NPC.height))
+        if (wall && (Collision.SolidCollision(NPC.BottomLeft, NPC.width, 6) || PlatformCollision(NPC.BottomLeft - new Vector2(4, 0), NPC.width + 8, 6)))
             NPC.velocity.Y = -7;
     }
 
@@ -417,16 +486,17 @@ internal class Haulox : ModNPC
 
     public override void SendExtraAI(BinaryWriter writer)
     {
-        writer.Write(GuidingPlayer);
-        writer.Write(Staked);
-        writer.Write((short)StakeID);
+        writer.Write((short)GuidingPlayer);
+        writer.Write(StoredSlot);
+        writer.Write(StakePosition.X);
+        writer.Write(StakePosition.Y);
     }
 
     public override void ReceiveExtraAI(BinaryReader reader)
     {
-        GuidingPlayer = reader.ReadInt32();
-        Staked = reader.ReadBoolean();
-        StakeID = reader.ReadInt16();
+        GuidingPlayer = reader.ReadInt16();
+        StoredSlot = reader.ReadSByte();
+        StakePosition = new Point16(reader.ReadInt16(), reader.ReadInt16());
     }
 
     public override void FindFrame(int frameHeight)
@@ -639,9 +709,7 @@ internal class Haulox : ModNPC
     public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
     {
         if (NPC.IsABestiaryIconDummy)
-        {
             Variant = Variants.Black;
-        }
 
         Texture2D tex = Textures[Variant].Value;
         Rectangle src = new(0, NPC.frame.Y * 94, tex.Width, 92);
