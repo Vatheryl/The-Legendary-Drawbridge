@@ -212,6 +212,8 @@ internal class StakeTile : ModTile, IAutoloadTileItem
         return false;
     }
 
+    void IAutoloadTileItem.AddItemRecipes(ModItem item) => item.CreateRecipe().AddRecipeGroup(RecipeGroupID.Wood, 8).AddTile(TileID.Sawmill).Register();
+
     public override void KillMultiTile(int i, int j, int frameX, int frameY) => ModContent.GetInstance<StakeTileEntity>().Kill(i, j);
 
     private static void SetHauloxStaked(int yokeType, StakeTileEntity te, NPC haul)

@@ -6,6 +6,7 @@ HAULOX ---
 	There's a variation of these per Haulox variant as well
 	Each is made with any wood @ a Sawmill, alongside some Cobwebs
 - Added Ground Stakes, which can be used to hold Haulox
+	Crafted @ a Sawmill with 8 of any wood
 
 GARGOYLES ---
 - Added 9 total Gargoyle statues:

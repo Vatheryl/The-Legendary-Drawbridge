@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -252,6 +253,8 @@ internal abstract class YokeItem : ModItem
                     YokePlayerHandler.SendDetatch();
                 }
             }
+
+            SoundEngine.PlaySound(SoundID.Dig, player.Center);
 
             attachedNPC = -1;
             return true;
