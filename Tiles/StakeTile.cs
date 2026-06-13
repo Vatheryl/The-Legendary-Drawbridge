@@ -1,9 +1,10 @@
 ﻿using Drawbridge.Common;
 using Drawbridge.Common.Tiles;
 using Drawbridge.NPCs.Haulox;
+using Drawbridge.Systems.Synchronization;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using Terraria;
+using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader.IO;
@@ -11,7 +12,7 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
 
-internal class StakeTile : ModTile//, IAutoloadTileItem
+internal class StakeTile : ModTile, IAutoloadTileItem
 {
     public class StakeTileEntity : ModTileEntity, IDrawableTE
     {
@@ -22,8 +23,6 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
         public bool HasData = false;
 
         private HauloxData Data = default;
-
-        public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
 
         public ref HauloxData GetData(out bool value)
         {
@@ -51,8 +50,17 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
             {
                 if (data.NPC == -2)
                 {
-                    data.NPC = NPC.NewNPC(new EntitySource_SpawnNPC(), Position.X * 16, (Position.Y - 1) * 16, ModContent.NPCType<Haulox>(), 0, (float)data.Variant);
-                    SetHauloxStaked(data.Yoke, this, Main.npc[data.NPC]);
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        data.NPC = NPC.NewNPC(new EntitySource_SpawnNPC(), Position.X * 16, (Position.Y - 1) * 16, ModContent.NPCType<Haulox>(), 0, (float)data.Variant);
+                        (Main.npc[data.NPC].ModNPC as Haulox).Variant = data.Variant;
+                        SetHauloxStaked(data.Yoke, this, Main.npc[data.NPC]);
+
+                        if (Main.netMode == NetmodeID.Server)
+                            NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, data.NPC);
+                    }
+                    else
+                        return;
                 }
 
                 NPC npc = Main.npc[data.NPC];
@@ -90,6 +98,26 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
             }
         }
 
+        public override void NetSend(BinaryWriter writer)
+        {
+            writer.Write(HasData);
+
+            if (HasData)
+            {
+                writer.Write((byte)Data.Variant);
+                writer.Write((ushort)Data.Yoke);
+                writer.Write((short)Data.NPC);
+            }
+        }
+
+        public override void NetReceive(BinaryReader reader)
+        {
+            HasData = reader.ReadBoolean();
+
+            if (HasData)
+                Data = new HauloxData((Haulox.Variants)reader.ReadByte(), reader.ReadUInt16(), reader.ReadInt16());
+        }
+
         void IDrawableTE.Draw(SpriteBatch spriteBatch)
         {
             ref HauloxData data = ref GetData(out bool hasValue);
@@ -105,7 +133,32 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
         }
     }
 
-    public override bool IsLoadingEnabled(Mod mod) => Haulox.Enabled;
+    public class StakeHauloxHandler : Handler
+    {
+        public override MessageType Message => MessageType.StakeHaulox;
+
+        public static void Send(short yokeType, short npcWho, Point16 location)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.StakeHaulox, 9);
+            packet.Write(yokeType);
+            packet.Write(npcWho);
+            packet.Write(location.X);
+            packet.Write(location.Y);
+            packet.Send();
+        }
+
+        public override void Recieve(int whoAmI, BinaryReader reader, bool onServer)
+        {
+            short yokeType = reader.ReadInt16();
+            short npcWho = reader.ReadInt16();
+            Point16 location = new(reader.ReadInt16(), reader.ReadInt16());
+
+            SetHauloxStaked(yokeType, (StakeTileEntity)TileEntity.ByPosition[location], Main.npc[npcWho]);
+
+            if (Main.dedServ)
+                Send(yokeType, npcWho, location);
+        }
+    }
 
     public override void SetStaticDefaults()
     {
@@ -137,7 +190,7 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
         Point16 topLeft = TileObjectData.TopLeft(i, j);
         ref int attachedNPC = ref p.GetModPlayer<YokeItem.YokePlayer>().attachedNPC;
         
-        if (p.HeldItem.ModItem is YokeItem y && y.storedVariant is not null && attachedNPC >= 0 && TileEntity.ByPosition[topLeft] is StakeTileEntity te)
+        if (p.HeldItem.ModItem is YokeItem y && y.attached && attachedNPC >= 0 && TileEntity.ByPosition[topLeft] is StakeTileEntity te)
         {
             NPC haul = Main.npc[attachedNPC];
             SetHauloxStaked(y.Type, te, haul);
@@ -147,18 +200,30 @@ internal class StakeTile : ModTile//, IAutoloadTileItem
             if (p.HeldItem.stack < 1)
                 p.HeldItem.TurnToAir();
 
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                StakeHauloxHandler.Send((short)y.Type, (short)haul.whoAmI, te.Position);
+                YokeItem.YokePlayerHandler.SendDetatch();
+            }
+
             attachedNPC = -1;
         }
 
         return false;
     }
 
+    void IAutoloadTileItem.AddItemRecipes(ModItem item) => item.CreateRecipe().AddRecipeGroup(RecipeGroupID.Wood, 8).AddTile(TileID.Sawmill).Register();
+
+    public override void KillMultiTile(int i, int j, int frameX, int frameY) => ModContent.GetInstance<StakeTileEntity>().Kill(i, j);
+
     private static void SetHauloxStaked(int yokeType, StakeTileEntity te, NPC haul)
     {
         var ox = haul.ModNPC as Haulox;
         ox.GuidingPlayer = -1;
-        ox.StakeID = te.ID;
+        ox.StakePosition = te.Position;
+        ox.AttachedYokeId = -1;
         ox.SetState(Haulox.States.Staked);
+        ox.Staked = true;
         te.SetData(new(ox.Variant, yokeType, haul.whoAmI));
     }
 }

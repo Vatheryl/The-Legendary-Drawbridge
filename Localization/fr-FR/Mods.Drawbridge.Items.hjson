@@ -333,30 +333,91 @@ TungstenHorseArmorItem: {
 
 BlackHauloxYoke: {
 	// DisplayName: Black Yoke
-	// Tooltip: ""
+	/* Tooltip:
+		'''
+		Can be used to lead Haulox by left clicking them while holding a yoke
+		When guiding a Haulox, you can tie them to a stake [i:Drawbridge/StakeTileItem] by right clicking the placed stake
+		Right click while guiding a Haulox to untie the yoke
+		Snaps at a distance
+		''' */
 }
 
 BrownHauloxYoke: {
 	// DisplayName: Brown Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 GingerHauloxYoke: {
 	// DisplayName: Ginger Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 SpottedHauloxYoke: {
 	// DisplayName: Spotted Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 WhiteHauloxYoke: {
 	// DisplayName: White Yoke
-	// Tooltip: ""
+	// Tooltip: "{$BlackHauloxYoke.Tooltip}"
 }
 
 StakeTileItem: {
 	// DisplayName: Ground Stake
 	// Tooltip: Can be used to hold yokes
+}
+
+CrouchingGargoyleItem: {
+	// DisplayName: Crouching Gargoyle
+	// Tooltip: ""
+}
+
+LargeCrouchingGargoyleItem: {
+	// DisplayName: Large Crouching Gargoyle
+	// Tooltip: ""
+}
+
+LargeGargoyleItem: {
+	// DisplayName: Large Gargoyle
+	// Tooltip: ""
+}
+
+FeatheredGargoyleSpoutItem: {
+	// DisplayName: Feathered Gargoyle Spout
+	// Tooltip: Creates a waterfall when placed
+}
+
+GargoyleSpoutItem: {
+	// DisplayName: Gargoyle Spout
+	// Tooltip: "{$FeatheredGargoyleSpoutItem.Tooltip}"
+}
+
+LungingGargoyleSpoutItem: {
+	// DisplayName: Lunging Gargoyle Spout
+	// Tooltip: "{$FeatheredGargoyleSpoutItem.Tooltip}"
+}
+
+LargeLurkingGargoyleItem: {
+	// DisplayName: Large Lurking Gargoyle
+	// Tooltip: ""
+}
+
+PoisedGargoyleItem: {
+	// DisplayName: Poised Gargoyle
+	// Tooltip: ""
+}
+
+TwistingGargoyleItem: {
+	// DisplayName: Twisting Gargoyle
+	// Tooltip: ""
+}
+
+IronHauloxArmor: {
+	// DisplayName: Iron Haulox Armor
+	/* Tooltip:
+		'''
+		Can be placed on Haulox with left Click
+		Can be removed from a Haulox by right clicking with an empty hand
+		Defense is granted to the Haulox
+		''' */
 }

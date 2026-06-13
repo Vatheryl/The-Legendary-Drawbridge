@@ -99,7 +99,7 @@ namespace Drawbridge.Systems
                     }
                 }
             }
-
+            
             for (int slotIdx = 0; slotIdx < StableSlots.Length; slotIdx++)
             {
                 var (slotIcon, slotItemID, getSlot, setSlot) = StableSlots[slotIdx];

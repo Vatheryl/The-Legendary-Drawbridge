@@ -561,6 +561,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
     private void ClearSolidTiles()
     {
         foreach (Point p in _solidTiles)
+        {
             if (WorldGen.InWorld(p.X, p.Y))
             {
                 Tile tile = Main.tile[p.X, p.Y];
@@ -571,6 +572,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
                         NetMessage.SendTileSquare(-1, p.X, p.Y, 1, 1);
                 }
             }
+        }
 
         _solidTiles.Clear();
     }
@@ -696,7 +698,7 @@ public abstract class BaseDrawbridgeAnimation : ModProjectile
         int placeX = originX + 1;
         int placeY = originY;
 
-        ClearArea(placeX - (Flipped ? 0 : 1), placeY - 14, 2, 15);
+        ClearArea(placeX - (Flipped ? 1 : 1), placeY - 14, 2, 15);
 
         bool placed = WorldGen.PlaceObject(placeX, placeY, tileType, mute: true, style: 0, alternate: 0, random: -1, direction: Flipped ? 1 : -1);
 

@@ -1,7 +1,5 @@
 using System.IO;
-using Terraria;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Drawbridge.Tiles;
 using Terraria.DataStructures;
 using Drawbridge.Players;
@@ -27,6 +25,10 @@ internal enum MessageType : byte
     // New system message types
     RequestTreetops,
     ForceProjectileAI,
+    YokeHaulox,
+    YokePlayer,
+    StakeHaulox,
+    ArmorHaulox,
 }
 
 // This is a static class for handling packets.
@@ -182,8 +184,8 @@ internal static class PacketHandler
             case MessageType.SyncEquineArmatureFlip:
                 {
                     bool flipped = reader.ReadBoolean();
-                    var pt = new Terraria.DataStructures.Point16(context, context2);
-                    Systems.EquineArmatureWorld.SetFlipped(pt, flipped);
+                    var pt = new Point16(context, context2);
+                    EquineArmatureWorld.SetFlipped(pt, flipped);
                     if (Main.netMode == NetmodeID.Server)
                     {
                         ModPacket p = ModContent.GetInstance<Drawbridge>().GetPacket();
