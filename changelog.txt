@@ -4,6 +4,7 @@ HAULOX ---
 	These come in 5 variations: Black, Brown, Ginger, Spotted, White
 - Added Yokes, which can be used to lead Haulox
 	There's a variation of these per Haulox variant as well
+	Each is made with any wood @ a Sawmill, alongside some Cobwebs
 - Added Ground Stakes, which can be used to hold Haulox
 
 GARGOYLES ---
@@ -22,7 +23,8 @@ Spouts:
 	- Gargoyle Spout
 
 The Standard Gargoyles are just statues; the Spouts attach to walls and create a waterfall on their position.
+All of these are created @ a Heavy Workbench with Stone (and a Water Bucket for Spouts).
 
 BUGFIXES ---
 - Delayed "functionality projectiles" (such as the Tower Clock's hands) from spawning (from load to right before the world is updated, and only when at least 1 player is joined)
-- 
+- Fixed Drawbridges destroying tiles directly to their right when facing right
