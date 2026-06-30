@@ -158,6 +158,7 @@ internal class Haulox : ModNPC
         NPC.aiStyle = -1;
         NPC.lifeMax = 120;
         NPC.defense = 30;
+        NPC.damage = 0;
         NPC.knockBackResist = 0.2f;
         NPC.chaseable = false;
     }
