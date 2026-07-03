@@ -71,3 +71,5 @@ PartySignTile.MapEntry: Party Sign Tile
 TavernSignTile.MapEntry: Tavern Sign Tile
 TaxSignTile.MapEntry: Tax Sign Tile
 WitchDoctorSignTile.MapEntry: Witch Doctor Sign Tile
+WoodenTableBase.MapEntry: Wooden Table Base
+WoodenTablePlatform.MapEntry: Wooden Table Platform

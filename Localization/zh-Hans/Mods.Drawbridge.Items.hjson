@@ -513,31 +513,41 @@ ZooSignTileItem: {
 }
 
 NurseSignTileItem: {
-	// DisplayName: Nurse Sign Tile Item
+	// DisplayName: Nurse Sign
 	// Tooltip: ""
 }
 
 PainterSignTileItem: {
-	// DisplayName: Painter Sign Tile Item
+	// DisplayName: Painter Sign
 	// Tooltip: ""
 }
 
 PartySignTileItem: {
-	// DisplayName: Party Sign Tile Item
+	// DisplayName: Party Girl Sign
 	// Tooltip: ""
 }
 
 TavernSignTileItem: {
-	// DisplayName: Tavern Sign Tile Item
+	// DisplayName: Tavernkeep Sign
 	// Tooltip: ""
 }
 
 TaxSignTileItem: {
-	// DisplayName: Tax Sign Tile Item
+	// DisplayName: Tax Collector Sign
 	// Tooltip: ""
 }
 
 WitchDoctorSignTileItem: {
-	// DisplayName: Witch Doctor Sign Tile Item
+	// DisplayName: Witch Doctor Sign
+	// Tooltip: ""
+}
+
+WoodenTableBaseItem: {
+	// DisplayName: Wooden Table Base Item
+	// Tooltip: ""
+}
+
+WoodenTablePlatformItem: {
+	// DisplayName: Wooden Table Platform Item
 	// Tooltip: ""
 }

@@ -2,6 +2,7 @@ using Drawbridge.Tiles;
 using Terraria.ID;
 using Drawbridge.Tiles.TownNPCSigns;
 using Drawbridge.Common.Tiles;
+using Microsoft.Xna.Framework.Input;
 
 namespace Drawbridge.Players;
 
@@ -140,7 +141,7 @@ public class DrawbridgeGlobalNPC : GlobalNPC
         AddQuick<PainterSignTile>(NPCID.Painter);
         AddQuick<TavernSignTile>(NPCID.DD2Bartender);
         AddQuick<WitchDoctorSignTile>(NPCID.WitchDoctor);
-
+        
         return;
 
         void AddQuick<T>(int type, int hasNpc = -1) where T : BaseSignTile

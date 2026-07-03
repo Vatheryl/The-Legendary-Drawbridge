@@ -545,3 +545,13 @@ WitchDoctorSignTileItem: {
 	DisplayName: Witch Doctor Sign
 	Tooltip: ""
 }
+
+WoodenTableBaseItem: {
+	DisplayName: Wooden Table Base Item
+	Tooltip: ""
+}
+
+WoodenTablePlatformItem: {
+	DisplayName: Wooden Table Platform Item
+	Tooltip: ""
+}
