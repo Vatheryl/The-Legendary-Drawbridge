@@ -64,3 +64,10 @@ EquineArmatureTile.MapEntry: Manekin Zbroi Końskiej
 // HookTileNew.MapEntry: Hook Tile New
 // StakeTile.MapEntry: Stake Tile
 // CrouchingGargoyle.MapEntry: Gargoyle
+// AnglerSignTile.MapEntry: Angler Sign Tile
+// NurseSignTile.MapEntry: Nurse Sign Tile
+// PainterSignTile.MapEntry: Painter Sign Tile
+// PartySignTile.MapEntry: Party Sign Tile
+// TavernSignTile.MapEntry: Tavern Sign Tile
+// TaxSignTile.MapEntry: Tax Sign Tile
+// WitchDoctorSignTile.MapEntry: Witch Doctor Sign Tile

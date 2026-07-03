@@ -1,3 +1,6 @@
-1.4.1.1
-- Fixed pink pixels appearing under the Gargoyle statues
-- 
+1.4.2 - 
+
+--- ADDITIONS ---
+- Added all remaining town NPC signs (Nurse, Painter, Party Girl, Tavernkeep, Tax Collector, Witch Doctor)
+- Improved all existing town NPC sign sprites (item and tile)
+	All of this should work with existing tiles/items.
