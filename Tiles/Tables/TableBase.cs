@@ -39,4 +39,12 @@ internal abstract class TableBase : ModTile, IAutoloadTileItem
         HitSound = SoundID.Dig;
         Bases.Add(Type);
     }
+
+    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
+    {
+        Tile tile = Main.tile[i, j - 1];
+
+        if (tile.HasTile && ModContent.GetModTile(tile.TileType) is TablePlatform)
+            WorldGen.TileFrame(i, j - 1);
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using Drawbridge.Common.Tiles;
-using System;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -7,6 +6,8 @@ using Terraria.ID;
 using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles.Tables;
+
+#nullable enable
 
 internal abstract class TablePlatform : ModTile, IAutoloadTileItem
 {
@@ -28,7 +29,9 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
         }
     }
 
-    public virtual void StaticItemDefaults(ModItem item) { }
+    private static bool BlockRecursion = false;
+
+    public virtual void StaticItemDefaults(ModItem item) => RegisterItemDrop(item.Type);
 
     public void SetItemDefaults(ModItem item)
     {
@@ -82,43 +85,138 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
         HitSound = SoundID.Dig;
     }
 
-    public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
+    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
-        Dust.NewDustPerfect(new Vector2(i + 0.5f, j + 0.5f) * 16, DustID.Adamantite, Vector2.Zero);
         Tile tile = Main.tile[i, j];
         int offsetX = tile.TileFrameX % 54 / 18;
-        Tile @base = Main.tile[i - offsetX + 1, j + 1];
-        bool hasBase = @base.HasTile && ModContent.GetModTile(@base.TileType) is TableBase;
+        GetInformation(i, j, out _, out _, out _, out TileObjectData mainData);
 
         if (offsetX == 1)
+        {
+            if (!BlockRecursion)
+            {
+                BlockRecursion = true;
+                WorldGen.KillTile(i - 1, j, fail, effectOnly, true);
+                WorldGen.KillTile(i + 1, j, fail, effectOnly, true);
+                BlockRecursion = false;
+            }
+        }
+        else if (offsetX == 0 && Mergeable(i - 1, j, mainData))
+        {
+            if (!BlockRecursion)
+            {
+                BlockRecursion = true;
+                GetInformation(i - 1, j, out Tile subTile, out int subOffsetX, out bool hasBase, out TileObjectData subData);
+                FrameFunctionality(i - 1, j, subTile, subOffsetX, hasBase, subData);
+                BlockRecursion = false;
+            }
+        }
+        else if (offsetX == 2 && Mergeable(i + 1, j, mainData))
+        {
+            if (!BlockRecursion)
+            {
+                BlockRecursion = true;
+                GetInformation(i + 1, j, out Tile subTile, out int subOffsetX, out bool hasBase, out TileObjectData subData);
+                FrameFunctionality(i + 1, j, subTile, subOffsetX, hasBase, subData);
+                BlockRecursion = false;
+            }
+        }
+    }
+
+    public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
+    {
+        GetInformation(i, j, out Tile tile, out int offsetX, out bool hasBase, out TileObjectData data);
+        return FrameFunctionality(i, j, tile, offsetX, hasBase, data);
+    }
+
+    private static bool FrameFunctionality(int i, int j, Tile tile, int offsetX, bool hasBase, TileObjectData data)
+    {
+        if (ModContent.GetModTile(tile.TileType) is not TablePlatform)
             return true;
-        else if (offsetX == 0 && Mergeable(i - 1, j, TileObjectData.GetTileData(tile.TileType, 0, 1)))
+
+        if (offsetX == 1)
         {
-            tile.TileFrameX = (short)(hasBase ? 162 : 108);
-            return false;
+            bool left = Mergeable(i - 2, j, data);
+            bool right = Mergeable(i + 2, j, data);
+
+            if (left && right)
+                tile.TileFrameX = (short)(hasBase ? 180 : 126);
+            else if (left && !right)
+                tile.TileFrameX = 72;
+            else if (!left && right)
+                tile.TileFrameX = 234;
+
+            return true;
         }
-        else if (offsetX == 2 && Mergeable(i + 1, j, TileObjectData.GetTileData(tile.TileType, 0, 1)))
+        else if (offsetX == 0)
         {
-            tile.TileFrameX = (short)(hasBase ? 198 : 144);
-            return false;
+            if (Mergeable(i - 1, j, data))
+            {
+                if (!BlockRecursion)
+                {
+                    BlockRecursion = true;
+                    WorldGen.TileFrame(i - 1, j);
+                    BlockRecursion = false;
+                }
+
+                tile.TileFrameX = (short)(hasBase ? 162 : 108);
+                return false;
+            }
+            else
+            {
+                tile.TileFrameX = (short)(hasBase ? 54 : 270);
+                return false;
+            }
         }
-         
+        else if (offsetX == 2)
+        {
+            if (Mergeable(i + 1, j, data))
+            {
+                if (!BlockRecursion)
+                {
+                    BlockRecursion = true;
+                    WorldGen.TileFrame(i + 1, j);
+                    BlockRecursion = false;
+                }
+
+                tile.TileFrameX = (short)(hasBase ? 198 : 144);
+                return false;
+            }
+            else
+            {
+                tile.TileFrameX = (short)(hasBase ? 252 : 288);
+                return false;
+            }
+        }
+
         return true;
     }
 
-    private bool Mergeable(int x, int y, TileObjectData data)
+    private static void GetInformation(int i, int j, out Tile tile, out int offsetX, out bool hasBase, out TileObjectData data)
+    {
+        tile = Main.tile[i, j];
+        offsetX = tile.TileFrameX % 54 / 18;
+        Tile @base = Main.tile[i - offsetX + 1, j + 1];
+        hasBase = @base.HasTile && (ModContent.GetModTile(@base.TileType) is TableBase || Main.tileSolid[@base.TileType]);
+        data = TileObjectData.GetTileData(tile.TileType, 0, 1);
+    }
+
+    private static bool Mergeable(int x, int y, TileObjectData? data)
     {
         Tile tile = Main.tile[x, y];
 
         if (!tile.HasTile)
             return false;
 
-        bool solid = WorldGen.AnchorValid(tile, AnchorType.SolidSide | AnchorType.SolidTile);
+        bool solid = WorldGen.AnchorValid(tile, AnchorType.SolidSide | AnchorType.SolidTile) || TileID.Sets.IsATreeTrunk[tile.TileType];
         bool isAlt = false;
 
-        for (int i = 0; i < data.AnchorAlternateTiles.Length; ++i)
-            if (tile.TileType == data.AnchorAlternateTiles[i])
-                isAlt = true;
+        if (data is not null)
+        {
+            for (int i = 0; i < data.AnchorAlternateTiles.Length; ++i)
+                if (tile.TileType == data.AnchorAlternateTiles[i])
+                    isAlt = true;
+        }
 
         return solid || isAlt;
     }
