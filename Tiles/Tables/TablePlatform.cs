@@ -113,6 +113,9 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
             Main.LocalPlayer.QuickSpawnItem(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), table.TableclothType);
             table.TableclothType = 0;
             table.Kill(i, j);
+
+            Tablecloth.TableclothPlaceHandler.Send(true, new Point16(i, j), 0);
+
             return true;
         }
 

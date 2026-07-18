@@ -1,6 +1,4 @@
-﻿using Terraria.ID;
-
-namespace Drawbridge.Tiles.Tables;
+﻿namespace Drawbridge.Tiles.Tables;
 
 internal class WoodenTableBase : TableBase
 {

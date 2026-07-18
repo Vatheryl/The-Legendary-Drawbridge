@@ -565,7 +565,7 @@ WoodenTablePlatformItem: {
 
 RedTablecloth: {
 	DisplayName: Red Tablecloth
-	Tooltip: 
+	Tooltip:
 		'''
 		Can be placed on Platform table pieces
 		{$ClothRemoval}

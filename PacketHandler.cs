@@ -29,6 +29,7 @@ internal enum MessageType : byte
     YokePlayer,
     StakeHaulox,
     ArmorHaulox,
+    PlaceTablecloth,
 }
 
 // This is a static class for handling packets.
