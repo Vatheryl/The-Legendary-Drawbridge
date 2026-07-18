@@ -1,4 +1,4 @@
 displayName = The Castle Era
-author = Dice, Vatheryl, Space Dolphin & GabeHasWon
-version = 1.4.1.1
+author = Vatheryl, GabeHasWon, Gobiidaiah and Blade
+version = 1.4.2
 dllReferences = NPCUtils

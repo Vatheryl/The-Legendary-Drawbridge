@@ -47,6 +47,40 @@ Configs: {
 			// Label: Portcullis Speed
 			// Tooltip: Controls how quickly Portcullis tiles raise/lower. The higher, the faster.
 		}
+
+		SlotPosition: {
+			// Label: Slot Position
+			// Tooltip: ""
+		}
+	}
+
+	HorseMountSlotPosition: {
+		// Tooltip: ""
+
+		Default: {
+			// Label: Default
+			// Tooltip: ""
+		}
+
+		DownOne: {
+			// Label: Down One
+			// Tooltip: ""
+		}
+
+		NextToBuffs: {
+			// Label: Next To Buffs
+			// Tooltip: ""
+		}
+
+		LeftOfTop: {
+			// Label: Left Of Top
+			// Tooltip: ""
+		}
+
+		LeftOfBottom: {
+			// Label: Left Of Bottom
+			// Tooltip: ""
+		}
 	}
 }
 

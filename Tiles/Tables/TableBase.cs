@@ -36,7 +36,7 @@ internal abstract class TableBase : ModTile, IAutoloadTileItem
         item.Item.value = Item.buyPrice(0, 0, 0, 5);
     }
 
-    public virtual void AddItemRecipes(ModItem item) => item.CreateRecipe().AddIngredient(ItemID.Wood, 3).AddTile(TileID.Sawmill).Register();
+    public virtual void AddItemRecipes(ModItem item) => item.CreateRecipe(2).AddIngredient(ItemID.Wood, 3).AddTile(TileID.Sawmill).Register();
 
     public override void SetStaticDefaults()
     {
@@ -45,7 +45,6 @@ internal abstract class TableBase : ModTile, IAutoloadTileItem
         Main.tileLavaDeath[Type] = true;
         Main.tileSolid[Type] = false;
         Main.tileSolidTop[Type] = true;
-        Main.tileTable[Type] = true;
 
         TileID.Sets.DisableSmartCursor[Type] = true;
 
