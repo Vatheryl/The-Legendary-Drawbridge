@@ -547,11 +547,27 @@ WitchDoctorSignTileItem: {
 }
 
 WoodenTableBaseItem: {
-	DisplayName: Wooden Table Base Item
-	Tooltip: ""
+	DisplayName: Wooden Table Piece (Leg)
+	Tooltip: Can be placed on top of itself, or for Platform table pieces
 }
 
+ClothRemoval: Tablecloths can be removed by right clicking the table, or breaking the table
+
 WoodenTablePlatformItem: {
-	DisplayName: Wooden Table Platform Item
-	Tooltip: ""
+	DisplayName: Wooden Table Piece (Platform)
+	Tooltip:
+		'''
+		Can be placed horizontally on itself, solid tiles or trees, or on top of leg table pieces
+		Can have tablecloths placed on top
+		{$ClothRemoval}
+		'''
+}
+
+RedTablecloth: {
+	DisplayName: Red Tablecloth
+	Tooltip: 
+		'''
+		Can be placed on Platform table pieces
+		{$ClothRemoval}
+		'''
 }

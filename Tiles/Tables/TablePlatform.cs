@@ -1,8 +1,14 @@
-﻿using Drawbridge.Common.Tiles;
+﻿using Drawbridge.Common;
+using Drawbridge.Common.Tiles;
+using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ID;
+using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles.Tables;
@@ -23,13 +29,31 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
             {
                 TileObjectData.GetTileData(platform.Type, 0).AnchorAlternateTiles = bases;
 
-                for (int i = 0; i < 3; ++i)
+                for (int i = 0; i < 2; ++i)
                     TileObjectData.GetTileData(platform.Type, 0, i + 1).AnchorAlternateTiles = types;
             }
         }
     }
 
+    internal class TableEntity : ModTileEntity
+    {
+        public int TableclothType = 0;
+
+        public override bool IsTileValidForEntity(int x, int y)
+        {
+            Tile tile = Main.tile[x, y];
+            return ModContent.GetModTile(tile.TileType) is TablePlatform && tile.HasTile;
+        }
+
+        public override void SaveData(TagCompound tag) => tag.Add("cloth", SavingUtils.IOType<ModItem>(TableclothType, ItemID.Count));
+        public override void LoadData(TagCompound tag) => TableclothType = SavingUtils.GetTypeFromIO<ModItem>(tag.GetString("cloth"));
+        public override void NetSend(BinaryWriter writer) => writer.Write((ushort)TableclothType);
+        public override void NetReceive(BinaryReader reader) => TableclothType = reader.ReadUInt16();
+    }
+
     private static bool BlockRecursion = false;
+    private static int KillOrderInvalidX = 0;
+    private static int KillOrderInvalidXMax = 0;
 
     public virtual void StaticItemDefaults(ModItem item) => RegisterItemDrop(item.Type);
 
@@ -55,7 +79,7 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
         tile.CopyFrom(TileObjectData.Style3x2);
         tile.Height = 1;
         tile.CoordinateHeights = [16];
-        tile.UsesCustomCanPlace = true;
+        //tile.UsesCustomCanPlace = true;
         tile.Origin = new Point16(1, 0);
         tile.AnchorBottom = new AnchorData(AnchorType.SolidTile | AnchorType.SolidWithTop | AnchorType.AlternateTile, 1, 1);
 
@@ -63,161 +87,193 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
 
         alternate.CopyFrom(tile);
         alternate.AnchorBottom = AnchorData.Empty;
-        alternate.AnchorLeft = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile, 1, 0);
         alternate.AnchorRight = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile, 1, 0);
-        TileObjectData.addAlternate(2);
-
-        alternate.CopyFrom(tile);
-        alternate.AnchorBottom = AnchorData.Empty;
-        alternate.AnchorRight = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile, 1, 0);
-        TileObjectData.addAlternate(1);
+        TileObjectData.addAlternate(0);
 
         alternate.CopyFrom(tile);
         alternate.AnchorBottom = AnchorData.Empty;
         alternate.AnchorLeft = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide | AnchorType.Tree | AnchorType.AlternateTile, 1, 0);
-        TileObjectData.addAlternate(4);
+        TileObjectData.addAlternate(0);
 
         TileObjectData.addTile(Type);
 
         AddMapEntry(new Color(108, 71, 43), CreateMapEntryName());
+        RegisterItemDrop(this.ItemType());
 
         DustType = DustID.WoodFurniture;
         HitSound = SoundID.Dig;
     }
 
+    public override bool RightClick(int i, int j)
+    {
+        if (GetTableAtPosition(i, j, out TableEntity? table) && table.TableclothType != 0 && Main.mouseRight && Main.mouseRightRelease)
+        {
+            Main.mouseRightRelease = false;
+
+            Main.LocalPlayer.QuickSpawnItem(new EntitySource_TileInteraction(Main.LocalPlayer, i, j), table.TableclothType);
+            table.TableclothType = 0;
+            table.Kill(i, j);
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void GetAnchors(int i, int j, out bool left, out bool right, out bool bottom)
+    {
+        Tile tile = Main.tile[i - 1, j];
+        left = ValidAnchor(tile);
+
+        tile = Main.tile[i + 3, j];
+        right = ValidAnchor(tile) && (i < KillOrderInvalidX || i >= KillOrderInvalidXMax);
+
+        tile = Main.tile[i + 1, j + 1];
+        bottom = WorldGen.AnchorValid(tile, AnchorType.SolidTile | AnchorType.SolidWithTop) || ModContent.GetModTile(tile.TileType) is TableBase;
+
+        static bool ValidAnchor(Tile tile)
+        {
+            const AnchorType Anchors = AnchorType.SolidTile | AnchorType.SolidSide;
+
+            return WorldGen.AnchorValid(tile, Anchors) || ModContent.GetModTile(tile.TileType) is TablePlatform || TileID.Sets.IsATreeTrunk[tile.TileType];
+        }
+    }
+
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
     {
+        TileID.Sets.Platforms[Type] = true;
         Tile tile = Main.tile[i, j];
         int offsetX = tile.TileFrameX % 54 / 18;
-        GetInformation(i, j, out _, out _, out _, out TileObjectData mainData);
 
-        if (offsetX == 1)
+        if (!fail && !BlockRecursion)
         {
-            if (!BlockRecursion)
+            BlockRecursion = true;
+
+            for (int x = 0; x < 3; ++x)
             {
-                BlockRecursion = true;
-                WorldGen.KillTile(i - 1, j, fail, effectOnly, true);
-                WorldGen.KillTile(i + 1, j, fail, effectOnly, true);
-                BlockRecursion = false;
+                int curX = x + i - offsetX;
+
+                if (curX != i && Main.tile[curX, j].HasTile)
+                    WorldGen.KillTile(curX, j);
             }
+
+            BlockRecursion = false;
         }
-        else if (offsetX == 0 && Mergeable(i - 1, j, mainData))
+
+        if (offsetX == 0)
         {
-            if (!BlockRecursion)
-            {
-                BlockRecursion = true;
-                GetInformation(i - 1, j, out Tile subTile, out int subOffsetX, out bool hasBase, out TileObjectData subData);
-                FrameFunctionality(i - 1, j, subTile, subOffsetX, hasBase, subData);
-                BlockRecursion = false;
-            }
+            bool oldRecur = BlockRecursion;
+            BlockRecursion = false;
+            KillOrderInvalidX = i - 3;
+            KillOrderInvalidXMax = i;
+
+            ReframeAdjacent(i - 3, j);
+            ReframeAdjacent(i + 3, j);
+
+            KillOrderInvalidX = 0;
+            KillOrderInvalidXMax = 0;
+            BlockRecursion = oldRecur;
         }
-        else if (offsetX == 2 && Mergeable(i + 1, j, mainData))
+
+        if (!BlockRecursion)
+            Item.NewItem(new EntitySource_TileBreak(i, j), new Vector2(i, j) * 16, this.ItemType());
+
+        if (GetTableAtPosition(i, j, out TableEntity? table) && table.TableclothType != 0)
         {
-            if (!BlockRecursion)
-            {
-                BlockRecursion = true;
-                GetInformation(i + 1, j, out Tile subTile, out int subOffsetX, out bool hasBase, out TileObjectData subData);
-                FrameFunctionality(i + 1, j, subTile, subOffsetX, hasBase, subData);
-                BlockRecursion = false;
-            }
+            Item.NewItem(new EntitySource_TileBreak(i, j), new Vector2(i, j) * 16, table.TableclothType);
+            table.Kill(i, j);
         }
     }
 
     public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
     {
-        GetInformation(i, j, out Tile tile, out int offsetX, out bool hasBase, out TileObjectData data);
-        return FrameFunctionality(i, j, tile, offsetX, hasBase, data);
-    }
+        GetAnchors(i, j, out bool left, out bool right, out bool bottom);
+        Tile tile = Main.tile[i, j];
+        int offsetX = tile.TileFrameX % 54 / 18;
 
-    private static bool FrameFunctionality(int i, int j, Tile tile, int offsetX, bool hasBase, TileObjectData data)
-    {
-        if (ModContent.GetModTile(tile.TileType) is not TablePlatform)
-            return true;
-
-        if (offsetX == 1)
-        {
-            bool left = Mergeable(i - 2, j, data);
-            bool right = Mergeable(i + 2, j, data);
-
-            if (left && right)
-                tile.TileFrameX = (short)(hasBase ? 180 : 126);
-            else if (left && !right)
-                tile.TileFrameX = 72;
-            else if (!left && right)
-                tile.TileFrameX = 234;
-
-            return true;
-        }
-        else if (offsetX == 0)
-        {
-            if (Mergeable(i - 1, j, data))
-            {
-                if (!BlockRecursion)
-                {
-                    BlockRecursion = true;
-                    WorldGen.TileFrame(i - 1, j);
-                    BlockRecursion = false;
-                }
-
-                tile.TileFrameX = (short)(hasBase ? 162 : 108);
-                return false;
-            }
-            else
-            {
-                tile.TileFrameX = (short)(hasBase ? 54 : 270);
-                return false;
-            }
-        }
-        else if (offsetX == 2)
-        {
-            if (Mergeable(i + 1, j, data))
-            {
-                if (!BlockRecursion)
-                {
-                    BlockRecursion = true;
-                    WorldGen.TileFrame(i + 1, j);
-                    BlockRecursion = false;
-                }
-
-                tile.TileFrameX = (short)(hasBase ? 198 : 144);
-                return false;
-            }
-            else
-            {
-                tile.TileFrameX = (short)(hasBase ? 252 : 288);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static void GetInformation(int i, int j, out Tile tile, out int offsetX, out bool hasBase, out TileObjectData data)
-    {
-        tile = Main.tile[i, j];
-        offsetX = tile.TileFrameX % 54 / 18;
-        Tile @base = Main.tile[i - offsetX + 1, j + 1];
-        hasBase = @base.HasTile && (ModContent.GetModTile(@base.TileType) is TableBase || Main.tileSolid[@base.TileType]);
-        data = TileObjectData.GetTileData(tile.TileType, 0, 1);
-    }
-
-    private static bool Mergeable(int x, int y, TileObjectData? data)
-    {
-        Tile tile = Main.tile[x, y];
-
-        if (!tile.HasTile)
+        if (offsetX != 0)
             return false;
 
-        bool solid = WorldGen.AnchorValid(tile, AnchorType.SolidSide | AnchorType.SolidTile) || TileID.Sets.IsATreeTrunk[tile.TileType];
-        bool isAlt = false;
+        int frame = 0;
 
-        if (data is not null)
+        if (left && right)
+            frame = 2;
+        else if (left && !right)
+            frame = 3;
+        else if (right && !left)
+            frame = 1;
+
+        if (!bottom)
+            frame += 4;
+
+        for (int x = 0; x < 3; ++x)
         {
-            for (int i = 0; i < data.AnchorAlternateTiles.Length; ++i)
-                if (tile.TileType == data.AnchorAlternateTiles[i])
-                    isAlt = true;
+            Tile subTile = Main.tile[i - offsetX + x, j];
+            subTile.TileFrameX = (short)(frame * 54 + x * 18);
         }
 
-        return solid || isAlt;
+        ReframeAdjacent(i - 3, j);
+        ReframeAdjacent(i + 3, j);
+
+        return false;
+    }
+
+    static void ReframeAdjacent(int x, int y)
+    {
+        if (BlockRecursion)
+            return;
+
+        Tile tile = Main.tile[x, y];
+
+        if (ModContent.GetModTile(tile.TileType) is TablePlatform)
+        {
+            BlockRecursion = true;
+            WorldGen.Reframe(x, y);
+            BlockRecursion = false;
+        }
+    }
+
+    public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+    {
+        if (GetTableAtPosition(i, j, out _))
+            Main.instance.TilesRenderer.AddSpecialPoint(i, j, Terraria.GameContent.Drawing.TileDrawing.TileCounterType.CustomNonSolid);
+    }
+
+    public override void SpecialDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        if (GetTableAtPosition(i, j, out TableEntity? table))
+        {
+            int type = table.TableclothType;
+
+            if (type == 0)
+                return;
+
+            bool left = GetTableAtPosition(i - 3, j, out _);
+            bool right = GetTableAtPosition(i + 3, j, out _);
+            int frame = 0;
+
+            if (left && right)
+                frame = 2;
+            else if (left)
+                frame = 3;
+            else if (right)
+                frame = 1;
+
+            Texture2D tex = Tablecloth.PlacedTexturesByType[type].Value;
+            Main.spriteBatch.Draw(tex, new Vector2(i - 1, j) * 16 - Main.screenPosition, new Rectangle(frame * 50, 0, 48, 30), Lighting.GetColor(i, j));
+        }
+    }
+
+    public static bool GetTableAtPosition(int i, int j, [NotNullWhen(true)] out TableEntity? table)
+    {
+        table = null;
+        bool found = false;
+
+        if (TileEntity.ByPosition.TryGetValue(new Point16(i, j), out TileEntity? ent) && ent is TableEntity tb)
+        {
+            table = tb;
+            found = true;
+        }
+
+        return found;
     }
 }
