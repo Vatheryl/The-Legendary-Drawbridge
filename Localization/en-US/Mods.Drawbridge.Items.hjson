@@ -425,3 +425,149 @@ IronHauloxArmor: {
 		Defense is granted to the Haulox
 		'''
 }
+
+AnglerSignTileItem: {
+	DisplayName: Angler Sign
+	Tooltip: ""
+}
+
+AnvilSignTileItem: {
+	DisplayName: Goblin Tinkerer Sign
+	Tooltip: ""
+}
+
+BlankSignTileItem: {
+	DisplayName: Blank Sign
+	Tooltip: ""
+}
+
+ClothierSignTileItem: {
+	DisplayName: Clothier Sign
+	Tooltip: ""
+}
+
+CyberSignTileItem: {
+	DisplayName: Cyborg Sign
+	Tooltip: ""
+}
+
+DemolitionistSignTileItem: {
+	DisplayName: Demolitionist Sign
+	Tooltip: ""
+}
+
+DryadSignTileItem: {
+	DisplayName: Dryad Sign
+	Tooltip: ""
+}
+
+DyeSignTileItem: {
+	DisplayName: Dye Trader Sign
+	Tooltip: ""
+}
+
+GolfSignTileItem: {
+	DisplayName: Golfer Sign
+	Tooltip: ""
+}
+
+GunSignTileItem: {
+	DisplayName: Arms Dealer Sign
+	Tooltip: ""
+}
+
+MechanicSignTileItem: {
+	DisplayName: Mechanic Sign
+	Tooltip: ""
+}
+
+MerchantSignTileItem: {
+	DisplayName: Merchant Sign
+	Tooltip: ""
+}
+
+PirateSignTileItem: {
+	DisplayName: Pirate Sign
+	Tooltip: ""
+}
+
+PrincessSignTileItem: {
+	DisplayName: Princess Sign
+	Tooltip: ""
+}
+
+SteamSignTileItem: {
+	DisplayName: Steampunker Sign
+	Tooltip: ""
+}
+
+StylistSignTileItem: {
+	DisplayName: Stylist Sign
+	Tooltip: ""
+}
+
+TruffleSignTileItem: {
+	DisplayName: Truffle Sign
+	Tooltip: ""
+}
+
+ZooSignTileItem: {
+	DisplayName: Zoologist Sign
+	Tooltip: ""
+}
+
+NurseSignTileItem: {
+	DisplayName: Nurse Sign
+	Tooltip: ""
+}
+
+PainterSignTileItem: {
+	DisplayName: Painter Sign
+	Tooltip: ""
+}
+
+PartySignTileItem: {
+	DisplayName: Party Girl Sign
+	Tooltip: ""
+}
+
+TavernSignTileItem: {
+	DisplayName: Tavernkeep Sign
+	Tooltip: ""
+}
+
+TaxSignTileItem: {
+	DisplayName: Tax Collector Sign
+	Tooltip: ""
+}
+
+WitchDoctorSignTileItem: {
+	DisplayName: Witch Doctor Sign
+	Tooltip: ""
+}
+
+WoodenTableBaseItem: {
+	DisplayName: Wooden Table Piece (Leg)
+	Tooltip: Can be placed on top of itself, or for Platform table pieces
+}
+
+ClothRemoval: Tablecloths can be removed by right clicking the table, or breaking the table
+
+WoodenTablePlatformItem: {
+	DisplayName: Wooden Table Piece (Platform)
+	Tooltip:
+		'''
+		Can be placed horizontally on itself, solid tiles or trees, or on top of leg table pieces
+		Can have tablecloths placed on top
+		{$ClothRemoval}
+		'''
+}
+
+RedTablecloth: {
+	DisplayName: Red Tablecloth
+	Tooltip:
+		'''
+		Can be placed on Platform table pieces
+		{$ClothRemoval}
+		'''
+}

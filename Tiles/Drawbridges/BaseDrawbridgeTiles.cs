@@ -92,7 +92,7 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
         int partX = tile.TileFrameX / 16;
         int partY = GetVerticalSegmentIndex(tile.TileFrameY);
 
-        if (partX == 0 && partY == 0)
+        if (partX == 0 && partY == 0 || partY == 14)
             Toggle(i, j);
     }
 
@@ -216,9 +216,9 @@ public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile
     {
         // only respond on bottom-left segment
         Tile tile = Main.tile[i, j];
-        int partX = tile.TileFrameX / 16;
         int partY = tile.TileFrameY / 16;
-        if (partX == 0 && partY == 0)
+
+        if (partY == 14)
             Toggle(i, j);
     }
 

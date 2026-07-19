@@ -47,6 +47,40 @@ Configs: {
 			// Label: Portcullis Speed
 			// Tooltip: Controls how quickly Portcullis tiles raise/lower. The higher, the faster.
 		}
+
+		SlotPosition: {
+			// Label: Horse Armor Slot Position
+			// Tooltip: Allows customization to where the horse armor slot is placed, in case of cross-mod overlap.
+		}
+	}
+
+	HorseMountSlotPosition: {
+		// Tooltip: ""
+
+		Default: {
+			// Label: Default
+			// Tooltip: Default slot position: to the right of the vanilla mount slot.
+		}
+
+		DownOne: {
+			// Label: Down
+			// Tooltip: One slot under the default slot position: to the right of the vanilla hook slot.
+		}
+
+		NextToBuffs: {
+			// Label: Buffs
+			// Tooltip: To the left of the vertical buff icon display: under the vanilla hook dye slot.
+		}
+
+		LeftOfTop: {
+			// Label: Top-Left
+			// Tooltip: To the left of the topmost misc equip: to the left of the vanilla pet dye slot.
+		}
+
+		LeftOfBottom: {
+			// Label: Bottom-Left
+			// Tooltip: To the left of the bottom-most misc equip: to the left of the vanilla hook dye slot.
+		}
 	}
 }
 
