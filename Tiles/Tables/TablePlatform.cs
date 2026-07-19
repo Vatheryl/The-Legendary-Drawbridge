@@ -114,7 +114,8 @@ internal abstract class TablePlatform : ModTile, IAutoloadTileItem
             table.TableclothType = 0;
             table.Kill(i, j);
 
-            Tablecloth.TableclothPlaceHandler.Send(true, new Point16(i, j), 0);
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                Tablecloth.TableclothPlaceHandler.Send(true, new Point16(i, j), 0);
 
             return true;
         }

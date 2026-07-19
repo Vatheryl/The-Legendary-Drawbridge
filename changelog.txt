@@ -1,10 +1,3 @@
-1.4.2 - Tables & Signs
-
---- ADDITIONS ---
-- Added all remaining town NPC signs (Nurse, Painter, Party Girl, Tavernkeep, Tax Collector, Witch Doctor)
-- Improved all existing town NPC sign sprites (item and tile)
-	All of this should work with existing tiles/items on existing worlds/characters
-- Added new modular tables, only two pieces for now - Wooden Table Pieces (Leg [3 Wood @ Sawmill, makes 2] and Platform [2 Wood @ Sawmill])
-- Added modular table tablecloth system, with Red Tablecloth only for now - crafted w/ 2 Silk, Red Dye @ Loom
-- Substantially simplified the description for both in-game and Workshop
-- Made vertical Drawbridges work with wiring from the base of the tile - like horizontal Drawbridges already do
+1.4.2.1
+- Fixed sheeting/image error with the Angler and Tavernkeep signs
+- Fixed a packet being run on singleplayer in Table Platform right click
