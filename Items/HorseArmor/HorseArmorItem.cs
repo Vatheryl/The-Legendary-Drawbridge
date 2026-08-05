@@ -28,15 +28,18 @@ public abstract class HorseArmorItem : ModItem
         Item.useAnimation = 15;
         Item.consumable = false;
         Item.value = Item.buyPrice(silver: 25);
-        Item.rare = ItemRarityID.White;
+        Item.rare = ItemRarityID.Blue;
     }
 
     protected virtual void Defaults() { }
 
     public override bool CanRightClick() => true;
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips) 
-        => tooltips.Add(new TooltipLine(Mod, "HorseDefense", Language.GetTextValue("Mods.Drawbridge.Tooltips.HorseDefense", DefenseBonus)));
+    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    {
+        if (!Item.social)
+            tooltips.Add(new TooltipLine(Mod, "HorseDefense", Language.GetTextValue("Mods.Drawbridge.Tooltips.HorseDefense", DefenseBonus)));
+    }
 
     public override void RightClick(Player player)
     {
@@ -47,7 +50,7 @@ public abstract class HorseArmorItem : ModItem
         SoundEngine.PlaySound(SoundID.Grab);
 
         if (Main.netMode != NetmodeID.SinglePlayer)
-            PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, player.whoAmI, modPlayer.horseArmorSlot.type);
+            player.GetModPlayer<DrawbridgePlayer>().SendSyncHorseArmor(-1, -1);
 
         if (previous != null && !previous.IsAir)
             player.QuickSpawnItem(player.GetSource_Misc("HorseArmorSwap"), previous);

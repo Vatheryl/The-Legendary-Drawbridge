@@ -1,16 +1,14 @@
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Drawbridge.Players;
 using Drawbridge.Items.HorseArmor;
 
 namespace Drawbridge.Systems;
 
 // Draws an armor overlay for horse and unicorn mounts using the same frame/position as the mount sprite
-public class IronFieldBardingLayer : PlayerDrawLayer
+public class HorseArmorDrawLayer : PlayerDrawLayer
 {
     // Draw immediately after the mount "back" layer so it appears over the mount and behind the player
     public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.MountBack);
@@ -35,9 +33,18 @@ public class IronFieldBardingLayer : PlayerDrawLayer
             return;
 
         // Choose overlay texture based on item in the new dedicated slot
-        Item slotItem = player.GetModPlayer<DrawbridgePlayer>().horseArmorSlot;
+        DrawbridgePlayer mountPlayer = player.GetModPlayer<DrawbridgePlayer>();
+        Item slotItem = mountPlayer.horseArmorSlot;
+
         if (slotItem == null || slotItem.IsAir || slotItem.ModItem is not HorseArmorItem horseArmor)
-            return;
+        {
+            slotItem = mountPlayer.horseArmorVanity;
+
+            if (slotItem == null || slotItem.IsAir || slotItem.ModItem is not HorseArmorItem horseVanity)
+                return;
+
+            horseArmor = horseVanity;
+        }
 
         Texture2D overlayTexture = ModContent.Request<Texture2D>(horseArmor.OverlayPath).Value;
 
@@ -61,7 +68,7 @@ public class IronFieldBardingLayer : PlayerDrawLayer
                 dd.scale,
                 dd.effect
             );
-            overlay.shader = Mount.currentShader; // respect mount dye
+            overlay.shader = mountPlayer.horseArmorDye.dye;
             overlay.ignorePlayerRotation = dd.ignorePlayerRotation;
             drawInfo.DrawDataCache.Add(overlay);
             break;

@@ -203,22 +203,19 @@ internal static class PacketHandler
                 {
                     int playerId = (Main.netMode == NetmodeID.Server) ? whoAmI : context;
                     int itemType = context2;
+                    int vanityType = reader.ReadUInt16();
+                    int dyeType = reader.ReadUInt16();
 
-                    if (playerId >= 0 && playerId < Main.maxPlayers)
+                    if (playerId is >= 0 and < Main.maxPlayers)
                     {
                         Player target = Main.player[playerId];
+
                         if (target != null)
                         {
-                            var modPl = target.GetModPlayer<DrawbridgePlayer>();
-                            Item newItem = new Item();
-
-                            if (itemType != 0)
-                            {
-                                newItem.SetDefaults(itemType);
-                                newItem.stack = 1;
-                            }
-
-                            modPl.horseArmorSlot = newItem;
+                            var horsePlayer = target.GetModPlayer<DrawbridgePlayer>();
+                            SetIndividualHorseSlot(itemType, ref horsePlayer.horseArmorSlot);
+                            SetIndividualHorseSlot(vanityType, ref horsePlayer.horseArmorVanity);
+                            SetIndividualHorseSlot(dyeType, ref horsePlayer.horseArmorDye);
 
                             if (Main.netMode == NetmodeID.Server)
                             {
@@ -226,6 +223,8 @@ internal static class PacketHandler
                                 p.Write((byte)MessageType.SyncHorseArmorSlot);
                                 p.Write(playerId);
                                 p.Write(itemType);
+                                p.Write((ushort)vanityType);
+                                p.Write((ushort)dyeType);
                                 p.Send(-1, whoAmI);
                             }
                         }
@@ -269,5 +268,18 @@ internal static class PacketHandler
                 Handler.HandlerByType[msg].Recieve(whoAmI, reader, Main.dedServ);
                 break;
         }
+    }
+
+    private static void SetIndividualHorseSlot(int itemType, ref Item slot)
+    {
+        Item horseSlot = new Item();
+
+        if (itemType != 0)
+        {
+            horseSlot.SetDefaults(itemType);
+            horseSlot.stack = 1;
+        }
+
+        slot = horseSlot;
     }
 }

@@ -85,16 +85,7 @@ public abstract class BaseDrawbridgeTile : ModTile, IToggleTile, IDrawbridgeWhee
         return true;
     }
 
-    public override void HitWire(int i, int j)
-    {
-        // Lever-like behavior: only respond to the top-left tile.
-        Tile tile = Main.tile[i, j];
-        int partX = tile.TileFrameX / 16;
-        int partY = GetVerticalSegmentIndex(tile.TileFrameY);
-
-        if (partX == 0 && partY == 0 || partY == 14)
-            Toggle(i, j);
-    }
+    public override void HitWire(int i, int j) => Toggle(i, j);
 
     public virtual void Toggle(int i, int j)
     {
@@ -214,12 +205,7 @@ public abstract class BaseDrawbridgeVerticalFlippedTile : BaseDrawbridgeTile
 
     public override void HitWire(int i, int j)
     {
-        // only respond on bottom-left segment
-        Tile tile = Main.tile[i, j];
-        int partY = tile.TileFrameY / 16;
-
-        if (partY == 14)
-            Toggle(i, j);
+        Toggle(i, j);
     }
 
     // Compute which vertical segment (0-14) a given frameY corresponds to
