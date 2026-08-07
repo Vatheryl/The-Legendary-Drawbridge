@@ -4,3 +4,6 @@
 - Added horse armor slot icon (instead of the Iron Barding item sprite)
 - Made all current horse armors Blue rarity (instead of White)
 - Allowed both Drawbridges and Portcullises to be wired anywhere, instead of only at the base
+- Renamed Doorcase to Gothic Doorcase
+- Increased Gothic Doorcase item max stack to 9999, instead of 99
+- Reduced Gothic Doorcase sell price from 3 gold to 50 silver

@@ -4,9 +4,11 @@ using Terraria.ID;
 using Terraria.ObjectData;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Drawbridge.Tiles;
 
+[Obsolete("Replaced with new GothicDoorcase (in-game) and Doorcase (functionality).")]
 public class DoorcaseTile : ModTile
 {
     private const int TELEPORT_COOLDOWN = 60; // 1 second at 60 FPS
@@ -206,7 +208,7 @@ public class DoorcaseTile : ModTile
         doorcaseStates.Remove(key);
         UnregisterDoorcaseFromTeleportation(key);
 
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Items.DoorcaseItem>());
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Doorcases.GothicDoorcase.GothicDoorcaseItem>());
     }
 
     public override bool CanDrop(int i, int j) => false;

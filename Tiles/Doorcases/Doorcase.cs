@@ -1,6 +1,8 @@
 ﻿using Drawbridge.Common;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.IO;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -8,12 +10,12 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles.Doorcases;
 
-internal class Doorcase : ModTile
+internal abstract class Doorcase : ModTile
 {
     internal class DoorcaseEntity : ModTileEntity, IClientSideTE
     {
         public float DoorProgress = 0;
-        public bool DoorOpen = true;
+        public bool DoorOpen = false;
 
         public override bool IsTileValidForEntity(int x, int y)
         {
@@ -21,17 +23,29 @@ internal class Doorcase : ModTile
             return tile.HasTile && ModContent.GetModTile(tile.TileType) is Doorcase;
         }
 
-        public override void Update()
-        {
-            DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
-        }
+        public override void Update() => DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
 
         public override void NetSend(BinaryWriter writer) => writer.Write(DoorOpen);
         public override void NetReceive(BinaryReader reader) => DoorOpen = reader.ReadBoolean();
     }
 
     public static bool BookcaseIsOpen(Tile tile) => tile.TileFrameX >= 54;
-    public static DoorcaseEntity GetEntity(int x, int y) => TileEntity.ByPosition[new Point16(x, y)] as DoorcaseEntity;
+
+    public static bool TryGetEntity(int x, int y, out DoorcaseEntity entity)
+    {
+        Tile tile = Main.tile[x, y];
+        int i = x - tile.TileFrameX % 54 / 18;
+        int j = y - tile.TileFrameY % 72 / 18;
+
+        if (TileEntity.ByPosition.TryGetValue(new Point16(i, j), out TileEntity ent) && ent is DoorcaseEntity doorcase)
+        {
+            entity = doorcase;
+            return true;
+        }
+
+        entity = null;
+        return false;
+    }
 
     public override void SetStaticDefaults()
     {
@@ -50,6 +64,7 @@ internal class Doorcase : ModTile
 
         AddToArray(ref TileID.Sets.RoomNeeds.CountsAsTable);
         AddMapEntry(new Color(120, 85, 60), CreateMapEntryName());
+        RegisterItemDrop(ModContent.ItemType<GothicDoorcase.GothicDoorcaseItem>());
 
         AdjTiles = [TileID.Bookcases];
         DustType = DustID.WoodFurniture;
@@ -59,23 +74,34 @@ internal class Doorcase : ModTile
     public override bool RightClick(int i, int j)
     {
         Tile tile = Main.tile[i, j];
-        DoorcaseEntity entity = GetEntity(i, j);
 
-        if (BookcaseIsOpen(tile))
+        if (!TryGetEntity(i, j, out DoorcaseEntity entity))
+            return true;
+
+        if (!BookcaseIsOpen(tile))
         {
-            ToggleDoorcaseFrames(i, j, true);
+            ToggleDoorcaseFrames(i, j, null);
             entity.DoorOpen = true;
         }
         else
         {
-            if (tile.TileFrameX == 0)
+            if (tile.TileFrameX % 54 == 0)
             {
-                ToggleDoorcaseFrames(i, j, false);
+                ToggleDoorcaseFrames(i, j, null);
                 entity.DoorOpen = false;
             }
+            else
+                TryTeleport(i, j);
         }
 
         return true;
+    }
+
+    private void TryTeleport(int i, int j)
+    {
+        if (!Wiring.CheckMech(i, j, 20))
+            return;
+
     }
 
     public override void HitWire(int i, int j)
@@ -86,21 +112,20 @@ internal class Doorcase : ModTile
     public static void ToggleDoorcaseFrames(int i, int j, bool? open)
     {
         Tile tile = Main.tile[i, j];
-        i -= tile.TileFrameX % 54;
-        j -= tile.TileFrameY % 74;
         bool openDoor = false;
 
-        if (open.HasValue && open.Value)
-            openDoor = true;
-        else if (!open.HasValue && !BookcaseIsOpen(tile))
-            openDoor = true;
+        if (open is null && TryGetEntity(i, j, out DoorcaseEntity door))
+            openDoor = door.DoorOpen;
 
-        for (int x = i; x < i + 3; ++i)
+        i -= tile.TileFrameX % 54 / 18;
+        j -= tile.TileFrameY % 72 / 18;
+
+        for (int x = i; x < i + 3; ++x)
         {
-            for (int y = j; y < j + 3; y++)
+            for (int y = j; y < j + 4; y++)
             {
                 Tile subTile = Main.tile[x, y];
-                subTile.TileFrameX += (short)(openDoor ? 54 : -54);
+                subTile.TileFrameX += (short)(openDoor ? -54 : 54);
             }
         }
 
@@ -111,7 +136,7 @@ internal class Doorcase : ModTile
     public override void MouseOver(int i, int j)
     {
         Tile tile = Main.tile[i, j];
-        bool book = !BookcaseIsOpen(tile) || tile.TileFrameX == 0;
+        bool book = !BookcaseIsOpen(tile) || tile.TileFrameX % 54 == 0;
         
         if (book)
         {
@@ -122,12 +147,15 @@ internal class Doorcase : ModTile
 
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        if (!TryGetEntity(i, j, out DoorcaseEntity entity))
+            return false;
+        
         Tile tile = Main.tile[i, j];
         Texture2D texture = TextureAssets.Tile[Type].Value;
-        Vector2 position = new Vector2(i, j).ToWorldCoordinates(0, 0) + TileExtensions.TileOffset;
-        DoorcaseEntity entity = GetEntity(i, j);
-        
-        spriteBatch.Draw(texture, position, new Rectangle(tile.TileFrameX, tile.TileFrameY + (int)(entity.DoorProgress * 6) * 54, 16, 16), Lighting.GetColor(i, j));
+        Vector2 position = new Vector2(i, j).ToWorldCoordinates(0, 0) + TileExtensions.TileOffset - Main.screenPosition;
+
+        var sourceRectangle = new Rectangle(tile.TileFrameX % 54 / 18 * 16, tile.TileFrameY / 18 * 16 + (int)(entity.DoorProgress * 18) * 64, 16, 16);
+        spriteBatch.Draw(texture, position, sourceRectangle, Lighting.GetColor(i, j));
         return false;
     }
 }

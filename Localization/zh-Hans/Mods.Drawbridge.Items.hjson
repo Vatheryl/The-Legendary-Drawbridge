@@ -567,3 +567,8 @@ RedTablecloth: {
 		{$ClothRemoval}
 		''' */
 }
+
+GothicDoorcaseItem: {
+	// DisplayName: Gothic Doorcase Item
+	// Tooltip: ""
+}
