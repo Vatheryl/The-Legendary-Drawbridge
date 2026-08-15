@@ -572,7 +572,13 @@ RedTablecloth: {
 		'''
 }
 
+DoorcaseCommon: 
+	'''
+	Can be wired to other doorcases to be used as teleporters
+	Can also be opened
+	'''
+
 GothicDoorcaseItem: {
-	DisplayName: Gothic Doorcase Item
-	Tooltip: ""
+	DisplayName: Gothic Doorcase
+	Tooltip: "{$DoorcaseCommon}"
 }
