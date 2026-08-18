@@ -11,6 +11,7 @@ internal class GothicDoorcase : Doorcase
             Item.DefaultToPlaceableTile(ModContent.TileType<GothicDoorcase>());
             Item.value = Item.buyPrice(silver: 50);
             Item.rare = ItemRarityID.Blue;
+            Item.mech = true;
         }
 
         public override void AddRecipes()

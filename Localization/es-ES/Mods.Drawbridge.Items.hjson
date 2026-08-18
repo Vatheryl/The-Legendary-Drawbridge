@@ -568,7 +568,15 @@ RedTablecloth: {
 		''' */
 }
 
+/* DoorcaseCommon:
+	'''
+	Can be wired to other doorcases to be used as teleporters
+	Can be opened
+	Right click an open doorcase to activate it, using it as a mechanism
+	(The tile you right click must be wired up)
+	''' */
+
 GothicDoorcaseItem: {
-	// DisplayName: Gothic Doorcase Item
-	// Tooltip: ""
+	// DisplayName: Gothic Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
 }

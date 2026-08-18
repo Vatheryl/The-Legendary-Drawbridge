@@ -2,10 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using System;
 using System.IO;
-using System.Reflection;
-using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -19,12 +16,20 @@ internal abstract class Doorcase : ModTile
     internal class DoorcaseEntity : ModTileEntity, IClientSideTE
     {
         public float DoorProgress = 0;
-        public bool DoorOpen = false;
+        public bool DoorOpen { get; private set; }
 
         public override bool IsTileValidForEntity(int x, int y)
         {
             Tile tile = Main.tile[x, y];
             return tile.HasTile && ModContent.GetModTile(tile.TileType) is Doorcase;
+        }
+
+        public void OpenDoor(bool newValue)
+        {
+            DoorOpen = newValue;
+
+            if (Main.netMode != NetmodeID.SinglePlayer)
+                ForceSyncTEHandler.Send(ID);
         }
 
         public override void Update() => DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
@@ -153,6 +158,12 @@ internal abstract class Doorcase : ModTile
         HitSound = SoundID.Dig;
     }
 
+    public override void KillMultiTile(int i, int j, int frameX, int frameY)
+    {
+        if (TryGetEntity(i, j, out var entity))
+            entity.Kill(i, j);
+    }
+
     public override bool RightClick(int i, int j)
     {
         Activate(i, j);
@@ -162,6 +173,7 @@ internal abstract class Doorcase : ModTile
     private static void Activate(int i, int j)
     {
         Tile tile = Main.tile[i, j];
+        Point original = new(i, j);
 
         if (!TryGetEntity(ref i, ref j, out DoorcaseEntity entity))
             return;
@@ -169,24 +181,32 @@ internal abstract class Doorcase : ModTile
         if (!BookcaseIsOpen(tile))
         {
             ToggleDoorcaseFrames(i, j, null);
-            entity.DoorOpen = true;
+            entity.OpenDoor(true);
         }
         else
         {
             if (tile.TileFrameX % 54 == 0)
             {
                 ToggleDoorcaseFrames(i, j, null);
-                entity.DoorOpen = false;
+                entity.OpenDoor(false);
             }
             else
             {
-                Wiring.TripWire(i, j, 1, 1);
+                if (Main.netMode != NetmodeID.MultiplayerClient)
+                    Wiring.TripWire(original.X, original.Y, 1, 1);
+                else
+                    SendTripWireHandler.Send(original.X, original.Y, 1, 1);
             }
         }
     }
 
     private static void TryTeleport(int i, int j)
     {
+        Tile tile = Main.tile[i, j];
+
+        if (tile.WallType == WallID.LihzahrdBrickUnsafe && !NPC.downedGolemBoss)
+            return;
+
         if (Wiring._teleport[0].X == -1f)
         {
             Wiring._teleport[0].X = i;
@@ -208,7 +228,7 @@ internal abstract class Doorcase : ModTile
         if (!BookcaseIsOpen(tile) && TryGetEntity(i, j, out DoorcaseEntity entity))
         {
             ToggleDoorcaseFrames(i, j, null);
-            entity.DoorOpen = true;
+            entity.OpenDoor(true);
         }
 
         i -= tile.TileFrameX % 54 / 18;

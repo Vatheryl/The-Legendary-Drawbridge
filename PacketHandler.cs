@@ -30,6 +30,8 @@ internal enum MessageType : byte
     StakeHaulox,
     ArmorHaulox,
     PlaceTablecloth,
+    SendTripWire,
+    ForceSyncTileEntity,
 }
 
 // This is a static class for handling packets.
@@ -59,9 +61,7 @@ internal static class PacketHandler
     public static void SendContextPacket(MessageType msg, int context, int context2 = 0)
     {
         if (Main.netMode == NetmodeID.SinglePlayer)
-        {
             return; // No need to send packets in single player.
-        }
 
         ModPacket packet = ModContent.GetInstance<Drawbridge>().GetPacket();
         packet.Write((byte)msg);
