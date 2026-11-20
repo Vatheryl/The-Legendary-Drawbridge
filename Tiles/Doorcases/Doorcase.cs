@@ -11,45 +11,50 @@ using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles.Doorcases;
 
-internal abstract class Doorcase : ModTile
+/// <summary>
+/// Marker interface for doorcase tiles.
+/// </summary>
+internal interface IDoorcase { }
+
+internal class DoorcaseEntity : ModTileEntity, IClientSideTE
 {
-    internal class DoorcaseEntity : ModTileEntity, IClientSideTE
+    public float DoorProgress = 0;
+    public bool DoorOpen { get; private set; }
+
+    public override bool IsTileValidForEntity(int x, int y)
     {
-        public float DoorProgress = 0;
-        public bool DoorOpen { get; private set; }
-
-        public override bool IsTileValidForEntity(int x, int y)
-        {
-            Tile tile = Main.tile[x, y];
-            return tile.HasTile && ModContent.GetModTile(tile.TileType) is Doorcase;
-        }
-
-        public void OpenDoor(bool newValue)
-        {
-            DoorOpen = newValue;
-
-            if (Main.netMode != NetmodeID.SinglePlayer)
-                ForceSyncTEHandler.Send(ID);
-        }
-
-        public override void Update() => DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
-
-        public override void NetSend(BinaryWriter writer) => writer.Write(DoorOpen);
-        public override void NetReceive(BinaryReader reader) => DoorOpen = reader.ReadBoolean();
-
-        public override void SaveData(TagCompound tag)
-        {
-            tag.Add("open", DoorOpen);
-            tag.Add("prog", DoorProgress);
-        }
-
-        public override void LoadData(TagCompound tag)
-        {
-            DoorOpen = tag.GetBool("open");
-            DoorProgress = tag.GetFloat("prog");
-        }
+        Tile tile = Main.tile[x, y];
+        return tile.HasTile && ModContent.GetModTile(tile.TileType) is IDoorcase;
     }
 
+    public void OpenDoor(bool newValue)
+    {
+        DoorOpen = newValue;
+
+        if (Main.netMode != NetmodeID.SinglePlayer)
+            ForceSyncTEHandler.Send(ID);
+    }
+
+    public override void Update() => DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
+
+    public override void NetSend(BinaryWriter writer) => writer.Write(DoorOpen);
+    public override void NetReceive(BinaryReader reader) => DoorOpen = reader.ReadBoolean();
+
+    public override void SaveData(TagCompound tag)
+    {
+        tag.Add("open", DoorOpen);
+        tag.Add("prog", DoorProgress);
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        DoorOpen = tag.GetBool("open");
+        DoorProgress = tag.GetFloat("prog");
+    }
+}
+
+internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
+{
     private static readonly bool[] _teleportIsDoorcase = [false, false];
 
     public static bool BookcaseIsOpen(Tile tile) => tile.TileFrameX >= 54;
@@ -84,13 +89,13 @@ internal abstract class Doorcase : ModTile
         Point16 pos = newPos.ToTileCoordinates16();
         Tile tile = Main.tile[pos.X, pos.Y - 1];
 
-        if (tile.HasTile && ModContent.GetModTile(tile.TileType) is Doorcase)
+        if (tile.HasTile && ModContent.GetModTile(tile.TileType) is IDoorcase)
             newPos.Y -= 54;
         else
         {
             tile = Main.tile[pos.X + 1, pos.Y - 1];
 
-            if (tile.HasTile && ModContent.GetModTile(tile.TileType) is Doorcase)
+            if (tile.HasTile && ModContent.GetModTile(tile.TileType) is IDoorcase)
                 newPos.Y -= 54;
         }
 
@@ -138,7 +143,7 @@ internal abstract class Doorcase : ModTile
         Main.tileNoAttach[Type] = true;
         Main.tileLavaDeath[Type] = true;
         Main.tileSolid[Type] = false;
-        Main.tileSolidTop[Type] = false;
+        Main.tileSolidTop[Type] = true;
 
         TileID.Sets.DisableSmartCursor[Type] = true;
         TileID.Sets.IsAMechanism[Type] = true;
@@ -151,7 +156,7 @@ internal abstract class Doorcase : ModTile
 
         AddToArray(ref TileID.Sets.RoomNeeds.CountsAsTable);
         AddMapEntry(new Color(120, 85, 60), CreateMapEntryName());
-        RegisterItemDrop(ModContent.ItemType<GothicDoorcase.GothicDoorcaseItem>());
+        RegisterItemDrop(ModContent.ItemType<T>());
 
         AdjTiles = [TileID.Bookcases];
         DustType = DustID.WoodFurniture;
@@ -277,15 +282,18 @@ internal abstract class Doorcase : ModTile
 
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
+        const int FrameHeight = 72;
+
         if (!TryGetEntity(i, j, out DoorcaseEntity entity))
             return false;
         
         Tile tile = Main.tile[i, j];
         Texture2D texture = TextureAssets.Tile[Type].Value;
         Vector2 position = new Vector2(i, j).ToWorldCoordinates(0, 0) + TileExtensions.TileOffset - Main.screenPosition;
+        int frameX = tile.TileFrameX % 54 + 18;
+        int frameY = tile.TileFrameY + (int)(entity.DoorProgress * 9) * FrameHeight;
 
-        var sourceRectangle = new Rectangle(tile.TileFrameX % 54 / 18 * 16, tile.TileFrameY / 18 * 16 + (int)(entity.DoorProgress * 18) * 64, 16, 16);
-        spriteBatch.Draw(texture, position, sourceRectangle, Lighting.GetColor(i, j));
+        spriteBatch.Draw(texture, position, new Rectangle(frameX, frameY, 16, 16), Lighting.GetColor(i, j));
         return false;
     }
 }

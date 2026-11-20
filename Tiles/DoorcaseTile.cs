@@ -208,7 +208,7 @@ public class DoorcaseTile : ModTile
         doorcaseStates.Remove(key);
         UnregisterDoorcaseFromTeleportation(key);
 
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Doorcases.GothicDoorcase.GothicDoorcaseItem>());
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Doorcases.WoodenDoorcase.WoodenDoorcaseItem>());
     }
 
     public override bool CanDrop(int i, int j) => false;
