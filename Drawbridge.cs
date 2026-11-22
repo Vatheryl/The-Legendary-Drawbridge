@@ -14,7 +14,7 @@ public class Drawbridge : Mod
     // Force-load our PlayerDrawLayer so tModLoader discovers it at runtime
     public override void Load()
     {
-        _ = typeof(Systems.IronFieldBardingLayer);
+        _ = typeof(Systems.HorseArmorDrawLayer);
 
         NPCUtils.NPCUtils.TryLoadBestiaryHelper(this);
     }

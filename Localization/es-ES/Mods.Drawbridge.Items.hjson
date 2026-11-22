@@ -567,3 +567,35 @@ RedTablecloth: {
 		{$ClothRemoval}
 		''' */
 }
+
+/* DoorcaseCommon:
+	'''
+	Can be opened and closed with right click
+	Right click on opening to send a signal
+	Allows travel between doorcases when signalled
+	''' */
+
+GothicDoorcaseItem: {
+	// DisplayName: Gothic Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
+}
+
+WoodenDoorcaseItem: {
+	// DisplayName: Wooden Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
+}
+
+BlueDungeonDoorcaseItem: {
+	// DisplayName: Blue Dungeon Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
+}
+
+GreenDungeonDoorcaseItem: {
+	// DisplayName: Green Dungeon Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
+}
+
+PinkDungeonDoorcaseItem: {
+	// DisplayName: Pink Dungeon Doorcase
+	// Tooltip: "{$DoorcaseCommon}"
+}

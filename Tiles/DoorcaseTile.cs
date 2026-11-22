@@ -4,9 +4,11 @@ using Terraria.ID;
 using Terraria.ObjectData;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Drawbridge.Tiles;
 
+[Obsolete("Replaced with new WoodenDoorcas (in-game, among others) and Doorcase (functionality).")]
 public class DoorcaseTile : ModTile
 {
     private const int TELEPORT_COOLDOWN = 60; // 1 second at 60 FPS
@@ -206,7 +208,7 @@ public class DoorcaseTile : ModTile
         doorcaseStates.Remove(key);
         UnregisterDoorcaseFromTeleportation(key);
 
-        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Items.DoorcaseItem>());
+        Item.NewItem(new EntitySource_TileBreak(i, j), i * 16, j * 16, 48, 64, ModContent.ItemType<Doorcases.WoodenDoorcase.WoodenDoorcaseItem>());
     }
 
     public override bool CanDrop(int i, int j) => false;
@@ -316,30 +318,24 @@ public class DoorcaseTile : ModTile
     }
 
     // Teleport a player from one doorcase to another
-    private void TeleportPlayer(Player player, Point fromKey, Point toKey)
+    public static void TeleportPlayer(Player player, Point fromKey, Point toKey)
     {
         // Set teleport cooldown
         playerTeleportCooldown[player.whoAmI] = TELEPORT_COOLDOWN;
-        
+
         // Calculate destination position (center of destination doorcase, at floor level)
         // Position player at the bottom center of the doorcase (3rd row of tiles)
         // toKey.Y + 3 is the tile row below the doorcase where player should stand
         Vector2 destinationPos = new Vector2((toKey.X + 1.5f) * 16, (toKey.Y + 3) * 16 - player.height);
-        
-        // Create dark dust at origin before teleporting
-        CreateTeleportDust(new Vector2((fromKey.X + 1.5f) * 16, (fromKey.Y + 2f) * 16));
-        
-        // Teleport the player (without teleporter particles)
-        player.teleporting = true;
-        player.Teleport(destinationPos, TeleportationStyleID.DebugTeleport); // Use debug style for no particles
-        
+        DefaultTeleportFunctionality(player, fromKey.ToWorldCoordinates(24, 3), destinationPos);
+
         // Create dark dust at destination
         CreateTeleportDust(destinationPos);
-        
+
         // Close both doorcases with animation and sound
         CloseDoorcaseAfterTeleport(fromKey);
         CloseDoorcaseAfterTeleport(toKey);
-        
+
         // Network sync if multiplayer
         if (Main.netMode != NetmodeID.SinglePlayer)
         {
@@ -347,8 +343,18 @@ public class DoorcaseTile : ModTile
         }
     }
 
+    private static void DefaultTeleportFunctionality(Player player, Vector2 currentPos, Vector2 destinationPos)
+    {
+        // Create dark dust at origin before teleporting
+        CreateTeleportDust(new Vector2(currentPos.X, currentPos.Y));
+
+        // Teleport the player (without teleporter particles)
+        player.teleporting = true;
+        player.Teleport(destinationPos, TeleportationStyleID.DebugTeleport); // Use debug style for no particles
+    }
+
     // Create dark dust effect for teleportation (no particles, just dust)
-    private void CreateTeleportDust(Vector2 position)
+    private static void CreateTeleportDust(Vector2 position)
     {
         int dustCount = 25;
         
@@ -381,7 +387,7 @@ public class DoorcaseTile : ModTile
     }
 
     // Close a doorcase after teleportation with animation and sound
-    private void CloseDoorcaseAfterTeleport(Point structureKey)
+    private static void CloseDoorcaseAfterTeleport(Point structureKey)
     {
         // Get or create state for this doorcase
         if (!doorcaseStates.TryGetValue(structureKey, out DoorcaseState state))

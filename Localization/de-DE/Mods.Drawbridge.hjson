@@ -106,3 +106,9 @@ NPCs: {
 
 // "Keybinds.Cycle Mount Armor Overlay.DisplayName": Cycle Mount Armor Overlay
 // Mods.Drawbridge.Tiles.ClockTile: Clock
+
+Slots: {
+	// HorseArmor: Horse Armor
+	// HorseVanity: Vanity
+	// HorseDye: Dye
+}

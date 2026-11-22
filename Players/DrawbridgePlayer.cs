@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Terraria.Localization;
 using Drawbridge.Items.HorseArmor;
 using System.Runtime.CompilerServices;
+using Terraria.ModLoader.IO;
 
 namespace Drawbridge.Players;
 
@@ -20,6 +21,8 @@ public class DrawbridgePlayer : ModPlayer
 
     // Horse armor item equipped in the dedicated slot
     public Item horseArmorSlot = new Item();
+    public Item horseArmorVanity = new Item();
+    public Item horseArmorDye = new Item();
 
     // Per-stable slot storage
     public class StableSlots
@@ -42,13 +45,11 @@ public class DrawbridgePlayer : ModPlayer
         if (Main.netMode == NetmodeID.MultiplayerClient)
         {
             PacketHandler.SendContextPacket(MessageType.ClearSolidTiles, 0);
-            int itemType = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
-            PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, itemType);
+            SendSyncHorseArmor(-1, -1);
+            //PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, itemType);
         }
         else if (Main.netMode == NetmodeID.SinglePlayer)
-        {
             PacketHandler.ClearSolidTiles();
-        }
     }
 
     public override void PostUpdate()
@@ -131,14 +132,10 @@ public class DrawbridgePlayer : ModPlayer
                 Player.velocity = Vector2.Zero;
             }
             else
-            {
                 lastSafePosition = Player.position;
-            }
         }
         else
-        {
             lastSafePosition = Player.position;
-        }
     }
 
     public override void ResetEffects()
@@ -165,25 +162,25 @@ public class DrawbridgePlayer : ModPlayer
         if (hasSpiritVeil && modifiers.DamageSource.SourceNPCIndex != -1)
         {
             NPC npc = Main.npc[modifiers.DamageSource.SourceNPCIndex];
+
             if (npc.type == NPCID.Zombie || npc.type == NPCID.Skeleton)
-            {
                 modifiers.FinalDamage *= 0.9f;
-            }
         }
     }
 
     public override void Initialize()
     {
         lastSafePosition = Player.position;
-        stableSlotsPerStable = new();
+        stableSlotsPerStable = [];
     }
 
-    public override void SaveData(Terraria.ModLoader.IO.TagCompound tag)
+    public override void SaveData(TagCompound tag)
     {
-        var stableData = new List<Terraria.ModLoader.IO.TagCompound>();
+        var stableData = new List<TagCompound>();
+
         foreach (var kvp in stableSlotsPerStable)
         {
-            var entry = new Terraria.ModLoader.IO.TagCompound
+            var entry = new TagCompound
             {
                 ["pos"] = kvp.Key,
                 ["BlessedApple"] = kvp.Value.BlessedApple,
@@ -195,18 +192,24 @@ public class DrawbridgePlayer : ModPlayer
         }
 
         tag["stableSlotsPerStable"] = stableData;
+
         if (horseArmorSlot != null && !horseArmorSlot.IsAir)
-        {
             tag["horseArmorItemType"] = horseArmorSlot.type;
-        }
+
+        if (horseArmorVanity != null && !horseArmorVanity.IsAir)
+            tag["horseArmorVanityType"] = horseArmorVanity.type;
+
+        if (horseArmorDye != null && !horseArmorDye.IsAir)
+            tag["horseArmorDyeType"] = horseArmorDye.type;
     }
 
-    public override void LoadData(Terraria.ModLoader.IO.TagCompound tag)
+    public override void LoadData(TagCompound tag)
     {
-        stableSlotsPerStable = new();
+        stableSlotsPerStable = [];
+
         if (tag.ContainsKey("stableSlotsPerStable"))
         {
-            var stableData = tag.Get<List<Terraria.ModLoader.IO.TagCompound>>("stableSlotsPerStable");
+            var stableData = tag.Get<List<TagCompound>>("stableSlotsPerStable");
             foreach (var entry in stableData)
             {
                 var pos = entry.Get<Point16>("pos");
@@ -220,36 +223,49 @@ public class DrawbridgePlayer : ModPlayer
                 stableSlotsPerStable[pos] = slots;
             }
         }
-        if (tag.ContainsKey("horseArmorItemType"))
+
+        LoadItem(tag, "horseArmorItemType", ref horseArmorSlot);
+        LoadItem(tag, "horseArmorVanityType", ref horseArmorVanity);
+        LoadItem(tag, "horseArmorDyeType", ref horseArmorDye);
+    }
+
+    private static void LoadItem(TagCompound tag, string key, ref Item item)
+    {
+        if (tag.ContainsKey(key))
         {
-            int t = tag.GetInt("horseArmorItemType");
-            horseArmorSlot = new Item();
+            int t = tag.GetInt(key);
+            item = new Item();
+
             if (t != 0)
             {
-                horseArmorSlot.SetDefaults(t);
-                horseArmorSlot.stack = 1;
+                item.SetDefaults(t);
+                item.stack = 1;
             }
         }
         else
-        {
-            horseArmorSlot = new Item();
-        }
+            item = new Item();
     }
 
     public override void CopyClientState(ModPlayer targetCopy)
     {
         var clone = (DrawbridgePlayer)targetCopy;
-        if (horseArmorSlot != null && !horseArmorSlot.IsAir)
+
+        CloneSlotTo(ref horseArmorSlot, ref clone.horseArmorSlot);
+        CloneSlotTo(ref horseArmorVanity, ref clone.horseArmorVanity);
+        CloneSlotTo(ref horseArmorDye, ref clone.horseArmorDye);
+    }
+
+    private static void CloneSlotTo(ref Item slot, ref Item cloneSlot)
+    {
+        if (slot != null && !slot.IsAir)
         {
-            if (clone.horseArmorSlot == null)
-                clone.horseArmorSlot = new Item();
-            horseArmorSlot.CopyNetStateTo(clone.horseArmorSlot);
+            cloneSlot ??= new Item();
+            slot.CopyNetStateTo(cloneSlot);
         }
         else
         {
-            if (clone.horseArmorSlot == null)
-                clone.horseArmorSlot = new Item();
-            clone.horseArmorSlot.TurnToAir();
+            cloneSlot ??= new Item();
+            cloneSlot.TurnToAir();
         }
     }
 
@@ -257,23 +273,35 @@ public class DrawbridgePlayer : ModPlayer
     {
         var old = (DrawbridgePlayer)clientPlayer;
         int oldType = (old.horseArmorSlot != null && !old.horseArmorSlot.IsAir) ? old.horseArmorSlot.type : 0;
+        int oldVan = (old.horseArmorVanity != null && !old.horseArmorVanity.IsAir) ? old.horseArmorVanity.type : 0;
+        int oldDye = (old.horseArmorDye != null && !old.horseArmorDye.IsAir) ? old.horseArmorDye.type : 0;
+        
         int newType = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
-        if (oldType != newType && Main.netMode != NetmodeID.SinglePlayer)
-        {
-            PacketHandler.SendContextPacket(MessageType.SyncHorseArmorSlot, Player.whoAmI, newType);
-        }
+        int newVan = (horseArmorVanity != null && !horseArmorVanity.IsAir) ? horseArmorVanity.type : 0;
+        int newDye = (horseArmorDye != null && !horseArmorDye.IsAir) ? horseArmorDye.type : 0;
+
+        if ((oldType != newType || oldVan != newVan || oldDye != newDye) && Main.netMode != NetmodeID.SinglePlayer)
+            Main.LocalPlayer.GetModPlayer<DrawbridgePlayer>().SendSyncHorseArmor(-1, -1);
     }
 
     public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
     {
         if (Main.netMode == NetmodeID.Server)
-        {
-            int type = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
-            ModPacket p = ModContent.GetInstance<Drawbridge>().GetPacket();
-            p.Write((byte)MessageType.SyncHorseArmorSlot);
-            p.Write(Player.whoAmI);
-            p.Write(type);
-            p.Send(toWho, fromWho);
-        }
+            SendSyncHorseArmor(toWho, fromWho);
+    }
+
+    public void SendSyncHorseArmor(int toWho, int fromWho)
+    {
+        int type = (horseArmorSlot != null && !horseArmorSlot.IsAir) ? horseArmorSlot.type : 0;
+        int vanityType = (horseArmorVanity != null && !horseArmorVanity.IsAir) ? horseArmorVanity.type : 0;
+        int dyeType = (horseArmorDye != null && !horseArmorDye.IsAir) ? horseArmorDye.type : 0;
+
+        PacketHandler.GetPacket(MessageType.SyncHorseArmorSlot);
+        ModPacket p = PacketHandler.GetPacket(MessageType.SyncHorseArmorSlot);
+        p.Write(Player.whoAmI);
+        p.Write(type);
+        p.Write((ushort)vanityType);
+        p.Write((ushort)dyeType);
+        p.Send(toWho, fromWho);
     }
 }

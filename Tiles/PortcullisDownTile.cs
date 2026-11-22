@@ -5,7 +5,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace Drawbridge.Tiles;
@@ -50,6 +49,7 @@ public class PortcullisDownTile : ModTile, IToggleTile
         int segment = tile.TileFrameY / 16; // row 0=top .. 7=bottom
         int originX = i;
         int originY = j - segment + 7; // world Y of bottom tile
+
         for (int y = 0; y < 8; y++)
         {
             int killY = originY - y;
@@ -57,6 +57,7 @@ public class PortcullisDownTile : ModTile, IToggleTile
             if (currentTile.HasTile && currentTile.TileType == Type)
             {
                 currentTile.HasTile = false;
+
                 if (Main.netMode == NetmodeID.Server)
                     NetMessage.SendTileSquare(-1, originX, killY, 1);
             }
@@ -82,16 +83,7 @@ public class PortcullisDownTile : ModTile, IToggleTile
         return true;
     }
 
-    public override void HitWire(int i, int j)
-    {
-        // Only trigger on the top part of the portcullis
-        Tile tile = Main.tile[i, j];
-        int segment = tile.TileFrameY / 16;
-        if (segment == 0)
-        {
-            Toggle(i, j);
-        }
-    }
+    public override void HitWire(int i, int j) => Toggle(i, j);
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
