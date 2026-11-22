@@ -8,7 +8,7 @@ using System;
 
 namespace Drawbridge.Tiles;
 
-[Obsolete("Replaced with new GothicDoorcase (in-game) and Doorcase (functionality).")]
+[Obsolete("Replaced with new WoodenDoorcas (in-game, among others) and Doorcase (functionality).")]
 public class DoorcaseTile : ModTile
 {
     private const int TELEPORT_COOLDOWN = 60; // 1 second at 60 FPS
