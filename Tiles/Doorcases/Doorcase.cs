@@ -165,19 +165,6 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
 
     private void On_Player_Teleport(On_Player.orig_Teleport orig, Player self, Vector2 newPos, int Style, int extraInfo)
     {
-        Point16 pos = newPos.ToTileCoordinates16();
-        Tile tile = Main.tile[pos.X, pos.Y - 1];
-
-        if (tile.HasTile && ModContent.GetModTile(tile.TileType) is IDoorcase)
-            newPos.Y -= 54;
-        else
-        {
-            tile = Main.tile[pos.X + 1, pos.Y - 1];
-
-            if (tile.HasTile && ModContent.GetModTile(tile.TileType) is IDoorcase)
-                newPos.Y -= 54;
-        }
-
         orig(self, newPos, Style, extraInfo);
     }
 
@@ -202,18 +189,30 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
     public static void ModifyHitboxArray(ref Rectangle[] hitboxes)
     {
         if (_teleportIsDoorcase[0])
-            ModifyHitbox(ref hitboxes[0]);
+            ModifyHitbox(ref hitboxes[0], 0);
 
         if (_teleportIsDoorcase[1])
-            ModifyHitbox(ref hitboxes[1]);
+            ModifyHitbox(ref hitboxes[1], 1);
     }
 
-    private static void ModifyHitbox(ref Rectangle rectangle)
+    private static void ModifyHitbox(ref Rectangle rectangle, int index)
     {
-        rectangle.X -= 8;
-        rectangle.Y -= 16;
-        rectangle.Width -= 16;
-        rectangle.Height += 64;
+        ref Vector2 tele = ref Wiring._teleport[index];
+
+        Point16 topLeft = TileObjectData.TopLeft(tele.ToPoint16());
+
+        if (topLeft is { X: -1, Y: -1 })
+        {
+            topLeft = TileObjectData.TopLeft(new Point16((int)tele.X, (int)tele.Y + 1));
+
+            if (topLeft is { X: -1, Y: -1 })
+                topLeft = tele.ToPoint16();
+        }
+
+        rectangle.X = topLeft.X * 16;
+        rectangle.Y = topLeft.Y * 16;
+        rectangle.Width = 16 * 3;
+        rectangle.Height = 16 * 4;
     }
 
     public override void SetStaticDefaults()
@@ -234,7 +233,7 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
         TileObjectData.addTile(Type);
 
         AddToArray(ref TileID.Sets.RoomNeeds.CountsAsTable);
-        AddMapEntry(new Color(120, 85, 60), CreateMapEntryName());
+        AddMapEntry(new Color(191, 142, 111), CreateMapEntryName());
         RegisterItemDrop(ModContent.ItemType<T>());
 
         AdjTiles = [TileID.Bookcases];

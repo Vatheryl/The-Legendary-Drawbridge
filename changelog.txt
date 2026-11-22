@@ -1,12 +1,4 @@
-1.4.3
-- Added horse armor vanity slot
-- Added horse armor dye slot
-- Added horse armor slot icon (instead of the Iron Barding item sprite)
-- Made all current horse armors Blue rarity (instead of White)
-- Overhauled how horse armors are synced, allowing them to be more consistent in multiplayer
-- Stopped horse armors from displaying their defense value in social slots
-- Allowed both Drawbridges and Portcullises to be wired anywhere, instead of only at the base
-- Removed the Gothic Doorcase (existing worlds will continue to have the tile, which now drops the Wooden Doorcase, and the item is replaced with the same)
-- Added Wooden, Blue/Pink/Green Doorcases, crafted with 8 books, 8 wires, 3 fallen stars, and 20 of their material (wood, blue/pink/green brick, respectively) @ Heavy Workbench
-- Increased all Doorcase item max stacks to 9999, instead of 99
-- Reduced all Doorcase sell price from 3 gold to 50 silver
+1.4.3.1
+- Fixed inconsistent offset for doorcase teleports
+- Fixed detection for doorcase teleports
+- Massively improved teleport hitbox for doorcases
