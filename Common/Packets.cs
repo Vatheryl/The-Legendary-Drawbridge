@@ -1,4 +1,5 @@
 ﻿using Drawbridge.Systems.Synchronization;
+using System;
 using System.IO;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -30,6 +31,7 @@ internal class SendTripWireHandler : Handler
     }
 }
 
+[Obsolete("This doesn't work stably.")]
 internal class ForceSyncTEHandler : Handler
 {
     public override MessageType Message => MessageType.ForceSyncTileEntity;
@@ -41,8 +43,10 @@ internal class ForceSyncTEHandler : Handler
 
         using MemoryStream mem = new();
         using BinaryWriter writer = new(mem);
-        TileEntity.ByID[id].NetSend(writer);
-        packet.Write(mem.GetBuffer());
+        ((ModTileEntity)TileEntity.ByID[id]).NetSend(writer);
+        byte[] buffer = mem.GetBuffer();
+        packet.Write((ushort)buffer.Length);
+        packet.Write(buffer);
 
         packet.Send();
     }
@@ -50,8 +54,13 @@ internal class ForceSyncTEHandler : Handler
     public override void Recieve(int whoAmI, BinaryReader reader, bool onServer)
     {
         int id = reader.ReadUInt16();
+        int len = reader.ReadUInt16();
+        byte[] bytes = reader.ReadBytes(len);
 
-        TileEntity.ByID[id].NetReceive(reader);
+        using MemoryStream stream = new(bytes);
+        using BinaryReader newReader = new(stream);
+
+        ((ModTileEntity)TileEntity.ByID[id]).NetReceive(newReader);
         NetMessage.SendData(MessageID.TileEntitySharing, -1, whoAmI, null, id);
     }
 }

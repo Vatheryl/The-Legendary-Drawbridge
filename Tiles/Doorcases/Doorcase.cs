@@ -1,4 +1,5 @@
 ﻿using Drawbridge.Common;
+using Drawbridge.Systems.Synchronization;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -14,10 +15,89 @@ namespace Drawbridge.Tiles.Doorcases;
 /// <summary>
 /// Marker interface for doorcase tiles.
 /// </summary>
-internal interface IDoorcase { }
-
-internal class DoorcaseEntity : ModTileEntity, IClientSideTE
+internal interface IDoorcase
 {
+}
+
+public static class DoorcaseHelper
+{
+    public static bool TryGetEntity(ref int x, ref int y, out DoorcaseEntity entity)
+    {
+        Tile tile = Main.tile[x, y];
+        x -= tile.TileFrameX % 54 / 18;
+        y -= tile.TileFrameY % 72 / 18;
+
+        if (TileEntity.ByPosition.TryGetValue(new Point16(x, y), out TileEntity ent) && ent is DoorcaseEntity doorcase)
+        {
+            entity = doorcase;
+            return true;
+        }
+
+        entity = null;
+        return false;
+    }
+
+    public static bool TryGetEntity(int x, int y, out DoorcaseEntity entity) => TryGetEntity(ref x, ref y, out entity);
+
+    public static void ToggleDoorcaseFrames(int i, int j, bool? open)
+    {
+        Tile tile = Main.tile[i, j];
+        bool openDoor = false;
+
+        if (open is null && TryGetEntity(i, j, out DoorcaseEntity door))
+            openDoor = door.DoorOpen;
+
+        i -= tile.TileFrameX % 54 / 18;
+        j -= tile.TileFrameY % 72 / 18;
+
+        for (int x = i; x < i + 3; ++x)
+        {
+            for (int y = j; y < j + 4; y++)
+            {
+                Tile subTile = Main.tile[x, y];
+                subTile.TileFrameX += (short)(openDoor ? -54 : 54);
+            }
+        }
+
+        if (Main.netMode != NetmodeID.Server)
+            NetMessage.SendTileSquare(-1, i, j, 3, 4);
+    }
+
+    public static bool BookcaseIsOpen(Tile tile) => tile.TileFrameX >= 54;
+}
+
+public class DoorcaseEntity : ModTileEntity, IClientSideTE
+{
+    internal class DoorcaseSyncHandler : Handler
+    {
+        public override MessageType Message => MessageType.DoorcaseSync;
+
+        public static void Send(int id, bool open)
+        {
+            ModPacket packet = PacketHandler.GetPacket(MessageType.DoorcaseSync);
+            packet.Write((ushort)id);
+            packet.Write(open);
+            packet.Send();
+        }
+
+        public override void Recieve(int whoAmI, BinaryReader reader, bool onServer)
+        {
+            ushort id = reader.ReadUInt16();
+            bool open = reader.ReadBoolean();
+
+            if (ByID[id] is DoorcaseEntity ent)
+            {
+                ent.DoorOpen = open;
+                Point16 pos = ent.Position;
+
+                if (DoorcaseHelper.BookcaseIsOpen(Main.tile[pos]) != open)
+                    DoorcaseHelper.ToggleDoorcaseFrames(pos.X, pos.Y, open);
+
+                NetMessage.SendData(MessageID.TileEntitySharing, -1, -1, null, id);
+            }
+        }
+    }
+
     public float DoorProgress = 0;
     public bool DoorOpen { get; private set; }
 
@@ -32,7 +112,7 @@ internal class DoorcaseEntity : ModTileEntity, IClientSideTE
         DoorOpen = newValue;
 
         if (Main.netMode != NetmodeID.SinglePlayer)
-            ForceSyncTEHandler.Send(ID);
+            DoorcaseSyncHandler.Send(ID, DoorOpen);
     }
 
     public override void Update() => DoorProgress = MathHelper.Lerp(DoorProgress, DoorOpen ? 1 : 0, 0.1f);
@@ -53,29 +133,28 @@ internal class DoorcaseEntity : ModTileEntity, IClientSideTE
     }
 }
 
+internal abstract class DoorcaseItem<T> : ModItem where T : ModTile, IDoorcase
+{
+    public abstract int Material { get; }
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableTile(ModContent.TileType<T>());
+        Item.value = Item.buyPrice(silver: 50);
+        Item.rare = ItemRarityID.Blue;
+        Item.mech = true;
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe().AddIngredient(ItemID.Book, 8).AddIngredient(ItemID.Wire, 8).AddIngredient(Material, 20).AddIngredient(ItemID.FallenStar, 3)
+            .AddTile(TileID.HeavyWorkBench).Register();
+    }
+}
+
 internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
 {
     private static readonly bool[] _teleportIsDoorcase = [false, false];
-
-    public static bool BookcaseIsOpen(Tile tile) => tile.TileFrameX >= 54;
-
-    public static bool TryGetEntity(ref int x, ref int y, out DoorcaseEntity entity)
-    {
-        Tile tile = Main.tile[x, y];
-        x -= tile.TileFrameX % 54 / 18;
-        y -= tile.TileFrameY % 72 / 18;
-
-        if (TileEntity.ByPosition.TryGetValue(new Point16(x, y), out TileEntity ent) && ent is DoorcaseEntity doorcase)
-        {
-            entity = doorcase;
-            return true;
-        }
-
-        entity = null;
-        return false;
-    }
-
-    public static bool TryGetEntity(int x, int y, out DoorcaseEntity entity) => TryGetEntity(ref x, ref y, out entity);
 
     public override void Load()
     {
@@ -165,7 +244,7 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
-        if (TryGetEntity(i, j, out var entity))
+        if (DoorcaseHelper.TryGetEntity(i, j, out var entity))
             entity.Kill(i, j);
     }
 
@@ -180,19 +259,19 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
         Tile tile = Main.tile[i, j];
         Point original = new(i, j);
 
-        if (!TryGetEntity(ref i, ref j, out DoorcaseEntity entity))
+        if (!DoorcaseHelper.TryGetEntity(ref i, ref j, out DoorcaseEntity entity))
             return;
 
-        if (!BookcaseIsOpen(tile))
+        if (!DoorcaseHelper.BookcaseIsOpen(tile))
         {
-            ToggleDoorcaseFrames(i, j, null);
+            DoorcaseHelper.ToggleDoorcaseFrames(i, j, null);
             entity.OpenDoor(true);
         }
         else
         {
             if (tile.TileFrameX % 54 == 0)
             {
-                ToggleDoorcaseFrames(i, j, null);
+                DoorcaseHelper.ToggleDoorcaseFrames(i, j, null);
                 entity.OpenDoor(false);
             }
             else
@@ -230,9 +309,9 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
     {
         Tile tile = Main.tile[i, j];
 
-        if (!BookcaseIsOpen(tile) && TryGetEntity(i, j, out DoorcaseEntity entity))
+        if (!DoorcaseHelper.BookcaseIsOpen(tile) && DoorcaseHelper.TryGetEntity(i, j, out DoorcaseEntity entity))
         {
-            ToggleDoorcaseFrames(i, j, null);
+            DoorcaseHelper.ToggleDoorcaseFrames(i, j, null);
             entity.OpenDoor(true);
         }
 
@@ -244,34 +323,10 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
                 Wiring.SkipWire(x, y);
     }
 
-    public static void ToggleDoorcaseFrames(int i, int j, bool? open)
-    {
-        Tile tile = Main.tile[i, j];
-        bool openDoor = false;
-
-        if (open is null && TryGetEntity(i, j, out DoorcaseEntity door))
-            openDoor = door.DoorOpen;
-
-        i -= tile.TileFrameX % 54 / 18;
-        j -= tile.TileFrameY % 72 / 18;
-
-        for (int x = i; x < i + 3; ++x)
-        {
-            for (int y = j; y < j + 4; y++)
-            {
-                Tile subTile = Main.tile[x, y];
-                subTile.TileFrameX += (short)(openDoor ? -54 : 54);
-            }
-        }
-
-        if (Main.netMode != NetmodeID.Server)
-            NetMessage.SendTileSquare(-1, i, j, 3, 4);
-    }
-
     public override void MouseOver(int i, int j)
     {
         Tile tile = Main.tile[i, j];
-        bool book = !BookcaseIsOpen(tile) || tile.TileFrameX % 54 == 0;
+        bool book = !DoorcaseHelper.BookcaseIsOpen(tile) || tile.TileFrameX % 54 == 0;
         
         if (book)
         {
@@ -280,11 +335,17 @@ internal abstract class Doorcase<T> : ModTile, IDoorcase where T : ModItem
         }
     }
 
+    public override bool PreDrawPlacementPreview(int i, int j, SpriteBatch spriteBatch, ref Rectangle frame, ref Vector2 position, ref Color color, bool validPlacement, ref SpriteEffects fx)
+    {
+        frame.X += 18;
+        return true;
+    }
+
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
     {
         const int FrameHeight = 72;
 
-        if (!TryGetEntity(i, j, out DoorcaseEntity entity))
+        if (!DoorcaseHelper.TryGetEntity(i, j, out DoorcaseEntity entity))
             return false;
         
         Tile tile = Main.tile[i, j];

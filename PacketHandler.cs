@@ -32,6 +32,7 @@ internal enum MessageType : byte
     PlaceTablecloth,
     SendTripWire,
     ForceSyncTileEntity,
+    DoorcaseSync,
 }
 
 // This is a static class for handling packets.
